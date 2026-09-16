@@ -4,22 +4,146 @@
   --color-base-bg: #15171A;
   --color-surface: #1E2126;
   --color-surface-hover: #262A31;
+  --color-surface-glass: rgba(30, 33, 38, 0.85);
   --color-border: #2E3238;
   --color-accent: #F5A623;
   --color-accent-hover: #FFB74D;
+  --color-accent-glow: rgba(245, 166, 35, 0.15);
   --color-steel: #4A90A4;
   --color-text-primary: #E8E9EB;
   --color-text-secondary: #8B9099;
   --color-danger: #E5484D;
+  --color-danger-glow: rgba(229, 72, 77, 0.15);
   --color-success: #3DD68C;
+  --color-success-glow: rgba(61, 214, 140, 0.15);
+  --color-info: #6E9EFF;
+  --color-info-glow: rgba(110, 158, 255, 0.15);
+  --color-warning: #F5A623;
+  --color-warning-glow: rgba(245, 166, 35, 0.15);
 
   --font-display: "Big Shoulders Display", sans-serif;
   --font-body: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-up: slide-up 0.35s ease-out;
+  --animate-slide-down: slide-down 0.25s ease-out;
+  --animate-pulse-subtle: pulse-subtle 2s ease-in-out infinite;
+  --animate-scale-in: scale-in 0.2s ease-out;
 }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+* { box-sizing: border-box; }
 
 body {
   background-color: var(--color-base-bg);
   color: var(--color-text-primary);
   font-family: var(--font-body);
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-base-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-secondary); }
+
+::selection { background: var(--color-accent); color: var(--color-base-bg); }
+
+@layer components {
+  .input {
+    width: 100%;
+    background: var(--color-base-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .input::placeholder { color: var(--color-text-secondary); }
+  .input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-glow);
+  }
+  .input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.375rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.15s;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+  .btn-primary {
+    background: var(--color-accent);
+    color: var(--color-base-bg);
+  }
+  .btn-primary:hover { background: var(--color-accent-hover); box-shadow: 0 4px 12px var(--color-accent-glow); }
+  .btn-ghost {
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    background: transparent;
+  }
+  .btn-ghost:hover { background: var(--color-surface-hover); }
+  .btn-danger {
+    background: var(--color-danger);
+    color: #fff;
+  }
+  .btn-danger:hover { box-shadow: 0 4px 12px var(--color-danger-glow); }
+  .btn-sm { padding: 0.375rem 0.625rem; font-size: 0.8125rem; }
+
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
 }
