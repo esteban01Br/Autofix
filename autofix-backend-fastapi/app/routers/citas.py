@@ -5,7 +5,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import admin, get_current_user
+from app.routers.deps import admin, get_current_user
 from app.database import get_db
 from app.models.enums import EstadoCita
 from app.models.usuario import Usuario
@@ -29,7 +29,7 @@ def crear_cita(payload: CitaCreate, db: Session = Depends(get_db)) -> CitaRespon
 @router.get(
     "",
     response_model=list[CitaResponse],
-    summary="Listar citas (con filtros, orden y paginación)",
+    summary="Listar citas (con filtros, orden y paginaciÃ³n)",
 )
 def listar_citas(
     db: Session = Depends(get_db),

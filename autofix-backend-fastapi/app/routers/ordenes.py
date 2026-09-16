@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import admin, get_current_user
+from app.routers.deps import admin, get_current_user
 from app.database import get_db
 from app.models.enums import EstadoOrden
 from app.models.usuario import Usuario
@@ -18,7 +18,7 @@ from app.schemas.orden_trabajo import (
 )
 from app.services import orden_trabajo_service
 
-router = APIRouter(prefix="/api/ordenes", tags=["Órdenes de Trabajo"])
+router = APIRouter(prefix="/api/ordenes", tags=["Ã“rdenes de Trabajo"])
 
 
 @router.post(
@@ -35,7 +35,7 @@ def crear_orden(payload: OrdenTrabajoCreate, db: Session = Depends(get_db)) -> O
 @router.get(
     "",
     response_model=list[OrdenTrabajoResponse],
-    summary="Listar órdenes (con filtros, orden y paginación)",
+    summary="Listar Ã³rdenes (con filtros, orden y paginaciÃ³n)",
 )
 def listar_ordenes(
     db: Session = Depends(get_db),
@@ -102,7 +102,7 @@ def actualizar_orden(
     "/{orden_id}/estado",
     response_model=OrdenTrabajoResponse,
     summary="Cambiar estado de la orden",
-    description="Al pasar a ENTREGADO se registra la fecha de salida automáticamente.",
+    description="Al pasar a ENTREGADO se registra la fecha de salida automÃ¡ticamente.",
     dependencies=[Depends(admin)],
 )
 def cambiar_estado_orden(
@@ -116,7 +116,7 @@ def cambiar_estado_orden(
 @router.patch(
     "/{orden_id}/mecanico",
     response_model=OrdenTrabajoResponse,
-    summary="Asignar mecánico a la orden",
+    summary="Asignar mecÃ¡nico a la orden",
     dependencies=[Depends(admin)],
 )
 def asignar_mecanico(

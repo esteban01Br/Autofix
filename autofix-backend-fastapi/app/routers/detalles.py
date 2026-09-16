@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import admin, get_current_user
+from app.routers.deps import admin, get_current_user
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.detalle_orden import (
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/api/detalles", tags=["Detalles de Orden"])
     response_model=DetalleOrdenResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Agregar repuesto a una orden",
-    description="Valida el stock y lo descuenta automáticamente.",
+    description="Valida el stock y lo descuenta automÃ¡ticamente.",
     dependencies=[Depends(admin)],
 )
 def crear_detalle(
@@ -35,7 +35,7 @@ def crear_detalle(
 @router.get(
     "",
     response_model=list[DetalleOrdenResponse],
-    summary="Listar detalles (filtro por orden, orden y paginación)",
+    summary="Listar detalles (filtro por orden, orden y paginaciÃ³n)",
 )
 def listar_detalles(
     db: Session = Depends(get_db),
@@ -64,7 +64,7 @@ def listar_detalles(
 @router.get(
     "/orden/{orden_id}",
     response_model=list[DetalleOrdenResponse],
-    summary="Listar detalles de una orden específica",
+    summary="Listar detalles de una orden especÃ­fica",
 )
 def listar_detalles_por_orden(
     orden_id: int,

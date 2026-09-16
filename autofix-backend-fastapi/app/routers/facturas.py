@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import admin, get_current_user
+from app.routers.deps import admin, get_current_user
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.factura import FacturaCreate, FacturaResponse
@@ -29,7 +29,7 @@ def crear_factura(payload: FacturaCreate, db: Session = Depends(get_db)) -> Fact
 @router.get(
     "",
     response_model=list[FacturaResponse],
-    summary="Listar facturas (con filtros, orden y paginación)",
+    summary="Listar facturas (con filtros, orden y paginaciÃ³n)",
 )
 def listar_facturas(
     db: Session = Depends(get_db),

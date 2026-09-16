@@ -16,15 +16,15 @@ import { useAuth } from '../context/AuthContext';
 import Badge from './Badge';
 
 const modulos = [
-  { to: '/dashboard', label: 'Panel', icon: LayoutDashboard },
-  { to: '/usuarios', label: 'Usuarios', icon: Users },
-  { to: '/clientes', label: 'Clientes', icon: UserCog },
-  { to: '/vehiculos', label: 'Vehículos', icon: Car },
-  { to: '/citas', label: 'Citas', icon: Calendar },
-  { to: '/mecanicos', label: 'Mecánicos', icon: Activity },
-  { to: '/ordenes', label: 'Órdenes', icon: Wrench },
-  { to: '/repuestos', label: 'Repuestos', icon: Package },
-  { to: '/facturas', label: 'Facturas', icon: Receipt },
+  { to: '/dashboard', label: 'Panel', icon: LayoutDashboard, roles: ['ADMIN', 'MECANICO', 'CLIENTE'] },
+  { to: '/usuarios', label: 'Usuarios', icon: Users, roles: ['ADMIN'] },
+  { to: '/clientes', label: 'Clientes', icon: UserCog, roles: ['ADMIN', 'MECANICO'] },
+  { to: '/vehiculos', label: 'Vehículos', icon: Car, roles: ['ADMIN', 'MECANICO', 'CLIENTE'] },
+  { to: '/citas', label: 'Citas', icon: Calendar, roles: ['ADMIN', 'MECANICO', 'CLIENTE'] },
+  { to: '/mecanicos', label: 'Mecánicos', icon: Activity, roles: ['ADMIN'] },
+  { to: '/ordenes', label: 'Órdenes', icon: Wrench, roles: ['ADMIN', 'MECANICO'] },
+  { to: '/repuestos', label: 'Repuestos', icon: Package, roles: ['ADMIN', 'MECANICO'] },
+  { to: '/facturas', label: 'Facturas', icon: Receipt, roles: ['ADMIN', 'MECANICO', 'CLIENTE'] },
 ];
 
 export default function Sidebar({ abierto, cerrar }) {
@@ -35,6 +35,8 @@ export default function Sidebar({ abierto, cerrar }) {
     logout();
     navigate('/login');
   };
+
+  const visibles = modulos.filter((m) => (usuario?.rol ? m.roles.includes(usuario.rol) : false));
 
   return (
     <>
@@ -63,7 +65,7 @@ export default function Sidebar({ abierto, cerrar }) {
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {modulos.map(({ to, label, icon: Icon }) => (
+          {visibles.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}

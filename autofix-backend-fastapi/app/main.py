@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import (
+from app.routers import (
     auth,
     citas,
     clientes,
@@ -25,16 +25,16 @@ from app.errors import unhandled_exception_handler, validation_exception_handler
 import app.models  # noqa: F401  (importa y registra todos los modelos)
 
 OPENAPI_TAGS = [
-    {"name": "Autenticación", "description": "Inicio de sesión, registro y perfil (JWT)."},
-    {"name": "Usuarios", "description": "Gestión de usuarios. Solo administradores."},
-    {"name": "Clientes", "description": "Gestión de clientes del taller."},
-    {"name": "Vehículos", "description": "Gestión de vehículos registrados."},
-    {"name": "Mecánicos", "description": "Gestión de mecánicos del taller."},
+    {"name": "AutenticaciÃ³n", "description": "Inicio de sesiÃ³n, registro y perfil (JWT)."},
+    {"name": "Usuarios", "description": "GestiÃ³n de usuarios. Solo administradores."},
+    {"name": "Clientes", "description": "GestiÃ³n de clientes del taller."},
+    {"name": "VehÃ­culos", "description": "GestiÃ³n de vehÃ­culos registrados."},
+    {"name": "MecÃ¡nicos", "description": "GestiÃ³n de mecÃ¡nicos del taller."},
     {"name": "Citas", "description": "Agendamiento de citas de servicio."},
-    {"name": "Órdenes de Trabajo", "description": "Órdenes de trabajo y su estado."},
+    {"name": "Ã“rdenes de Trabajo", "description": "Ã“rdenes de trabajo y su estado."},
     {"name": "Detalles de Orden", "description": "Repuestos asignados a cada orden."},
     {"name": "Repuestos", "description": "Inventario de repuestos."},
-    {"name": "Facturas", "description": "Facturación automática por orden de trabajo."},
+    {"name": "Facturas", "description": "FacturaciÃ³n automÃ¡tica por orden de trabajo."},
 ]
 
 
@@ -81,7 +81,7 @@ app.include_router(repuestos.router)
 app.include_router(facturas.router)
 
 
-@app.get("/", tags=["Estado"], summary="Información de la API")
+@app.get("/", tags=["Estado"], summary="InformaciÃ³n de la API")
 def raiz() -> dict:
     return {
         "nombre": settings.APP_NAME,

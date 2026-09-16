@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import admin
+from app.routers.deps import admin
 from app.database import get_db
 from app.models.enums import Rol
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioUpdate
@@ -30,7 +30,7 @@ def crear_usuario(payload: UsuarioCreate, db: Session = Depends(get_db)) -> Usua
 @router.get(
     "",
     response_model=list[UsuarioResponse],
-    summary="Listar usuarios (con filtros, orden y paginación)",
+    summary="Listar usuarios (con filtros, orden y paginaciÃ³n)",
     dependencies=[Depends(admin)],
 )
 def listar_usuarios(

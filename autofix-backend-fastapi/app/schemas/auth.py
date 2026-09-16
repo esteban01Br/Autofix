@@ -1,6 +1,6 @@
 """Esquemas de autenticación."""
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class LoginRequest(BaseModel):
@@ -16,6 +16,25 @@ class RegisterRequest(BaseModel):
         min_length=8, max_length=128, description="Contraseña (mínimo 8 caracteres)"
     )
     telefono: str | None = Field(default=None, max_length=20)
+
+    @field_validator("nombre", "apellido")
+    @classmethod
+    def sin_solo_espacios(cls, valor: str) -> str:
+        if not valor.strip():
+            raise ValueError("No puede contener solo espacios")
+        return valor.strip()
+
+    @field_validator("correo")
+    @classmethod
+    def normalizar_correo(cls, valor: str) -> str:
+        return valor.strip().lower()
+
+    @field_validator("contrasena")
+    @classmethod
+    def contrasena_segura(cls, valor: str) -> str:
+        if valor.islower() and valor.isalpha():
+            raise ValueError("Debe contener al menos una mayúscula o un número")
+        return valor
 
 
 class TokenResponse(BaseModel):

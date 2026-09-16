@@ -14,19 +14,18 @@ original (`../autofix-backend`) sin modificaciones.
 ```
 autofix-backend-fastapi/
 ├── app/
-│   ├── api/          # Rutas (APIRouter, una por recurso)
-│   ├── models/       # Modelos SQLAlchemy (ORM) con relaciones
-│   ├── schemas/      # Esquemas Pydantic (entrada/salida) con validaciones
-│   ├── crud/         # Capa CRUD genérica y por entidad
-│   ├── services/     # Lógica de negocio (stock, IVA, estados, autenticación)
-│   ├── main.py       # App FastAPI, CORS, Swagger y manejadores de errores
-│   ├── config.py     # Configuración (variables de entorno)
-│   ├── database.py   # Engine, sesión y get_db
-│   ├── security.py   # JWT (PyJWT) y hash bcrypt
-│   ├── deps.py       # get_current_user / require_roles
-│   ├── errors.py     # Respuestas de error sin información sensible
-│   ├── seed.py       # Crea el administrador por defecto
-│   └── utils.py      # Utilidades (fechas)
+│   ├── routers/       # Rutas (APIRouter, una por recurso) y deps.py (auth/roles)
+│   ├── models/        # Modelos SQLAlchemy (ORM) con relaciones
+│   ├── schemas/       # Esquemas Pydantic (entrada/salida) con validaciones
+│   ├── crud/          # Capa CRUD genérica y por entidad
+│   ├── services/      # Lógica de negocio (stock, IVA, estados, autenticación)
+│   ├── main.py        # App FastAPI, CORS, Swagger y manejadores de errores
+│   ├── config.py      # Configuración (variables de entorno)
+│   ├── database.py    # Engine, sesión y get_db
+│   ├── security.py    # JWT (PyJWT) y hash bcrypt
+│   ├── errors.py      # Respuestas de error sin información sensible
+│   ├── seed.py        # Crea el administrador por defecto
+│   └── utils.py       # Utilidades (fechas)
 ├── tests/            # Pruebas con pytest + TestClient
 ├── requirements.txt
 ├── .env.example      # Plantilla de variables de entorno

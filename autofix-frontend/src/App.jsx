@@ -53,11 +53,11 @@ export default function App() {
           }
         >
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/usuarios" element={<Usuarios />} />
+          <Route path="/usuarios" element={<ProtectedRoute roles={['ADMIN']}><Usuarios /></ProtectedRoute>} />
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/vehiculos" element={<Vehiculos />} />
           <Route path="/citas" element={<Citas />} />
-          <Route path="/mecanicos" element={<Mecanicos />} />
+          <Route path="/mecanicos" element={<ProtectedRoute roles={['ADMIN', 'MECANICO']}><Mecanicos /></ProtectedRoute>} />
           <Route path="/ordenes" element={<Ordenes />} />
           <Route path="/repuestos" element={<Repuestos />} />
           <Route path="/facturas" element={<Facturas />} />

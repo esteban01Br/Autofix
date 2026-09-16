@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import admin, get_current_user
+from app.routers.deps import admin, get_current_user
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.repuesto import (
@@ -31,13 +31,13 @@ def crear_repuesto(payload: RepuestoCreate, db: Session = Depends(get_db)) -> Re
 @router.get(
     "",
     response_model=list[RepuestoResponse],
-    summary="Listar repuestos (con filtros, orden y paginación)",
+    summary="Listar repuestos (con filtros, orden y paginaciÃ³n)",
 )
 def listar_repuestos(
     db: Session = Depends(get_db),
     resp: Response = Response(),
     _usuario: Usuario = Depends(get_current_user),
-    busqueda: str | None = Query(None, description="Filtra por nombre o descripción"),
+    busqueda: str | None = Query(None, description="Filtra por nombre o descripciÃ³n"),
     stock_min: int | None = Query(None, ge=0),
     stock_max: int | None = Query(None, ge=0),
     orden: str | None = Query(

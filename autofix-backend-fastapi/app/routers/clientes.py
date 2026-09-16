@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import admin, get_current_user
+from app.routers.deps import admin, get_current_user
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.cliente import ClienteCreate, ClienteResponse, ClienteUpdate
@@ -26,13 +26,13 @@ def crear_cliente(payload: ClienteCreate, db: Session = Depends(get_db)) -> Clie
 @router.get(
     "",
     response_model=list[ClienteResponse],
-    summary="Listar clientes (con filtros, orden y paginación)",
+    summary="Listar clientes (con filtros, orden y paginaciÃ³n)",
 )
 def listar_clientes(
     db: Session = Depends(get_db),
     resp: Response = Response(),
     _usuario: Usuario = Depends(get_current_user),
-    busqueda: str | None = Query(None, description="Filtra por nombre, apellido, correo o dirección"),
+    busqueda: str | None = Query(None, description="Filtra por nombre, apellido, correo o direcciÃ³n"),
     orden: str | None = Query(
         None, description="Campo de orden: id, direccion, nombre, apellido, correo"
     ),

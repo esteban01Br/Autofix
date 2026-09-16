@@ -1,22 +1,22 @@
-"""Rutas de Mecánico."""
+"""Rutas de MecÃ¡nico."""
 
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import admin, get_current_user
+from app.routers.deps import admin, get_current_user
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.mecanico import MecanicoCreate, MecanicoResponse, MecanicoUpdate
 from app.services import mecanico_service
 
-router = APIRouter(prefix="/api/mecanicos", tags=["Mecánicos"])
+router = APIRouter(prefix="/api/mecanicos", tags=["MecÃ¡nicos"])
 
 
 @router.post(
     "",
     response_model=MecanicoResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Crear mecánico",
+    summary="Crear mecÃ¡nico",
     dependencies=[Depends(admin)],
 )
 def crear_mecanico(payload: MecanicoCreate, db: Session = Depends(get_db)) -> MecanicoResponse:
@@ -26,7 +26,7 @@ def crear_mecanico(payload: MecanicoCreate, db: Session = Depends(get_db)) -> Me
 @router.get(
     "",
     response_model=list[MecanicoResponse],
-    summary="Listar mecánicos (con filtros, orden y paginación)",
+    summary="Listar mecÃ¡nicos (con filtros, orden y paginaciÃ³n)",
 )
 def listar_mecanicos(
     db: Session = Depends(get_db),
@@ -57,7 +57,7 @@ def listar_mecanicos(
 @router.get(
     "/{mecanico_id}",
     response_model=MecanicoResponse,
-    summary="Obtener mecánico por id",
+    summary="Obtener mecÃ¡nico por id",
 )
 def obtener_mecanico(
     mecanico_id: int,
@@ -70,7 +70,7 @@ def obtener_mecanico(
 @router.put(
     "/{mecanico_id}",
     response_model=MecanicoResponse,
-    summary="Actualizar mecánico",
+    summary="Actualizar mecÃ¡nico",
     dependencies=[Depends(admin)],
 )
 def actualizar_mecanico(
@@ -84,7 +84,7 @@ def actualizar_mecanico(
 @router.delete(
     "/{mecanico_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Eliminar mecánico",
+    summary="Eliminar mecÃ¡nico",
     dependencies=[Depends(admin)],
 )
 def eliminar_mecanico(mecanico_id: int, db: Session = Depends(get_db)) -> Response:
