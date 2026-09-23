@@ -135,6 +135,16 @@ body {
     border-radius: 0.75rem;
   }
 
+  .bg-workshop {
+    background-color: #14161a;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+      radial-gradient(ellipse at top, rgba(245, 166, 35, 0.06), transparent 55%),
+      radial-gradient(ellipse at bottom, rgba(74, 144, 164, 0.07), transparent 55%);
+    background-size: 44px 44px, 44px 44px, 100% 100%, 100% 100%;
+  }
+
   .badge {
     display: inline-flex;
     align-items: center;

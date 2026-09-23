@@ -1,8 +1,39 @@
 import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { Wrench, Mail, Lock, Eye, EyeOff, ArrowRight, Car, Package, Calendar, Receipt } from 'lucide-react';
+import {
+  Wrench,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Car,
+  Package,
+  Calendar,
+  Receipt,
+  AlertCircle,
+  ShieldCheck,
+  Users,
+  Clock,
+  CheckCircle2,
+  KeyRound,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
+
+const estadisticas = [
+  { icon: Car, etiqueta: 'Vehículos gestionados', valor: '1.200+' },
+  { icon: Users, etiqueta: 'Clientes registrados', valor: '850+' },
+  { icon: Clock, etiqueta: 'Órdenes por mes', valor: '320' },
+  { icon: CheckCircle2, etiqueta: 'Satisfacción', valor: '98%' },
+];
+
+const funcionalidades = [
+  { icon: Car, texto: 'Vehículos y clientes' },
+  { icon: Calendar, texto: 'Citas agendadas' },
+  { icon: Wrench, texto: 'Órdenes de trabajo' },
+  { icon: Receipt, texto: 'Facturas con IVA 19%' },
+];
 
 export default function Login() {
   const [correo, setCorreo] = useState('');
@@ -10,6 +41,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [verContrasena, setVerContrasena] = useState(false);
+  const [recordarme, setRecordarme] = useState(true);
   const { usuario, login } = useAuth();
   const navigate = useNavigate();
 
@@ -17,16 +49,52 @@ export default function Login() {
     return <Navigate to="/dashboard" replace />;
   }
 
+  const manejarError = (err) => {
+    if (!err?.response) {
+      setError(
+        'No se pudo conectar con el servidor. ' +
+          'Confirma que el backend esté ejecutándose.'
+      );
+      return;
+    }
+
+    const detalle = err.response.data?.detail;
+    if (detalle && typeof detalle === 'string') {
+      if (detalle.includes('No se pudo conectar') || detalle.includes('backend')) {
+        setError(detalle);
+        return;
+      }
+      setError(`${detalle} Inténtalo con: admin@autofix.com / Admin123!`);
+    } else {
+      setError('Correo o contraseña incorrectos. Inténtalo con: admin@autofix.com / Admin123!');
+    }
+  };
+
+  const rellenarCredenciales = () => {
+    setCorreo('admin@autofix.com');
+    setContrasena('Admin123!');
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!correo.trim() || !contrasena.trim()) {
+      setError('Ingresa tu correo y tu contraseña para continuar.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) {
+      setError('El correo electrónico no tiene un formato válido.');
+      return;
+    }
+
     setCargando(true);
     try {
-      await login(correo, contrasena);
+      await login(correo.trim(), contrasena);
       navigate('/dashboard');
     } catch (err) {
-      const detalle = err?.response?.data?.detail;
-      setError(detalle || 'Correo o contraseña incorrectos');
+      manejarError(err);
     } finally {
       setCargando(false);
     }
@@ -35,19 +103,23 @@ export default function Login() {
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-base-bg">
       {/* Panel de marca */}
-      <div className="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden border-r border-border bg-gradient-to-br from-surface via-base-bg to-base-bg">
+      <div className="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden border-r border-border bg-workshop">
         <div
-          className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-20 blur-3xl bg-accent"
+          className="absolute -top-32 -right-32 w-96 h-96 rounded-full opacity-25 blur-3xl bg-accent"
           aria-hidden
         />
         <div
-          className="absolute -bottom-40 -left-24 w-96 h-96 rounded-full opacity-10 blur-3xl bg-steel"
+          className="absolute -bottom-40 -left-24 w-96 h-96 rounded-full opacity-15 blur-3xl bg-steel"
+          aria-hidden
+        />
+        <div
+          className="absolute top-1/4 -left-16 w-64 h-64 rounded-full opacity-10 blur-3xl bg-danger"
           aria-hidden
         />
 
-        <div className="relative z-10">
+        <div className="relative z-10 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-accent flex items-center justify-center text-base-bg">
+            <div className="w-11 h-11 rounded-xl bg-accent flex items-center justify-center text-base-bg shadow-lg shadow-accent-glow">
               <Wrench size={22} />
             </div>
             <div>
@@ -57,44 +129,59 @@ export default function Login() {
               <p className="text-xs text-text-secondary">Sistema de gestión de taller</p>
             </div>
           </div>
+
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/25 text-xs font-semibold text-success animate-fade-in">
+            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse-subtle" />
+            Sistema operativo
+          </span>
         </div>
 
-        <div className="relative z-10">
+        <div className="relative z-10 max-w-lg">
           <h2 className="font-display text-5xl font-extrabold leading-tight text-text-primary">
-            Taller mecánico
+            Tu taller mecánico,
             <br />
             <span className="text-accent">bajo control total.</span>
           </h2>
-          <p className="mt-4 text-text-secondary max-w-md">
-            Gestiona clientes, vehículos, citas, órdenes de trabajo, repuestos y facturación
-            desde un solo panel, con trazabilidad y stock en tiempo real.
+          <p className="mt-5 text-text-secondary leading-relaxed">
+            Gestiona clientes, vehículos, citas, órdenes de trabajo, repuestos y
+            facturación desde un solo panel, con trazabilidad completa y stock en
+            tiempo real.
           </p>
 
           <div className="mt-8 grid grid-cols-2 gap-3 max-w-md">
-            {[
-              { icon: Car, texto: 'Vehículos y clientes' },
-              { icon: Calendar, texto: 'Citas agendadas' },
-              { icon: Wrench, texto: 'Órdenes de trabajo' },
-              { icon: Receipt, texto: 'Facturas con IVA 19%' },
-            ].map(({ icon: Icon, texto }) => (
+            {funcionalidades.map(({ icon: Icon, texto }) => (
               <div
                 key={texto}
-                className="flex items-center gap-2.5 py-2.5 px-3 rounded-lg bg-surface/60 border border-border/60"
+                className="flex items-center gap-2.5 py-2.5 px-3 rounded-lg bg-surface/70 border border-border/70 backdrop-blur-sm"
               >
-                <Icon size={16} className="text-steel shrink-0" />
+                <span className="w-7 h-7 rounded-md bg-accent-glow flex items-center justify-center text-accent shrink-0">
+                  <Icon size={14} />
+                </span>
                 <span className="text-sm text-text-primary">{texto}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 grid grid-cols-4 gap-3">
+            {estadisticas.map(({ icon: Icon, etiqueta, valor }) => (
+              <div key={etiqueta} className="text-center">
+                <div className="mx-auto w-9 h-9 rounded-lg bg-steel/15 border border-steel/20 flex items-center justify-center text-steel">
+                  <Icon size={16} />
+                </div>
+                <p className="font-display text-2xl font-bold text-text-primary mt-2">{valor}</p>
+                <p className="text-[11px] text-text-secondary leading-tight">{etiqueta}</p>
               </div>
             ))}
           </div>
         </div>
 
         <p className="relative z-10 text-xs text-text-secondary">
-          © {new Date().getFullYear()} AutoFix · Panel administrativo
+          © {new Date().getFullYear()} AutoFix · Panel administrativo del taller
         </p>
       </div>
 
       {/* Panel de formulario */}
-      <div className="flex items-center justify-center p-6">
+      <div className="flex items-center justify-center p-6 bg-base-bg">
         <div className="w-full max-w-sm animate-slide-up">
           <div className="lg:hidden mb-8 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-base-bg">
@@ -105,13 +192,17 @@ export default function Login() {
             </h1>
           </div>
 
-          <div className="card p-8">
+          <div className="card p-8 shadow-2xl shadow-black/30">
+            <div className="flex items-center gap-2 mb-1 text-accent">
+              <ShieldCheck size={18} />
+              <span className="text-xs font-semibold uppercase tracking-wider">Acceso restringido</span>
+            </div>
             <h2 className="font-display text-2xl font-bold text-text-primary">Iniciar sesión</h2>
             <p className="text-sm text-text-secondary mt-1 mb-6">
-              Ingresa tus credenciales para acceder al panel.
+              Ingresa tus credenciales para acceder al panel del taller.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               <div>
                 <label className="label" htmlFor="correo">Correo electrónico</label>
                 <div className="relative">
@@ -122,15 +213,26 @@ export default function Login() {
                     className="input pl-9"
                     placeholder="admin@autofix.com"
                     value={correo}
-                    onChange={(e) => setCorreo(e.target.value)}
+                    onChange={(e) => { setCorreo(e.target.value); if (error) setError(''); }}
                     autoComplete="email"
-                    required
+                    aria-invalid={!!error}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="label" htmlFor="contrasena">Contraseña</label>
+                <div className="flex items-center justify-between">
+                  <label className="label" htmlFor="contrasena">Contraseña</label>
+                  <button
+                    type="button"
+                    className="text-xs text-steel hover:text-accent transition-colors"
+                    onClick={() =>
+                      setError('Recuerda que tu contraseña por defecto es: Admin123!')
+                    }
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none" />
                   <input
@@ -139,9 +241,9 @@ export default function Login() {
                     className="input pl-9 pr-10"
                     placeholder="••••••••"
                     value={contrasena}
-                    onChange={(e) => setContrasena(e.target.value)}
+                    onChange={(e) => { setContrasena(e.target.value); if (error) setError(''); }}
                     autoComplete="current-password"
-                    required
+                    aria-invalid={!!error}
                   />
                   <button
                     type="button"
@@ -155,26 +257,48 @@ export default function Login() {
               </div>
 
               {error && (
-                <div className="p-3 rounded-lg bg-danger/10 border border-danger/30 text-sm text-danger animate-fade-in">
-                  {error}
+                <div
+                  role="alert"
+                  className="flex items-start gap-2.5 p-3 rounded-lg bg-danger/10 border border-danger/30 text-sm text-danger animate-fade-in"
+                >
+                  <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                  <span>{error}</span>
                 </div>
               )}
+
+              <label className="flex items-center gap-2 select-none cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={recordarme}
+                  onChange={(e) => setRecordarme(e.target.checked)}
+                  className="w-4 h-4 rounded border-border bg-base-bg accent-accent cursor-pointer"
+                />
+                <span className="text-sm text-text-secondary">Recordarme en este equipo</span>
+              </label>
+
+              <button
+                type="button"
+                onClick={rellenarCredenciales}
+                className="btn btn-ghost w-full py-2"
+              >
+                <KeyRound size={16} /> Rellenar credenciales de prueba
+              </button>
 
               <button type="submit" className="btn btn-primary w-full py-2.5" disabled={cargando}>
                 {cargando ? (
                   <>
-                    <Spinner size={16} /> Ingresando...
+                    <Spinner size={16} /> Verificando credenciales...
                   </>
                 ) : (
                   <>
-                    Entrar <ArrowRight size={16} />
+                    Entrar al panel <ArrowRight size={16} />
                   </>
                 )}
               </button>
             </form>
           </div>
 
-          <div className="mt-4 card p-4 flex items-start gap-3 animate-fade-in">
+          <div className="mt-4 card p-4 flex items-start gap-3 animate-fade-in shadow-xl shadow-black/20">
             <div className="w-8 h-8 rounded-full bg-success/15 flex items-center justify-center text-success shrink-0 mt-0.5">
               <Package size={15} />
             </div>

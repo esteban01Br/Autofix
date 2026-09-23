@@ -14,7 +14,7 @@ class RepuestoCreate(BaseModel):
 
 class RepuestoUpdate(BaseModel):
     nombre: str | None = Field(default=None, min_length=1, max_length=150)
-    descripcion: str | None = Field(default=None, max_length=500)
+    descripcion: str | None = Field(default=None, max_legth=500)
     stock: int | None = Field(default=None, ge=0)
     precio: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
 
