@@ -1,5 +1,7 @@
 from app.database import Base
 from app.models.enums import EstadoCita, EstadoOrden, Rol
+from app.models.empresa import Empresa
+from app.models.sucursal import Sucursal
 from app.models.usuario import Usuario
 from app.models.cliente import Cliente
 from app.models.vehiculo import Vehiculo
@@ -15,6 +17,8 @@ __all__ = [
     "Rol",
     "EstadoCita",
     "EstadoOrden",
+    "Empresa",
+    "Sucursal",
     "Usuario",
     "Cliente",
     "Vehiculo",

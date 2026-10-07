@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.usuario import get_by_correo
 from app.database import get_db  # re-export para uso en rutas
+from app.models.enums import Rol
 from app.models.usuario import Usuario
 from app.security import decode_token
 
@@ -61,4 +62,16 @@ def require_roles(*roles: str) -> Callable[..., Usuario]:
 
 # Dependencias listas para usar en las rutas.
 admin = require_roles("ADMIN")
+superadmin = require_roles("SUPERADMIN")
 lectura_administrativa = require_roles("ADMIN", "MECANICO", "CLIENTE")
+
+
+def empresa_filtro(usuario: Usuario) -> int | None:
+    """Empresa con la que se deben filtrar las consultas del usuario.
+
+    Devuelve None para SUPERADMIN (ve los datos de TODAS las empresas);
+    para el resto, su propia empresa (aislamiento multiempresa).
+    """
+    if usuario.rol == Rol.SUPERADMIN:
+        return None
+    return usuario.empresa_id

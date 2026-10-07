@@ -5,7 +5,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, get_current_user
+from app.routers.deps import admin, empresa_filtro, get_current_user
 from app.database import get_db
 from app.models.enums import EstadoCita
 from app.models.usuario import Usuario
@@ -20,21 +20,24 @@ router = APIRouter(prefix="/api/citas", tags=["Citas"])
     response_model=CitaResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Crear cita",
-    dependencies=[Depends(admin)],
 )
-def crear_cita(payload: CitaCreate, db: Session = Depends(get_db)) -> CitaResponse:
-    return cita_service.crear_cita(db, payload)
+def crear_cita(
+    payload: CitaCreate,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
+) -> CitaResponse:
+    return cita_service.crear_cita(db, usuario.empresa_id, payload)
 
 
 @router.get(
     "",
     response_model=list[CitaResponse],
-    summary="Listar citas (con filtros, orden y paginaciÃ³n)",
+    summary="Listar citas (con filtros, orden y paginación)",
 )
 def listar_citas(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    _usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(get_current_user),
     estado: EstadoCita | None = Query(None),
     desde: date | None = Query(None),
     hasta: date | None = Query(None),
@@ -48,6 +51,7 @@ def listar_citas(
 ) -> list[CitaResponse]:
     items, total = cita_service.listar_citas(
         db,
+        empresa_filtro(usuario),
         estado=estado,
         desde=desde,
         hasta=hasta,
@@ -69,45 +73,48 @@ def listar_citas(
 def obtener_cita(
     cita_id: int,
     db: Session = Depends(get_db),
-    _usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(get_current_user),
 ) -> CitaResponse:
-    return cita_service.obtener_cita(db, cita_id)
+    return cita_service.obtener_cita(db, empresa_filtro(usuario), cita_id)
 
 
 @router.put(
     "/{cita_id}",
     response_model=CitaResponse,
     summary="Actualizar cita",
-    dependencies=[Depends(admin)],
 )
 def actualizar_cita(
     cita_id: int,
     payload: CitaUpdate,
     db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
 ) -> CitaResponse:
-    return cita_service.actualizar_cita(db, cita_id, payload)
+    return cita_service.actualizar_cita(db, empresa_filtro(usuario), cita_id, payload)
 
 
 @router.patch(
     "/{cita_id}/estado",
     response_model=CitaResponse,
     summary="Cambiar estado de la cita",
-    dependencies=[Depends(admin)],
 )
 def cambiar_estado_cita(
     cita_id: int,
     payload: CitaEstadoRequest,
     db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
 ) -> CitaResponse:
-    return cita_service.cambiar_estado(db, cita_id, payload.estado)
+    return cita_service.cambiar_estado(db, empresa_filtro(usuario), cita_id, payload.estado)
 
 
 @router.delete(
     "/{cita_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Eliminar cita",
-    dependencies=[Depends(admin)],
 )
-def eliminar_cita(cita_id: int, db: Session = Depends(get_db)) -> Response:
-    cita_service.eliminar_cita(db, cita_id)
+def eliminar_cita(
+    cita_id: int,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
+) -> Response:
+    cita_service.eliminar_cita(db, empresa_filtro(usuario), cita_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

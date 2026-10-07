@@ -12,6 +12,7 @@ class FacturaCreate(BaseModel):
 
 class FacturaResponse(BaseModel):
     id: int
+    numero: str
     fecha: datetime
     subtotal: Decimal
     iva: Decimal

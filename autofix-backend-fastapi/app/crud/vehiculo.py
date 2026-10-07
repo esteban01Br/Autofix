@@ -1,15 +1,21 @@
 """CRUD de Vehículo: consultas, filtros y ordenamiento permitido."""
 
-from app.crud.base import buscar_por_columna, existe_por_columna
+from sqlalchemy import select
+
 from app.models.vehiculo import Vehiculo
 
 
-def get_by_placa(db, placa: str) -> Vehiculo | None:
-    return buscar_por_columna(db, Vehiculo, Vehiculo.placa, placa.strip().upper())
+def get_by_placa(db, placa: str, empresa_id: int | None = None) -> Vehiculo | None:
+    """Búsqueda por placa exacta, opcionalmente limitada a una empresa."""
+    stmt = select(Vehiculo).where(Vehiculo.placa == placa.strip().upper())
+    if empresa_id is not None:
+        stmt = stmt.where(Vehiculo.empresa_id == empresa_id)
+    stmt = stmt.limit(1)
+    return db.scalars(stmt).first()
 
 
-def exists_placa(db, placa: str) -> bool:
-    return existe_por_columna(db, Vehiculo, Vehiculo.placa, placa.strip().upper())
+def exists_placa(db, placa: str, empresa_id: int | None = None) -> bool:
+    return get_by_placa(db, placa, empresa_id) is not None
 
 
 def construir_filtros(

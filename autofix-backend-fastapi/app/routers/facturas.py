@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, get_current_user
+from app.routers.deps import admin, empresa_filtro, get_current_user
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.factura import FacturaCreate, FacturaResponse
@@ -19,27 +19,31 @@ router = APIRouter(prefix="/api/facturas", tags=["Facturas"])
     response_model=FacturaResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Generar factura de una orden",
-    description="Calcula subtotal, IVA (19%) y total a partir de los detalles de la orden.",
-    dependencies=[Depends(admin)],
+    description="Calcula subtotal, IVA (según la empresa) y total a partir de "
+    "los detalles de la orden, con consecutivo FAC-0001 por empresa.",
 )
-def crear_factura(payload: FacturaCreate, db: Session = Depends(get_db)) -> FacturaResponse:
-    return factura_service.crear_factura(db, payload)
+def crear_factura(
+    payload: FacturaCreate,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
+) -> FacturaResponse:
+    return factura_service.crear_factura(db, usuario.empresa_id, payload)
 
 
 @router.get(
     "",
     response_model=list[FacturaResponse],
-    summary="Listar facturas (con filtros, orden y paginaciÃ³n)",
+    summary="Listar facturas (con filtros, orden y paginación)",
 )
 def listar_facturas(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    _usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(get_current_user),
     desde: date | None = Query(None, description="Fecha desde (YYYY-MM-DD)"),
     hasta: date | None = Query(None, description="Fecha hasta (YYYY-MM-DD)"),
     orden_trabajo_id: int | None = Query(None),
     orden: str | None = Query(
-        None, description="Campo de orden: id, fecha, subtotal, iva, total"
+        None, description="Campo de orden: id, numero, fecha, subtotal, iva, total"
     ),
     direccion: str = Query("asc", pattern="^(asc|desc)$"),
     limit: int | None = Query(None, ge=1, le=100),
@@ -49,6 +53,7 @@ def listar_facturas(
     hasta_dt = datetime.combine(hasta, time.max) if hasta else None
     items, total = factura_service.listar_facturas(
         db,
+        empresa_filtro(usuario),
         desde=desde_dt,
         hasta=hasta_dt,
         orden_trabajo_id=orden_trabajo_id,
@@ -69,17 +74,20 @@ def listar_facturas(
 def obtener_factura(
     factura_id: int,
     db: Session = Depends(get_db),
-    _usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(get_current_user),
 ) -> FacturaResponse:
-    return factura_service.obtener_factura(db, factura_id)
+    return factura_service.obtener_factura(db, empresa_filtro(usuario), factura_id)
 
 
 @router.delete(
     "/{factura_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Eliminar factura",
-    dependencies=[Depends(admin)],
 )
-def eliminar_factura(factura_id: int, db: Session = Depends(get_db)) -> Response:
-    factura_service.eliminar_factura(db, factura_id)
+def eliminar_factura(
+    factura_id: int,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
+) -> Response:
+    factura_service.eliminar_factura(db, empresa_filtro(usuario), factura_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

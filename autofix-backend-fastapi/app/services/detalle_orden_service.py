@@ -20,7 +20,7 @@ from app.schemas.detalle_orden import (
     DetalleOrdenResponse,
     DetalleOrdenUpdate,
 )
-from app.services.base import resolver_orden
+from app.services.base import resolver_orden, verificar_empresa
 
 
 def to_response(detalle: DetalleOrden) -> DetalleOrdenResponse:
@@ -35,13 +35,15 @@ def to_response(detalle: DetalleOrden) -> DetalleOrdenResponse:
     )
 
 
-def crear_detalle(db, orden_id: int, payload: DetalleOrdenCreate) -> DetalleOrdenResponse:
+def crear_detalle(db, empresa_id: int | None, orden_id: int, payload: DetalleOrdenCreate) -> DetalleOrdenResponse:
     orden = crud_base.obtener_o_404(
         db, OrdenTrabajo, orden_id, "Orden de trabajo no encontrada."
     )
+    verificar_empresa(orden, empresa_id, "Orden de trabajo no encontrada.")
     repuesto = crud_base.obtener_o_404(
         db, Repuesto, payload.repuestoId, "Repuesto no encontrado."
     )
+    verificar_empresa(repuesto, empresa_id, "Repuesto no encontrado.")
 
     if repuesto.stock < payload.cantidad:
         raise HTTPException(
@@ -66,6 +68,7 @@ def crear_detalle(db, orden_id: int, payload: DetalleOrdenCreate) -> DetalleOrde
 
 def listar_detalles(
     db,
+    empresa_id: int | None,
     *,
     orden_id: int | None = None,
     orden: str | None = None,
@@ -74,6 +77,9 @@ def listar_detalles(
     offset: int = 0,
 ) -> tuple[list[DetalleOrdenResponse], int]:
     filtros = crud_detalle.construir_filtros(orden_id=orden_id)
+    if empresa_id is not None:
+        # DetalleOrden no tiene empresa_id propio: se filtra por su orden.
+        filtros.append(DetalleOrden.orden_trabajo.has(OrdenTrabajo.empresa_id == empresa_id))
     col, dir_resuelta = resolver_orden(crud_detalle.COLUMNAS_ORDEN, orden, direccion) or (None, direccion)
     detalles = crud_base.listar(
         db,
@@ -88,24 +94,28 @@ def listar_detalles(
     return [to_response(d) for d in detalles], total
 
 
-def listar_por_orden(db, orden_id: int) -> list[DetalleOrdenResponse]:
+def listar_por_orden(db, empresa_id: int | None, orden_id: int) -> list[DetalleOrdenResponse]:
     orden = crud_base.obtener_o_404(
         db, OrdenTrabajo, orden_id, "Orden de trabajo no encontrada."
     )
+    verificar_empresa(orden, empresa_id, "Orden de trabajo no encontrada.")
     return [to_response(d) for d in orden.detalles]
 
 
-def obtener_detalle(db, detalle_id: int) -> DetalleOrdenResponse:
+def _obtener_verificado(db, empresa_id: int | None, detalle_id: int) -> DetalleOrden:
     detalle = crud_base.obtener_o_404(
         db, DetalleOrden, detalle_id, "Detalle no encontrado."
     )
-    return to_response(detalle)
+    verificar_empresa(detalle.orden_trabajo, empresa_id, "Detalle no encontrado.")
+    return detalle
 
 
-def actualizar_detalle(db, detalle_id: int, payload: DetalleOrdenUpdate) -> DetalleOrdenResponse:
-    detalle = crud_base.obtener_o_404(
-        db, DetalleOrden, detalle_id, "Detalle no encontrado."
-    )
+def obtener_detalle(db, empresa_id: int | None, detalle_id: int) -> DetalleOrdenResponse:
+    return to_response(_obtener_verificado(db, empresa_id, detalle_id))
+
+
+def actualizar_detalle(db, empresa_id: int | None, detalle_id: int, payload: DetalleOrdenUpdate) -> DetalleOrdenResponse:
+    detalle = _obtener_verificado(db, empresa_id, detalle_id)
 
     datos = payload.model_dump(exclude_unset=True)
 
@@ -117,6 +127,7 @@ def actualizar_detalle(db, detalle_id: int, payload: DetalleOrdenUpdate) -> Deta
     repuesto_nuevo = crud_base.obtener_o_404(
         db, Repuesto, nuevo_repuesto_id, "Repuesto no encontrado."
     )
+    verificar_empresa(repuesto_nuevo, empresa_id, "Repuesto no encontrado.")
 
     # Efectivo disponible: si es el mismo repuesto, el stock actual ya
     # tiene descontada la cantidad_actual (que aún sigue en la línea).
@@ -149,10 +160,8 @@ def actualizar_detalle(db, detalle_id: int, payload: DetalleOrdenUpdate) -> Deta
     return to_response(detalle)
 
 
-def eliminar_detalle(db, detalle_id: int) -> None:
-    detalle = crud_base.obtener_o_404(
-        db, DetalleOrden, detalle_id, "Detalle no encontrado."
-    )
+def eliminar_detalle(db, empresa_id: int | None, detalle_id: int) -> None:
+    detalle = _obtener_verificado(db, empresa_id, detalle_id)
 
     # Se devuelve el stock del repuesto al eliminar la línea.
     repuesto = detalle.repuesto

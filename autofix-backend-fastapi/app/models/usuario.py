@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, String
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -25,6 +25,14 @@ class Usuario(Base):
         Enum(Rol, name="rol"), nullable=False, default=Rol.CLIENTE
     )
     activo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # Empresa a la que pertenece (NULL solo para SUPERADMIN de plataforma)
+    empresa_id: Mapped[int | None] = mapped_column(
+        ForeignKey("empresas.id"), nullable=True, index=True
+    )
+    # Sucursal asignada (Fase 2); por ahora opcional
+    sucursal_id: Mapped[int | None] = mapped_column(
+        ForeignKey("sucursales.id"), nullable=True, index=True
+    )
     fecha_creacion: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=ahora_utc
     )
@@ -32,6 +40,8 @@ class Usuario(Base):
         DateTime, nullable=False, default=ahora_utc, onupdate=ahora_utc
     )
 
+    empresa = relationship("Empresa", back_populates="usuarios")
+    sucursal = relationship("Sucursal", back_populates="usuarios")
     cliente = relationship(
         "Cliente", back_populates="usuario", uselist=False, cascade="all, delete-orphan"
     )

@@ -8,7 +8,7 @@ from app.models.mecanico import Mecanico
 from app.models.usuario import Usuario
 from app.schemas.mecanico import MecanicoCreate, MecanicoResponse, MecanicoUpdate
 from app.services import usuario_service
-from app.services.base import resolver_orden
+from app.services.base import filtro_empresa, resolver_orden, verificar_empresa
 
 
 def to_response(mecanico: Mecanico) -> MecanicoResponse:
@@ -19,7 +19,7 @@ def to_response(mecanico: Mecanico) -> MecanicoResponse:
     )
 
 
-def crear_mecanico(db, payload: MecanicoCreate) -> MecanicoResponse:
+def crear_mecanico(db, empresa_id: int, payload: MecanicoCreate) -> MecanicoResponse:
     if crud_mecanico.exists_usuario(db, payload.usuarioId):
         raise HTTPException(
             status_code=409, detail="Ese usuario ya está registrado como mecánico."
@@ -28,14 +28,20 @@ def crear_mecanico(db, payload: MecanicoCreate) -> MecanicoResponse:
     usuario = crud_base.obtener_o_404(
         db, Usuario, payload.usuarioId, "Usuario no encontrado."
     )
+    verificar_empresa(usuario, empresa_id, "Usuario no encontrado.")
 
-    mecanico = Mecanico(usuario_id=usuario.id, especialidad=payload.especialidad)
+    mecanico = Mecanico(
+        usuario_id=usuario.id,
+        especialidad=payload.especialidad,
+        empresa_id=empresa_id,
+    )
     crud_base.crear(db, mecanico)
     return to_response(mecanico)
 
 
 def listar_mecanicos(
     db,
+    empresa_id: int | None,
     *,
     busqueda: str | None = None,
     especialidad: str | None = None,
@@ -44,7 +50,7 @@ def listar_mecanicos(
     limit: int | None = None,
     offset: int = 0,
 ) -> tuple[list[MecanicoResponse], int]:
-    filtros = crud_mecanico.construir_filtros(
+    filtros = filtro_empresa(Mecanico, empresa_id) + crud_mecanico.construir_filtros(
         busqueda=busqueda, especialidad=especialidad
     )
     col, dir_resuelta = resolver_orden(crud_mecanico.COLUMNAS_ORDEN, orden, direccion) or (None, direccion)
@@ -61,17 +67,21 @@ def listar_mecanicos(
     return [to_response(m) for m in mecanicos], total
 
 
-def obtener_mecanico(db, mecanico_id: int) -> MecanicoResponse:
+def obtener_mecanico(db, empresa_id: int | None, mecanico_id: int) -> MecanicoResponse:
     mecanico = crud_base.obtener_o_404(
         db, Mecanico, mecanico_id, "Mecánico no encontrado."
     )
+    verificar_empresa(mecanico, empresa_id, "Mecánico no encontrado.")
     return to_response(mecanico)
 
 
-def actualizar_mecanico(db, mecanico_id: int, payload: MecanicoUpdate) -> MecanicoResponse:
+def actualizar_mecanico(
+    db, empresa_id: int | None, mecanico_id: int, payload: MecanicoUpdate
+) -> MecanicoResponse:
     mecanico = crud_base.obtener_o_404(
         db, Mecanico, mecanico_id, "Mecánico no encontrado."
     )
+    verificar_empresa(mecanico, empresa_id, "Mecánico no encontrado.")
 
     datos = payload.model_dump(exclude_unset=True)
 
@@ -79,6 +89,7 @@ def actualizar_mecanico(db, mecanico_id: int, payload: MecanicoUpdate) -> Mecani
         usuario = crud_base.obtener_o_404(
             db, Usuario, datos["usuarioId"], "Usuario no encontrado."
         )
+        verificar_empresa(usuario, empresa_id, "Usuario no encontrado.")
         existente = crud_mecanico.get_by_usuario_id(db, usuario.id)
         if existente is not None and existente.id != mecanico.id:
             raise HTTPException(
@@ -93,10 +104,11 @@ def actualizar_mecanico(db, mecanico_id: int, payload: MecanicoUpdate) -> Mecani
     return to_response(mecanico)
 
 
-def eliminar_mecanico(db, mecanico_id: int) -> None:
+def eliminar_mecanico(db, empresa_id: int | None, mecanico_id: int) -> None:
     mecanico = crud_base.obtener_o_404(
         db, Mecanico, mecanico_id, "Mecánico no encontrado."
     )
+    verificar_empresa(mecanico, empresa_id, "Mecánico no encontrado.")
 
     if mecanico.ordenes:
         raise HTTPException(

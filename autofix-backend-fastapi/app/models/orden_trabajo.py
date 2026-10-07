@@ -32,6 +32,9 @@ class OrdenTrabajo(Base):
     vehiculo_id: Mapped[int] = mapped_column(
         ForeignKey("vehiculos.id"), nullable=False, index=True
     )
+    empresa_id: Mapped[int] = mapped_column(
+        ForeignKey("empresas.id"), nullable=False, index=True
+    )
 
     mecanico = relationship("Mecanico", back_populates="ordenes")
     vehiculo = relationship("Vehiculo", back_populates="ordenes")

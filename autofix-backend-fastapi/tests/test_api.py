@@ -555,6 +555,160 @@ def test_orden_inexistente_404_y_metodo_no_permitido(client, admin_token):
 
 
 # =========================================================
+# MULTIEMPRESA: registro, aislamiento y consecutivos
+# =========================================================
+
+def _registrar_empresa(client, nombre, correo_admin):
+    resp = client.post(
+        "/api/empresas/registro",
+        json={
+            "nombre_empresa": nombre,
+            "nit": f"9{uuid.uuid4().int % 10**8:08d}-1",
+            "nombre": "Dueño",
+            "apellido": nombre,
+            "correo": correo_admin,
+            "contrasena": "Clave123!",
+        },
+    )
+    assert resp.status_code == 201, resp.text
+    datos = resp.json()
+    assert datos["empresa"]["nombre"] == nombre
+    assert datos["empresa"]["activa"] is True
+    return datos["token"], datos["empresa"]["id"]
+
+
+def test_registro_empresa_crea_admin_y_token(client):
+    token, _ = _registrar_empresa(client, f"Taller-{uuid.uuid4().hex[:6]}", f"dueno-{uuid.uuid4().hex[:6]}@taller.com")
+
+    # El token del dueño recién registrado funciona como ADMIN de su empresa
+    resp = client.get("/api/empresas/actual", headers=auth(token))
+    assert resp.status_code == 200
+    assert resp.json()["nombre"].startswith("Taller-")
+
+    # Y puede usar los endpoints operativos de su empresa
+    resp = client.get("/api/repuestos", headers=auth(token))
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
+def test_aislamiento_empresa_a_no_ve_datos_de_b(client):
+    token_a, _ = _registrar_empresa(client, f"EmpresaA-{uuid.uuid4().hex[:6]}", f"a-{uuid.uuid4().hex[:6]}@a.com")
+    token_b, _ = _registrar_empresa(client, f"EmpresaB-{uuid.uuid4().hex[:6]}", f"b-{uuid.uuid4().hex[:6]}@b.com")
+    ha, hb = auth(token_a), auth(token_b)
+    codigo = f"777{uuid.uuid4().int % 10**9:09d}"
+
+    # A crea un repuesto con código de barras
+    resp = client.post(
+        "/api/repuestos",
+        json={"nombre": f"FiltroA-{uuid.uuid4().hex[:6]}", "stock": 5, "precio": "100.00", "codigo_barras": codigo},
+        headers=ha,
+    )
+    assert resp.status_code == 201, resp.text
+    repuesto_a_id = resp.json()["id"]
+
+    # B no lo ve en su lista, ni por id, ni por código de barras
+    assert client.get("/api/repuestos", headers=hb).json() == []
+    assert client.get(f"/api/repuestos/{repuesto_a_id}", headers=hb).status_code == 404
+    assert client.get(f"/api/repuestos/por-codigo/{codigo}", headers=hb).status_code == 404
+
+    # B SÍ puede registrar el mismo código de barras en SU empresa
+    resp = client.post(
+        "/api/repuestos",
+        json={"nombre": f"FiltroB-{uuid.uuid4().hex[:6]}", "stock": 3, "precio": "90.00", "codigo_barras": codigo},
+        headers=hb,
+    )
+    assert resp.status_code == 201, resp.text
+
+    # B tampoco puede modificar ni borrar el repuesto de A
+    assert client.put(f"/api/repuestos/{repuesto_a_id}", json={"stock": 99}, headers=hb).status_code == 404
+    assert client.delete(f"/api/repuestos/{repuesto_a_id}", headers=hb).status_code == 404
+
+
+def test_aislamiento_clientes_y_usuarios(client):
+    token_a, _ = _registrar_empresa(client, f"TallerC-{uuid.uuid4().hex[:6]}", f"c-{uuid.uuid4().hex[:6]}@c.com")
+    token_b, _ = _registrar_empresa(client, f"TallerD-{uuid.uuid4().hex[:6]}", f"d-{uuid.uuid4().hex[:6]}@d.com")
+    ha, hb = auth(token_a), auth(token_b)
+
+    # A crea un usuario CLIENTE en su empresa
+    resp = client.post(
+        "/api/usuarios",
+        json={
+            "nombre": "Cliente",
+            "apellido": "DeA",
+            "correo": f"cliente-{uuid.uuid4().hex[:6]}@correo.com",
+            "contrasena": "Clave123!",
+            "rol": "CLIENTE",
+        },
+        headers=ha,
+    )
+    assert resp.status_code == 201, resp.text
+    usuario_a_id = resp.json()["id"]
+
+    # B no ve ese usuario y no puede crearle un cliente a nombre de él
+    usuarios_b = client.get("/api/usuarios", headers=hb).json()
+    assert all(u["id"] != usuario_a_id for u in usuarios_b)
+    resp = client.post("/api/clientes", json={"usuarioId": usuario_a_id}, headers=hb)
+    assert resp.status_code == 404
+
+    # Nadie puede crear un SUPERADMIN desde la API de empresa
+    resp = client.post(
+        "/api/usuarios",
+        json={
+            "nombre": "Intruso",
+            "apellido": "X",
+            "correo": f"intruso-{uuid.uuid4().hex[:6]}@correo.com",
+            "contrasena": "Clave123!",
+            "rol": "SUPERADMIN",
+        },
+        headers=ha,
+    )
+    assert resp.status_code in (403, 422)
+
+
+def test_superadmin_ve_todas_las_empresas(client, superadmin_token):
+    token_a, _ = _registrar_empresa(client, f"VisibleA-{uuid.uuid4().hex[:6]}", f"va-{uuid.uuid4().hex[:6]}@a.com")
+    client.post(
+        "/api/repuestos",
+        json={"nombre": f"Global-{uuid.uuid4().hex[:6]}", "stock": 1, "precio": "10.00"},
+        headers=auth(token_a),
+    )
+
+    # SUPERADMIN lista empresas y ve repuestos de todas
+    empresas = client.get("/api/empresas", headers=auth(superadmin_token))
+    assert empresas.status_code == 200
+    assert len(empresas.json()) >= 2
+
+    repuestos = client.get("/api/repuestos", headers=auth(superadmin_token)).json()
+    assert any(r["nombre"].startswith("Global-") for r in repuestos)
+
+    # Un ADMIN normal NO puede listar todas las empresas
+    assert client.get("/api/empresas", headers=auth(token_a)).status_code == 403
+
+
+def test_consecutivo_factura_es_por_empresa(client):
+    token_a, _ = _registrar_empresa(client, f"FacA-{uuid.uuid4().hex[:6]}", f"fa-{uuid.uuid4().hex[:6]}@a.com")
+    token_b, _ = _registrar_empresa(client, f"FacB-{uuid.uuid4().hex[:6]}", f"fb-{uuid.uuid4().hex[:6]}@b.com")
+
+    def facturar(token):
+        h = auth(token)
+        cuid = crear_usuario(client, token, correo_unico("fac"))
+        cid = crear_cliente(client, token, cuid)
+        vid = crear_vehiculo(client, token, cid)
+        rid = crear_repuesto(client, token, stock=5, precio="100.00")
+        oid = crear_orden(client, token, vid)
+        client.post(f"/api/detalles/orden/{oid}", json={"repuestoId": rid, "cantidad": 1}, headers=h)
+        resp = client.post("/api/facturas", json={"ordenTrabajoId": oid}, headers=h)
+        assert resp.status_code == 201, resp.text
+        return resp.json()["numero"]
+
+    # Cada empresa arranca su propio consecutivo en FAC-0001
+    assert facturar(token_a) == "FAC-0001"
+    assert facturar(token_b) == "FAC-0001"
+    # Y el siguiente de A es FAC-0002 (no se contamina con B)
+    assert facturar(token_a) == "FAC-0002"
+
+
+# =========================================================
 # AJUSTE DE STOCK AL ACTUALIZAR DETALLE
 # =========================================================
 

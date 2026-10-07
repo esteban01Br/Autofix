@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, get_current_user
+from app.routers.deps import admin, empresa_filtro, get_current_user
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.repuesto import (
@@ -22,22 +22,25 @@ router = APIRouter(prefix="/api/repuestos", tags=["Repuestos"])
     response_model=RepuestoResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Crear repuesto",
-    dependencies=[Depends(admin)],
 )
-def crear_repuesto(payload: RepuestoCreate, db: Session = Depends(get_db)) -> RepuestoResponse:
-    return repuesto_service.crear_repuesto(db, payload)
+def crear_repuesto(
+    payload: RepuestoCreate,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
+) -> RepuestoResponse:
+    return repuesto_service.crear_repuesto(db, usuario.empresa_id, payload)
 
 
 @router.get(
     "",
     response_model=list[RepuestoResponse],
-    summary="Listar repuestos (con filtros, orden y paginaciÃ³n)",
+    summary="Listar repuestos (con filtros, orden y paginación)",
 )
 def listar_repuestos(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    _usuario: Usuario = Depends(get_current_user),
-    busqueda: str | None = Query(None, description="Filtra por nombre o descripciÃ³n"),
+    usuario: Usuario = Depends(get_current_user),
+    busqueda: str | None = Query(None, description="Filtra por nombre, código o descripción"),
     stock_min: int | None = Query(None, ge=0),
     stock_max: int | None = Query(None, ge=0),
     orden: str | None = Query(
@@ -49,6 +52,7 @@ def listar_repuestos(
 ) -> list[RepuestoResponse]:
     items, total = repuesto_service.listar_repuestos(
         db,
+        empresa_filtro(usuario),
         busqueda=busqueda,
         stock_min=stock_min,
         stock_max=stock_max,
@@ -64,15 +68,15 @@ def listar_repuestos(
 @router.get(
     "/por-codigo/{codigo}",
     response_model=RepuestoResponse,
-    summary="Buscar repuesto por código de barras",
+    summary="Buscar repuesto por código de barras (de tu empresa)",
     description="Usado por el escáner: devuelve 404 si el código no está registrado.",
 )
 def buscar_por_codigo(
     codigo: str,
     db: Session = Depends(get_db),
-    _usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(get_current_user),
 ) -> RepuestoResponse:
-    return repuesto_service.obtener_por_codigo(db, codigo)
+    return repuesto_service.obtener_por_codigo(db, empresa_filtro(usuario), codigo)
 
 
 @router.get(
@@ -83,45 +87,48 @@ def buscar_por_codigo(
 def obtener_repuesto(
     repuesto_id: int,
     db: Session = Depends(get_db),
-    _usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(get_current_user),
 ) -> RepuestoResponse:
-    return repuesto_service.obtener_repuesto(db, repuesto_id)
+    return repuesto_service.obtener_repuesto(db, empresa_filtro(usuario), repuesto_id)
 
 
 @router.put(
     "/{repuesto_id}",
     response_model=RepuestoResponse,
     summary="Actualizar repuesto",
-    dependencies=[Depends(admin)],
 )
 def actualizar_repuesto(
     repuesto_id: int,
     payload: RepuestoUpdate,
     db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
 ) -> RepuestoResponse:
-    return repuesto_service.actualizar_repuesto(db, repuesto_id, payload)
+    return repuesto_service.actualizar_repuesto(db, empresa_filtro(usuario), repuesto_id, payload)
 
 
 @router.patch(
     "/{repuesto_id}/stock",
     response_model=RepuestoResponse,
     summary="Ajustar stock (entrada o salida manual)",
-    dependencies=[Depends(admin)],
 )
 def ajustar_stock(
     repuesto_id: int,
     payload: AjusteStockRequest,
     db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
 ) -> RepuestoResponse:
-    return repuesto_service.ajustar_stock(db, repuesto_id, payload.cantidad)
+    return repuesto_service.ajustar_stock(db, empresa_filtro(usuario), repuesto_id, payload.cantidad)
 
 
 @router.delete(
     "/{repuesto_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Eliminar repuesto",
-    dependencies=[Depends(admin)],
 )
-def eliminar_repuesto(repuesto_id: int, db: Session = Depends(get_db)) -> Response:
-    repuesto_service.eliminar_repuesto(db, repuesto_id)
+def eliminar_repuesto(
+    repuesto_id: int,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
+) -> Response:
+    repuesto_service.eliminar_repuesto(db, empresa_filtro(usuario), repuesto_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

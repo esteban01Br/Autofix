@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
 import {
   Wrench,
   Mail,
@@ -308,6 +308,13 @@ export default function Login() {
               <p className="font-mono">Contraseña: <span className="text-accent">Admin123!</span></p>
             </div>
           </div>
+
+          <p className="mt-4 text-center text-sm text-text-secondary">
+            ¿Tienes un taller?{' '}
+            <Link to="/registro-empresa" className="font-semibold text-accent hover:text-accent-hover transition-colors">
+              Registra tu empresa gratis
+            </Link>
+          </p>
         </div>
       </div>
     </div>

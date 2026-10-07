@@ -22,11 +22,14 @@ def verify_password(contrasena: str, hash_almacenado: str) -> bool:
         return False
 
 
-def create_access_token(*, correo: str, usuario_id: int, rol: str) -> str:
+def create_access_token(
+    *, correo: str, usuario_id: int, rol: str, empresa_id: int | None = None
+) -> str:
     """Genera un token JWT con expiración configurable.
 
-    Los claims usados son sub (correo), id y rol; el frontend los decodifica
-    directamente (ver AuthContext).
+    Los claims usados son sub (correo), id, rol y empresa_id (None solo para
+    SUPERADMIN de plataforma); el frontend los decodifica directamente
+    (ver AuthContext).
     """
     expira = datetime.now(timezone.utc) + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
@@ -35,6 +38,7 @@ def create_access_token(*, correo: str, usuario_id: int, rol: str) -> str:
         "sub": correo,
         "id": usuario_id,
         "rol": rol,
+        "empresa_id": empresa_id,
         "iat": datetime.now(timezone.utc),
         "exp": expira,
     }

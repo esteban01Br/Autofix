@@ -63,7 +63,7 @@ export default function Facturas() {
       const creada = await crearFactura({ ordenTrabajoId: Number(ordenTrabajoId) });
       setModalAbierto(false);
       setFacturas((prev) => [creada, ...prev]);
-      pushToast(`Factura #${creada.id} generada por ${formatearMoneda(creada.total)}.`);
+      pushToast(`Factura ${creada.numero} generada por ${formatearMoneda(creada.total)}.`);
     } catch (err) {
       setErrorForm(extraerMensajeError(err, 'No se pudo generar la factura'));
     } finally {
@@ -85,7 +85,7 @@ export default function Facturas() {
     const texto = busqueda.trim().toLowerCase();
     if (!texto) return true;
     return (
-      String(f.id).includes(texto) ||
+      (f.numero ?? '').toLowerCase().includes(texto) ||
       (f.vehiculoPlaca ?? '').toLowerCase().includes(texto) ||
       (f.clienteNombre ?? '').toLowerCase().includes(texto)
     );
@@ -143,7 +143,7 @@ export default function Facturas() {
               <tbody className="text-text-primary">
                 {filtradas.map((f) => (
                   <tr key={f.id} className="border-b border-border last:border-0 hover:bg-surface-hover/40 transition-colors">
-                    <td className="py-3 px-4 font-mono text-text-secondary">#{f.id}</td>
+                    <td className="py-3 px-4 font-mono text-accent font-semibold">{f.numero}</td>
                     <td className="py-3 px-4 text-text-secondary">{formatearFechaHora(f.fecha)}</td>
                     <td className="py-3 px-4 font-mono">#{f.ordenTrabajoId}</td>
                     <td className="py-3 px-4 font-mono text-accent">{f.vehiculoPlaca ?? '—'}</td>

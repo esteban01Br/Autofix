@@ -1,13 +1,30 @@
 """Lógica de negocio de autenticación (login/registro)."""
 
 from fastapi import HTTPException
+from sqlalchemy import select
 
 from app.crud import usuario as crud_usuario
 from app.crud import base as crud_base
+from app.models.empresa import Empresa
 from app.models.enums import Rol
 from app.models.usuario import Usuario
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
 from app.security import create_access_token, hash_password, verify_password
+
+
+def _empresa_defecto(db) -> Empresa:
+    """Empresa a la que se asignan los auto-registros de clientes.
+
+    (El registro de EMPRESAS nuevas es otro endpoint: /api/empresas/registro;
+    el panel público de clientes por empresa llega en la Fase 4.)
+    """
+    empresa = db.scalar(select(Empresa).order_by(Empresa.id).limit(1))
+    if empresa is None:
+        raise HTTPException(
+            status_code=503,
+            detail="La plataforma aún no tiene una empresa configurada.",
+        )
+    return empresa
 
 
 def login(db, payload: LoginRequest) -> TokenResponse:
@@ -24,7 +41,10 @@ def login(db, payload: LoginRequest) -> TokenResponse:
         )
 
     token = create_access_token(
-        correo=usuario.correo, usuario_id=usuario.id, rol=usuario.rol.value
+        correo=usuario.correo,
+        usuario_id=usuario.id,
+        rol=usuario.rol.value,
+        empresa_id=usuario.empresa_id,
     )
     return TokenResponse(token=token)
 
@@ -44,10 +64,14 @@ def register(db, payload: RegisterRequest) -> TokenResponse:
         telefono=payload.telefono,
         rol=Rol.CLIENTE,
         activo=True,
+        empresa_id=_empresa_defecto(db).id,
     )
     crud_base.crear(db, usuario)
 
     token = create_access_token(
-        correo=usuario.correo, usuario_id=usuario.id, rol=usuario.rol.value
+        correo=usuario.correo,
+        usuario_id=usuario.id,
+        rol=usuario.rol.value,
+        empresa_id=usuario.empresa_id,
     )
     return TokenResponse(token=token)

@@ -4,6 +4,7 @@ from enum import Enum
 
 
 class Rol(str, Enum):
+    SUPERADMIN = "SUPERADMIN"  # Dueño de la plataforma: ve todas las empresas
     ADMIN = "ADMIN"
     MECANICO = "MECANICO"
     CLIENTE = "CLIENTE"

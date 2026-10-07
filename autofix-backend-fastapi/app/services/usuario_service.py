@@ -4,10 +4,11 @@ from fastapi import HTTPException
 
 from app.crud import usuario as crud_usuario
 from app.crud import base as crud_base
+from app.models.enums import Rol
 from app.models.usuario import Usuario
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 from app.security import hash_password
-from app.services.base import resolver_orden
+from app.services.base import filtro_empresa, resolver_orden, verificar_empresa
 
 
 def to_response(usuario: Usuario) -> UsuarioResponse:
@@ -23,10 +24,17 @@ def to_response(usuario: Usuario) -> UsuarioResponse:
     )
 
 
-def crear_usuario(db, payload: UsuarioCreate) -> UsuarioResponse:
+def crear_usuario(db, empresa_id: int, payload: UsuarioCreate) -> UsuarioResponse:
     correo = payload.correo.strip().lower()
     if crud_usuario.exists_correo(db, correo):
         raise HTTPException(status_code=409, detail="Ya existe un usuario con ese correo.")
+
+    # El rol SUPERADMIN de plataforma no se puede crear desde la API de
+    # cada empresa (solo por seed o por otro SUPERADMIN).
+    if payload.rol == Rol.SUPERADMIN:
+        raise HTTPException(
+            status_code=403, detail="No se puede crear un usuario SUPERADMIN."
+        )
 
     usuario = Usuario(
         nombre=payload.nombre.strip(),
@@ -36,6 +44,7 @@ def crear_usuario(db, payload: UsuarioCreate) -> UsuarioResponse:
         telefono=payload.telefono,
         rol=payload.rol,
         activo=True,
+        empresa_id=empresa_id,
     )
     crud_base.crear(db, usuario)
     return to_response(usuario)
@@ -43,6 +52,7 @@ def crear_usuario(db, payload: UsuarioCreate) -> UsuarioResponse:
 
 def listar_usuarios(
     db,
+    empresa_id: int | None,
     *,
     busqueda: str | None = None,
     rol=None,
@@ -52,7 +62,9 @@ def listar_usuarios(
     limit: int | None = None,
     offset: int = 0,
 ) -> tuple[list[UsuarioResponse], int]:
-    filtros = crud_usuario.construir_filtros(busqueda=busqueda, rol=rol, activo=activo)
+    filtros = filtro_empresa(Usuario, empresa_id) + crud_usuario.construir_filtros(
+        busqueda=busqueda, rol=rol, activo=activo
+    )
     col, dir_resuelta = resolver_orden(crud_usuario.COLUMNAS_ORDEN, orden, direccion) or (None, direccion)
     usuarios = crud_base.listar(
         db,
@@ -67,15 +79,25 @@ def listar_usuarios(
     return [to_response(u) for u in usuarios], total
 
 
-def obtener_usuario(db, usuario_id: int) -> UsuarioResponse:
+def obtener_usuario(db, empresa_id: int | None, usuario_id: int) -> UsuarioResponse:
     usuario = crud_base.obtener_o_404(db, Usuario, usuario_id, "Usuario no encontrado.")
+    verificar_empresa(usuario, empresa_id, "Usuario no encontrado.")
     return to_response(usuario)
 
 
-def actualizar_usuario(db, usuario_id: int, payload: UsuarioUpdate) -> UsuarioResponse:
+def actualizar_usuario(
+    db, empresa_id: int | None, usuario_id: int, payload: UsuarioUpdate
+) -> UsuarioResponse:
     usuario = crud_base.obtener_o_404(db, Usuario, usuario_id, "Usuario no encontrado.")
+    verificar_empresa(usuario, empresa_id, "Usuario no encontrado.")
 
     datos = payload.model_dump(exclude_unset=True)
+
+    # Nadie puede elevar un usuario a SUPERADMIN desde la API de empresa.
+    if datos.get("rol") == Rol.SUPERADMIN:
+        raise HTTPException(
+            status_code=403, detail="No se puede asignar el rol SUPERADMIN."
+        )
 
     if "correo" in datos:
         nuevo_correo = datos["correo"].strip().lower()
@@ -95,8 +117,9 @@ def actualizar_usuario(db, usuario_id: int, payload: UsuarioUpdate) -> UsuarioRe
     return to_response(usuario)
 
 
-def eliminar_usuario(db, usuario_id: int) -> None:
+def eliminar_usuario(db, empresa_id: int | None, usuario_id: int) -> None:
     usuario = crud_base.obtener_o_404(db, Usuario, usuario_id, "Usuario no encontrado.")
+    verificar_empresa(usuario, empresa_id, "Usuario no encontrado.")
 
     if usuario.cliente is not None or usuario.mecanico is not None:
         raise HTTPException(

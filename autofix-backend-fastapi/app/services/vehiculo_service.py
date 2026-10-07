@@ -7,7 +7,7 @@ from app.crud import base as crud_base
 from app.models.cliente import Cliente
 from app.models.vehiculo import Vehiculo
 from app.schemas.vehiculo import VehiculoCreate, VehiculoResponse, VehiculoUpdate
-from app.services.base import resolver_orden
+from app.services.base import filtro_empresa, resolver_orden, verificar_empresa
 
 
 def to_response(vehiculo: Vehiculo) -> VehiculoResponse:
@@ -30,12 +30,13 @@ def to_response(vehiculo: Vehiculo) -> VehiculoResponse:
     )
 
 
-def crear_vehiculo(db, payload: VehiculoCreate) -> VehiculoResponse:
+def crear_vehiculo(db, empresa_id: int, payload: VehiculoCreate) -> VehiculoResponse:
     placa = payload.placa.strip().upper()
-    if crud_vehiculo.exists_placa(db, placa):
+    if crud_vehiculo.exists_placa(db, placa, empresa_id):
         raise HTTPException(status_code=409, detail="La placa ya está registrada.")
 
-    crud_base.obtener_o_404(db, Cliente, payload.clienteId, "Cliente no encontrado.")
+    cliente = crud_base.obtener_o_404(db, Cliente, payload.clienteId, "Cliente no encontrado.")
+    verificar_empresa(cliente, empresa_id, "Cliente no encontrado.")
 
     vehiculo = Vehiculo(
         placa=placa,
@@ -45,6 +46,7 @@ def crear_vehiculo(db, payload: VehiculoCreate) -> VehiculoResponse:
         color=payload.color,
         kilometraje=payload.kilometraje,
         cliente_id=payload.clienteId,
+        empresa_id=empresa_id,
     )
     crud_base.crear(db, vehiculo)
     return to_response(vehiculo)
@@ -52,6 +54,7 @@ def crear_vehiculo(db, payload: VehiculoCreate) -> VehiculoResponse:
 
 def listar_vehiculos(
     db,
+    empresa_id: int | None,
     *,
     placa: str | None = None,
     marca: str | None = None,
@@ -61,7 +64,7 @@ def listar_vehiculos(
     limit: int | None = None,
     offset: int = 0,
 ) -> tuple[list[VehiculoResponse], int]:
-    filtros = crud_vehiculo.construir_filtros(
+    filtros = filtro_empresa(Vehiculo, empresa_id) + crud_vehiculo.construir_filtros(
         placa=placa, marca=marca, cliente_id=cliente_id
     )
     col, dir_resuelta = resolver_orden(crud_vehiculo.COLUMNAS_ORDEN, orden, direccion) or (None, direccion)
@@ -78,29 +81,34 @@ def listar_vehiculos(
     return [to_response(v) for v in vehiculos], total
 
 
-def obtener_vehiculo(db, vehiculo_id: int) -> VehiculoResponse:
+def obtener_vehiculo(db, empresa_id: int | None, vehiculo_id: int) -> VehiculoResponse:
     vehiculo = crud_base.obtener_o_404(
         db, Vehiculo, vehiculo_id, "Vehículo no encontrado."
     )
+    verificar_empresa(vehiculo, empresa_id, "Vehículo no encontrado.")
     return to_response(vehiculo)
 
 
-def actualizar_vehiculo(db, vehiculo_id: int, payload: VehiculoUpdate) -> VehiculoResponse:
+def actualizar_vehiculo(
+    db, empresa_id: int | None, vehiculo_id: int, payload: VehiculoUpdate
+) -> VehiculoResponse:
     vehiculo = crud_base.obtener_o_404(
         db, Vehiculo, vehiculo_id, "Vehículo no encontrado."
     )
+    verificar_empresa(vehiculo, empresa_id, "Vehículo no encontrado.")
 
     datos = payload.model_dump(exclude_unset=True)
 
     if "placa" in datos:
         placa = datos["placa"].strip().upper()
-        existente = crud_vehiculo.get_by_placa(db, placa)
+        existente = crud_vehiculo.get_by_placa(db, placa, vehiculo.empresa_id)
         if existente is not None and existente.id != vehiculo.id:
             raise HTTPException(status_code=409, detail="La placa ya está registrada.")
         vehiculo.placa = placa
 
     if "clienteId" in datos and datos["clienteId"] is not None:
-        crud_base.obtener_o_404(db, Cliente, datos["clienteId"], "Cliente no encontrado.")
+        cliente = crud_base.obtener_o_404(db, Cliente, datos["clienteId"], "Cliente no encontrado.")
+        verificar_empresa(cliente, empresa_id, "Cliente no encontrado.")
         vehiculo.cliente_id = datos["clienteId"]
 
     for campo in ("marca", "modelo", "anio", "color", "kilometraje"):
@@ -111,10 +119,11 @@ def actualizar_vehiculo(db, vehiculo_id: int, payload: VehiculoUpdate) -> Vehicu
     return to_response(vehiculo)
 
 
-def eliminar_vehiculo(db, vehiculo_id: int) -> None:
+def eliminar_vehiculo(db, empresa_id: int | None, vehiculo_id: int) -> None:
     vehiculo = crud_base.obtener_o_404(
         db, Vehiculo, vehiculo_id, "Vehículo no encontrado."
     )
+    verificar_empresa(vehiculo, empresa_id, "Vehículo no encontrado.")
 
     if vehiculo.ordenes:
         raise HTTPException(

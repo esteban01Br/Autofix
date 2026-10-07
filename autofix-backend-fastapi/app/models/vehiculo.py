@@ -1,6 +1,6 @@
 """Modelo Vehículo."""
 
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -8,11 +8,13 @@ from app.database import Base
 
 class Vehiculo(Base):
     __tablename__ = "vehiculos"
+    # La placa es única POR EMPRESA: el mismo carro puede visitar varios talleres.
+    __table_args__ = (
+        UniqueConstraint("empresa_id", "placa", name="uq_vehiculos_empresa_placa"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    placa: Mapped[str] = mapped_column(
-        String(10), unique=True, nullable=False, index=True
-    )
+    placa: Mapped[str] = mapped_column(String(10), nullable=False, index=True)
     marca: Mapped[str] = mapped_column(String(50), nullable=False)
     modelo: Mapped[str] = mapped_column(String(50), nullable=False)
     anio: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -20,6 +22,9 @@ class Vehiculo(Base):
     kilometraje: Mapped[int | None] = mapped_column(Integer, nullable=True)
     cliente_id: Mapped[int] = mapped_column(
         ForeignKey("clientes.id"), nullable=False, index=True
+    )
+    empresa_id: Mapped[int] = mapped_column(
+        ForeignKey("empresas.id"), nullable=False, index=True
     )
 
     cliente = relationship("Cliente", back_populates="vehiculos")

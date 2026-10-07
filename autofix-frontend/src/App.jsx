@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 
 const Login = lazy(() => import('./pages/Login'));
+const RegistroEmpresa = lazy(() => import('./pages/RegistroEmpresa'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Vehiculos = lazy(() => import('./pages/Vehiculos'));
 const Clientes = lazy(() => import('./pages/Clientes'));
@@ -13,6 +14,8 @@ const Citas = lazy(() => import('./pages/Citas'));
 const Ordenes = lazy(() => import('./pages/Ordenes'));
 const Repuestos = lazy(() => import('./pages/Repuestos'));
 const Facturas = lazy(() => import('./pages/Facturas'));
+const Empresas = lazy(() => import('./pages/Empresas'));
+const MiEmpresa = lazy(() => import('./pages/MiEmpresa'));
 const NoEncontrada = lazy(() => import('./pages/NoEncontrada'));
 
 const titulos = {
@@ -25,6 +28,8 @@ const titulos = {
   '/ordenes': 'Órdenes de trabajo',
   '/repuestos': 'Repuestos',
   '/facturas': 'Facturas',
+  '/empresas': 'Empresas',
+  '/mi-empresa': 'Mi empresa',
 };
 
 function ConTitulo() {
@@ -44,6 +49,7 @@ export default function App() {
     >
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/registro-empresa" element={<RegistroEmpresa />} />
 
         <Route
           element={
@@ -61,6 +67,8 @@ export default function App() {
           <Route path="/ordenes" element={<Ordenes />} />
           <Route path="/repuestos" element={<Repuestos />} />
           <Route path="/facturas" element={<Facturas />} />
+          <Route path="/empresas" element={<ProtectedRoute roles={['SUPERADMIN']}><Empresas /></ProtectedRoute>} />
+          <Route path="/mi-empresa" element={<ProtectedRoute roles={['ADMIN']}><MiEmpresa /></ProtectedRoute>} />
         </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

@@ -6,27 +6,30 @@ from app.crud.base import buscar_por_columna, existe_por_columna
 from app.models.repuesto import Repuesto
 
 
-def get_by_nombre_ci(db, nombre: str) -> Repuesto | None:
+def get_by_nombre_ci(db, nombre: str, empresa_id: int | None = None) -> Repuesto | None:
+    """Búsqueda por nombre (insensible a mayúsculas), opcionalmente por empresa."""
     termino = nombre.strip()
-    stmt = (
-        select(Repuesto)
-        .where(func.lower(Repuesto.nombre) == termino.lower())
-        .limit(1)
-    )
+    stmt = select(Repuesto).where(func.lower(Repuesto.nombre) == termino.lower())
+    if empresa_id is not None:
+        stmt = stmt.where(Repuesto.empresa_id == empresa_id)
+    stmt = stmt.limit(1)
     return db.scalars(stmt).first()
 
 
-def exists_nombre_ci(db, nombre: str) -> bool:
-    return get_by_nombre_ci(db, nombre) is not None
+def exists_nombre_ci(db, nombre: str, empresa_id: int | None = None) -> bool:
+    return get_by_nombre_ci(db, nombre, empresa_id) is not None
 
 
-def get_by_codigo(db, codigo: str) -> Repuesto | None:
-    """Busca un repuesto por su código de barras exacto."""
-    stmt = (
-        select(Repuesto)
-        .where(Repuesto.codigo_barras == codigo.strip())
-        .limit(1)
-    )
+def get_by_codigo(db, codigo: str, empresa_id: int | None = None) -> Repuesto | None:
+    """Busca un repuesto por su código de barras exacto.
+
+    Con empresa_id se limita a esa empresa (aislamiento); None busca global
+    (solo SUPERADMIN).
+    """
+    stmt = select(Repuesto).where(Repuesto.codigo_barras == codigo.strip())
+    if empresa_id is not None:
+        stmt = stmt.where(Repuesto.empresa_id == empresa_id)
+    stmt = stmt.limit(1)
     return db.scalars(stmt).first()
 
 

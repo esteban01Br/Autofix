@@ -26,36 +26,68 @@ def client():
         yield c
 
 
-@pytest.fixture(scope="session")
-def admin_token(client):
+@pytest.fixture(scope="session", autouse=True)
+def empresa_defecto(client):
+    """Empresa por defecto a la que se asignan los datos de los tests."""
     from app.database import SessionLocal
-    from app.models.enums import Rol
+    from app.models.empresa import Empresa
+
+    db = SessionLocal()
+    try:
+        empresa = db.query(Empresa).order_by(Empresa.id).first()
+        if empresa is None:
+            empresa = Empresa(nombre="AutoFix Pruebas", nit="900.000.001-1")
+            db.add(empresa)
+            db.commit()
+            db.refresh(empresa)
+        return empresa.id
+    finally:
+        db.close()
+
+
+def _token_para(client, correo: str, rol, empresa_id):
+    from app.database import SessionLocal
     from app.models.usuario import Usuario
     from app.security import create_access_token, hash_password
 
-    correo = "admin@prueba.com"
     db = SessionLocal()
     try:
-        admin = (
-            db.query(Usuario).filter(Usuario.correo == correo).first()
-        )
-        if admin is None:
-            admin = Usuario(
+        usuario = db.query(Usuario).filter(Usuario.correo == correo).first()
+        if usuario is None:
+            usuario = Usuario(
                 nombre="Admin",
                 apellido="Prueba",
                 correo=correo,
                 contrasena=hash_password("Password123!"),
-                rol=Rol.ADMIN,
+                rol=rol,
                 activo=True,
+                empresa_id=empresa_id,
             )
-            db.add(admin)
+            db.add(usuario)
             db.commit()
-            db.refresh(admin)
+            db.refresh(usuario)
         return create_access_token(
-            correo=admin.correo, usuario_id=admin.id, rol=admin.rol.value
+            correo=usuario.correo,
+            usuario_id=usuario.id,
+            rol=usuario.rol.value,
+            empresa_id=usuario.empresa_id,
         )
     finally:
         db.close()
+
+
+@pytest.fixture(scope="session")
+def admin_token(client, empresa_defecto):
+    from app.models.enums import Rol
+
+    return _token_para(client, "admin@prueba.com", Rol.ADMIN, empresa_defecto)
+
+
+@pytest.fixture(scope="session")
+def superadmin_token(client):
+    from app.models.enums import Rol
+
+    return _token_para(client, "super@prueba.com", Rol.SUPERADMIN, None)
 
 
 @pytest.fixture(scope="session")

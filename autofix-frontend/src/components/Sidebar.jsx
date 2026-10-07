@@ -11,12 +11,16 @@ import {
   Wrench as Activity,
   LogOut,
   ChevronRight,
+  Building2,
+  Store,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Badge from './Badge';
 
 const modulos = [
-  { to: '/dashboard', label: 'Panel', icon: LayoutDashboard, roles: ['ADMIN', 'MECANICO', 'CLIENTE'] },
+  { to: '/dashboard', label: 'Panel', icon: LayoutDashboard, roles: ['SUPERADMIN', 'ADMIN', 'MECANICO', 'CLIENTE'] },
+  { to: '/empresas', label: 'Empresas', icon: Building2, roles: ['SUPERADMIN'] },
+  { to: '/mi-empresa', label: 'Mi empresa', icon: Store, roles: ['ADMIN'] },
   { to: '/usuarios', label: 'Usuarios', icon: Users, roles: ['ADMIN'] },
   { to: '/clientes', label: 'Clientes', icon: UserCog, roles: ['ADMIN', 'MECANICO'] },
   { to: '/vehiculos', label: 'Vehículos', icon: Car, roles: ['ADMIN', 'MECANICO', 'CLIENTE'] },

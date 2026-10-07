@@ -15,7 +15,7 @@ from app.schemas.orden_trabajo import (
     OrdenTrabajoUpdate,
 )
 from app.services import detalle_orden_service
-from app.services.base import resolver_orden
+from app.services.base import filtro_empresa, resolver_orden, verificar_empresa
 from app.utils import ahora_utc
 
 
@@ -46,14 +46,16 @@ def to_response(orden: OrdenTrabajo) -> OrdenTrabajoResponse:
     )
 
 
-def crear_orden(db, payload: OrdenTrabajoCreate) -> OrdenTrabajoResponse:
-    crud_base.obtener_o_404(db, Vehiculo, payload.vehiculoId, "Vehículo no encontrado.")
+def crear_orden(db, empresa_id: int, payload: OrdenTrabajoCreate) -> OrdenTrabajoResponse:
+    vehiculo = crud_base.obtener_o_404(db, Vehiculo, payload.vehiculoId, "Vehículo no encontrado.")
+    verificar_empresa(vehiculo, empresa_id, "Vehículo no encontrado.")
 
     mecanico_id = payload.mecanicoId
     if mecanico_id is not None:
-        crud_base.obtener_o_404(
+        mecanico = crud_base.obtener_o_404(
             db, Mecanico, mecanico_id, "Mecánico no encontrado."
         )
+        verificar_empresa(mecanico, empresa_id, "Mecánico no encontrado.")
 
     orden = OrdenTrabajo(
         vehiculo_id=payload.vehiculoId,
@@ -61,6 +63,7 @@ def crear_orden(db, payload: OrdenTrabajoCreate) -> OrdenTrabajoResponse:
         diagnostico=payload.diagnostico,
         observaciones=payload.observaciones,
         estado=EstadoOrden.RECIBIDO,
+        empresa_id=empresa_id,
     )
     crud_base.crear(db, orden)
     return to_response(orden)
@@ -68,6 +71,7 @@ def crear_orden(db, payload: OrdenTrabajoCreate) -> OrdenTrabajoResponse:
 
 def listar_ordenes(
     db,
+    empresa_id: int | None,
     *,
     estado=None,
     vehiculo_id: int | None = None,
@@ -79,7 +83,7 @@ def listar_ordenes(
     limit: int | None = None,
     offset: int = 0,
 ) -> tuple[list[OrdenTrabajoResponse], int]:
-    filtros = crud_orden.construir_filtros(
+    filtros = filtro_empresa(OrdenTrabajo, empresa_id) + crud_orden.construir_filtros(
         estado=estado,
         vehiculo_id=vehiculo_id,
         mecanico_id=mecanico_id,
@@ -100,31 +104,37 @@ def listar_ordenes(
     return [to_response(o) for o in ordenes], total
 
 
-def obtener_orden(db, orden_id: int) -> OrdenTrabajoResponse:
+def obtener_orden(db, empresa_id: int | None, orden_id: int) -> OrdenTrabajoResponse:
     orden = crud_base.obtener_o_404(
         db, OrdenTrabajo, orden_id, "Orden de trabajo no encontrada."
     )
+    verificar_empresa(orden, empresa_id, "Orden de trabajo no encontrada.")
     return to_response(orden)
 
 
-def actualizar_orden(db, orden_id: int, payload: OrdenTrabajoUpdate) -> OrdenTrabajoResponse:
+def actualizar_orden(
+    db, empresa_id: int | None, orden_id: int, payload: OrdenTrabajoUpdate
+) -> OrdenTrabajoResponse:
     orden = crud_base.obtener_o_404(
         db, OrdenTrabajo, orden_id, "Orden de trabajo no encontrada."
     )
+    verificar_empresa(orden, empresa_id, "Orden de trabajo no encontrada.")
 
     datos = payload.model_dump(exclude_unset=True)
 
     if "vehiculoId" in datos:
-        crud_base.obtener_o_404(db, Vehiculo, datos["vehiculoId"], "Vehículo no encontrado.")
+        vehiculo = crud_base.obtener_o_404(db, Vehiculo, datos["vehiculoId"], "Vehículo no encontrado.")
+        verificar_empresa(vehiculo, empresa_id, "Vehículo no encontrado.")
         orden.vehiculo_id = datos["vehiculoId"]
 
     if "mecanicoId" in datos:
         if datos["mecanicoId"] is None:
             orden.mecanico_id = None
         else:
-            crud_base.obtener_o_404(
+            mecanico = crud_base.obtener_o_404(
                 db, Mecanico, datos["mecanicoId"], "Mecánico no encontrado."
             )
+            verificar_empresa(mecanico, empresa_id, "Mecánico no encontrado.")
             orden.mecanico_id = datos["mecanicoId"]
 
     for campo in ("diagnostico", "observaciones"):
@@ -135,10 +145,11 @@ def actualizar_orden(db, orden_id: int, payload: OrdenTrabajoUpdate) -> OrdenTra
     return to_response(orden)
 
 
-def cambiar_estado(db, orden_id: int, estado: EstadoOrden) -> OrdenTrabajoResponse:
+def cambiar_estado(db, empresa_id: int | None, orden_id: int, estado: EstadoOrden) -> OrdenTrabajoResponse:
     orden = crud_base.obtener_o_404(
         db, OrdenTrabajo, orden_id, "Orden de trabajo no encontrada."
     )
+    verificar_empresa(orden, empresa_id, "Orden de trabajo no encontrada.")
     orden.estado = estado
     # Al entregar se registra la fecha de salida automáticamente.
     if estado == EstadoOrden.ENTREGADO and orden.fecha_salida is None:
@@ -147,20 +158,23 @@ def cambiar_estado(db, orden_id: int, estado: EstadoOrden) -> OrdenTrabajoRespon
     return to_response(orden)
 
 
-def asignar_mecanico(db, orden_id: int, mecanico_id: int) -> OrdenTrabajoResponse:
+def asignar_mecanico(db, empresa_id: int | None, orden_id: int, mecanico_id: int) -> OrdenTrabajoResponse:
     orden = crud_base.obtener_o_404(
         db, OrdenTrabajo, orden_id, "Orden de trabajo no encontrada."
     )
-    crud_base.obtener_o_404(db, Mecanico, mecanico_id, "Mecánico no encontrado.")
+    verificar_empresa(orden, empresa_id, "Orden de trabajo no encontrada.")
+    mecanico = crud_base.obtener_o_404(db, Mecanico, mecanico_id, "Mecánico no encontrado.")
+    verificar_empresa(mecanico, empresa_id, "Mecánico no encontrado.")
     orden.mecanico_id = mecanico_id
     crud_base.actualizar(db, orden)
     return to_response(orden)
 
 
-def eliminar_orden(db, orden_id: int) -> None:
+def eliminar_orden(db, empresa_id: int | None, orden_id: int) -> None:
     orden = crud_base.obtener_o_404(
         db, OrdenTrabajo, orden_id, "Orden de trabajo no encontrada."
     )
+    verificar_empresa(orden, empresa_id, "Orden de trabajo no encontrada.")
 
     if orden.factura is not None:
         raise HTTPException(

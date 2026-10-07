@@ -14,6 +14,7 @@ export const decodificarToken = (token) => {
     correo: decoded.sub,
     id: decoded.id,
     rol: decoded.rol,
+    empresaId: decoded.empresa_id ?? null,
     expira: decoded.exp,
   };
 };

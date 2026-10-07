@@ -13,6 +13,7 @@ from app.routers import (
     citas,
     clientes,
     detalles,
+    empresas,
     facturas,
     mecanicos,
     ordenes,
@@ -32,6 +33,7 @@ from app.migrations import aplicar_migraciones
 import app.models  # noqa: F401  (importa y registra todos los modelos)
 
 OPENAPI_TAGS = [
+    {"name": "Empresas", "description": "Registro y gestión de empresas (multiempresa)."},
     {"name": "AutenticaciÃ³n", "description": "Inicio de sesiÃ³n, registro y perfil (JWT)."},
     {"name": "Usuarios", "description": "GestiÃ³n de usuarios. Solo administradores."},
     {"name": "Clientes", "description": "GestiÃ³n de clientes del taller."},
@@ -103,6 +105,7 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 
 # Rutas
 app.include_router(auth.router)
+app.include_router(empresas.router)
 app.include_router(usuarios.router)
 app.include_router(clientes.router)
 app.include_router(vehiculos.router)
