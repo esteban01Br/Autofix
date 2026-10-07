@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// En desarrollo el proxy de Vite reenvía /api al backend local (ver vite.config.js).
+// En producción (Netlify) se define VITE_API_URL con la URL del backend,
+// p. ej. https://autofix-api.onrender.com
 const api = axios.create({
-  baseURL: '/',
+  baseURL: import.meta.env.VITE_API_URL || '/',
   headers: {
     'Content-Type': 'application/json',
   },

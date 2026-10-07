@@ -5,6 +5,7 @@ responden con un mensaje genérico.
 """
 
 from fastapi.exceptions import RequestValidationError
+from slowapi.errors import RateLimitExceeded
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -30,3 +31,13 @@ def unhandled_exception_handler(request: Request, exc: Exception):
     else:
         detalle = "Error interno del servidor."
     return JSONResponse(status_code=500, content={"detail": detalle})
+
+
+def rate_limit_exception_handler(request: Request, exc: RateLimitExceeded):
+    """Respuesta 429 en JSON cuando se supera el límite de peticiones."""
+    return JSONResponse(
+        status_code=429,
+        content={
+            "detail": "Demasiados intentos. Espera un momento e inténtalo de nuevo."
+        },
+    )

@@ -1,10 +1,11 @@
 """Rutas de autenticaciÃ³n."""
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.orm import Session
 
 from app.routers.deps import get_current_user
 from app.database import get_db
+from app.limiter import limiter
 from app.models.usuario import Usuario
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
 from app.schemas.usuario import UsuarioResponse
@@ -19,7 +20,10 @@ router = APIRouter(prefix="/api/auth", tags=["AutenticaciÃ³n"])
     summary="Iniciar sesiÃ³n",
     description="Autentica con correo y contraseÃ±a y devuelve un token JWT.",
 )
-def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
+@limiter.limit("10/minute")
+def login(
+    request: Request, payload: LoginRequest, db: Session = Depends(get_db)
+) -> TokenResponse:
     return auth_service.login(db, payload)
 
 
@@ -30,7 +34,10 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse
     summary="Registrar usuario",
     description="Crea un nuevo usuario con su contraseÃ±a hasheada y devuelve un token.",
 )
-def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenResponse:
+@limiter.limit("5/minute")
+def register(
+    request: Request, payload: RegisterRequest, db: Session = Depends(get_db)
+) -> TokenResponse:
     return auth_service.register(db, payload)
 
 

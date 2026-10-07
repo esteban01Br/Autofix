@@ -1,0 +1,45 @@
+# ============================================================
+# AutoFix — Despliegue del backend en Render (https://render.com)
+#
+# Este archivo es un "Blueprint": Render lee este repositorio y crea
+# automáticamente el servicio web (FastAPI) y la base de datos
+# PostgreSQL ya conectada.
+#
+# Pasos: Render Dashboard → New → Blueprint → conecta este repo.
+# Solo tendrás que rellenar las variables marcadas con sync: false.
+# ============================================================
+
+services:
+  - type: web
+    name: autofix-api
+    runtime: python
+    plan: free
+    rootDir: autofix-backend-fastapi
+    buildCommand: pip install -r requirements.txt
+    # El seed es idempotente: crea el admin solo si no existe.
+    startCommand: python -m app.seed && python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true # Render genera una clave segura aleatoria
+      - key: DATABASE_URL
+        fromDatabase:
+          name: autofix-db
+          property: connectionString
+      - key: CORS_ORIGINS
+        sync: false # Pon aquí la URL de Netlify, ej: https://tu-app.netlify.app
+      - key: AUTOFIX_ADMIN_EMAIL
+        sync: false # Correo del administrador inicial
+      - key: AUTOFIX_ADMIN_PASSWORD
+        sync: false # Contraseña segura del administrador inicial
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "120"
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+
+databases:
+  - name: autofix-db
+    plan: free
+    databaseName: autofix

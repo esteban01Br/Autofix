@@ -1,0 +1,21 @@
+# ============================================================
+# AutoFix — Despliegue del frontend en Netlify (https://netlify.com)
+#
+# Netlify lee este archivo al conectar el repositorio:
+#   - Construye el frontend con "npm run build"
+#   - Publica la carpeta autofix-frontend/dist
+#   - Redirige todas las rutas al index.html (React Router)
+#
+# Recuerda definir en Netlify (Site settings → Environment variables):
+#   VITE_API_URL = https://autofix-api.onrender.com  (tu URL de Render)
+# ============================================================
+
+[build]
+  base = "autofix-frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

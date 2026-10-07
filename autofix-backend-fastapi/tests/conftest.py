@@ -11,6 +11,8 @@ if TEST_DB.exists():
 os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB.as_posix()}"
 os.environ["SECRET_KEY"] = "clave-de-prueba-para-autofix-tests-2026"
 os.environ["DEBUG"] = "true"
+# Los tests hacen muchos logins seguidos; sin límite de peticiones.
+os.environ["RATE_LIMIT_ENABLED"] = "false"
 
 import pytest
 from fastapi.testclient import TestClient

@@ -106,6 +106,42 @@ Para detener ambos servicios, presiona **`Ctrl+C`** en la terminal.
 
 ---
 
+## Despliegue en producción (Netlify + Render + PostgreSQL)
+
+La app se despliega en 3 piezas (el repo ya incluye los archivos de configuración):
+
+| Pieza | Servicio | Archivo de config |
+| --- | --- | --- |
+| Frontend (React) | **Netlify** | `netlify.toml` (raíz) |
+| Backend (FastAPI) | **Render** | `render.yaml` (raíz) |
+| Base de datos | **PostgreSQL en Render** | la crea el Blueprint |
+
+> ⚠️ Netlify **no puede correr el backend** (solo sitios estáticos); por eso el backend va en Render.
+
+### 1) Backend + base de datos (Render)
+
+1. Sube este repositorio a GitHub.
+2. En [Render](https://render.com): **New → Blueprint** y conecta el repo.
+3. Render detecta `render.yaml` y crea el servicio `autofix-api` y la base de datos `autofix-db` (PostgreSQL) ya conectada.
+4. Te pedirá las variables marcadas como `sync: false`:
+   - `CORS_ORIGINS`: la URL de tu Netlify (ej. `https://tu-app.netlify.app`)
+   - `AUTOFIX_ADMIN_EMAIL` / `AUTOFIX_ADMIN_PASSWORD`: credenciales del administrador inicial.
+5. Al terminar tendrás una URL tipo `https://autofix-api.onrender.com`.
+
+El `SECRET_KEY` lo genera Render automáticamente y en producción **la app se niega a arrancar con claves inseguras** (`ENVIRONMENT=production`).
+
+### 2) Frontend (Netlify)
+
+1. En [Netlify](https://netlify.com): **Add new site → Import an existing project** y conecta el repo.
+2. Netlify lee `netlify.toml` y configura solo el build (`npm run build` sobre `autofix-frontend`).
+3. En **Site settings → Environment variables** agrega:
+   - `VITE_API_URL` = `https://autofix-api.onrender.com` (la URL del paso 1)
+4. Despliega. El archivo `_redirects` ya cubre las rutas de React Router.
+
+> Nota: en el plan gratuito de Render el backend "duerme" tras ~15 min sin uso; la primera petición tarda ~1 min en despertarlo.
+
+---
+
 ## Stack tecnológico
 
 ### Frontend (`autofix-frontend`)
