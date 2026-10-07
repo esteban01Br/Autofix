@@ -24,6 +24,8 @@ autofix-backend-fastapi/
 │   ├── database.py    # Engine, sesión y get_db
 │   ├── security.py    # JWT (PyJWT) y hash bcrypt
 │   ├── errors.py      # Respuestas de error sin información sensible
+│   ├── limiter.py     # Rate limiting (slowapi) anti fuerza bruta
+│   ├── migrations.py  # Micro-migraciones automáticas de la BD (idempotentes)
 │   ├── seed.py        # Crea el administrador por defecto
 │   └── utils.py       # Utilidades (fechas)
 ├── tests/            # Pruebas con pytest + TestClient
@@ -64,14 +66,19 @@ Documentación interactiva (Swagger) en `http://localhost:8081/docs`.
 
 | Variable | Descripción | Valor por defecto |
 | --- | --- | --- |
-| `DATABASE_URL` | Cadena de conexión SQLAlchemy | `sqlite:///./autofix.db` |
-| `SECRET_KEY` | Clave secreta para firmar JWT | `cambiar-esta-clave-en-produccion` |
+| `ENVIRONMENT` | `development` o `production` (activa las medidas de seguridad) | `development` |
+| `DATABASE_URL` | Cadena de conexión SQLAlchemy. SQLite en local; PostgreSQL en producción (las URLs `postgres://` de la nube se normalizan solas) | `sqlite:///./autofix.db` |
+| `SECRET_KEY` | Clave secreta para firmar JWT. **Obligatoria (mín. 32 chars) en producción** | clave de desarrollo |
 | `ALGORITHM` | Algoritmo JWT | `HS256` |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | Expiración del token (min) | `1440` |
-| `CORS_ORIGINS` | Orígenes permitidos (JSON) | `["http://localhost:5173"]` |
+| `CORS_ORIGINS` | Orígenes permitidos, separados por coma | `http://localhost:5173,...` |
 | `SERVER_HOST` | Host de uvicorn | `0.0.0.0` |
 | `SERVER_PORT` | Puerto de uvicorn | `8081` |
 | `DEBUG` | Modo debug | `false` |
+| `DOCS_ENABLED` | Mostrar `/docs` y `/openapi.json` (en producción: ocultos por defecto) | según entorno |
+| `RATE_LIMIT_ENABLED` | Límite de peticiones en login (10/min) y registro (5/min) | `true` |
+| `AUTOFIX_ADMIN_EMAIL` | Correo del administrador inicial (seed) | `admin@autofix.com` |
+| `AUTOFIX_ADMIN_PASSWORD` | Contraseña del administrador inicial (seed) | `Admin123!` |
 
 ## Contrato de la API (resumen)
 
@@ -82,6 +89,14 @@ Documentación interactiva (Swagger) en `http://localhost:8081/docs`.
   `mecanicos`, `ordenes`, `detalles`, `repuestos`, `facturas`. Listados con
   filtros (`busqueda`, campos específicos), ordenamiento (`orden`,
   `direccion`), paginación (`limit`, `offset`) y cabecera `X-Total-Count`.
+- **Escáner / códigos de barras**: `GET /api/repuestos/por-codigo/{codigo}`
+  devuelve el repuesto con ese código de barras (404 si no existe); el campo
+  `codigo_barras` es único por repuesto y la búsqueda general de repuestos
+  también filtra por código.
+- **Seguridad**: rate limiting en login (10 intentos/min) y registro (5/min)
+  con respuesta 429; cabeceras HTTP de seguridad en todas las respuestas
+  (HSTS en producción); `/docs` oculto en producción; `SECRET_KEY` obligatoria
+  y validada al arrancar con `ENVIRONMENT=production`.
 - **Roles**: leer cualquier usuario autenticado; crear/actualizar/eliminar solo
   administradores (401/403).
 - **Lógica de negocio**: el IVA de factura es 19%; al agregar un detalle se

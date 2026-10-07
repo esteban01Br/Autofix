@@ -37,9 +37,11 @@ le entregó.
 | **Citas** | Agendamiento de citas con estados: `PENDIENTE`, `CONFIRMADA`, `CANCELADA`, `FINALIZADA`. |
 | **Mecánicos** | Administración del equipo de mecánicos. |
 | **Órdenes de trabajo** | Órdenes con estados (`RECIBIDO`, `DIAGNÓSTICO`, `EN REPARACIÓN`, `ESPERANDO REPUESTOS`, `LISTO`, `ENTREGADO`) y registro automático de la fecha de salida. |
-| **Repuestos** | Inventario con **descuento automático de stock** al usarlos en una orden y restauración al eliminarlos. |
+| **Repuestos** | Inventario con **descuento automático de stock** al usarlos en una orden y restauración al eliminarlos. Cada repuesto puede tener un **código de barras único**. |
+| **Escáner de códigos** 📷 | Registra repuestos **escaneando el código de barras** con la cámara del celular. Si el código es nuevo, abre el formulario con el código listo; si ya existe, abre el ajuste de stock directamente. |
 | **Facturas** | Facturación automática por orden de trabajo con **IVA 19%**, sin posibilidad de doble facturación. |
 | **Búsqueda rápida** | Barra de búsqueda en el encabezado para ir directo a cualquier módulo. |
+| **Seguridad reforzada** | Rate limiting anti fuerza bruta en login/registro, cabeceras de seguridad HTTP (HSTS, anti-clickjacking), `SECRET_KEY` obligatoria en producción y documentación de la API oculta. |
 
 ### Acceso por roles
 
@@ -55,9 +57,11 @@ le entregó.
 - ✅ **Evita errores:** el IVA se calcula automáticamente y no se permite facturar dos veces la misma orden.
 - 📦 **Control de inventario en tiempo real:** el stock baja solo cuando se asigna un repuesto.
 - 🧾 **Trazabilidad completa:** cada orden se puede seguir de principio a fin, con cliente, vehículo y mecánico.
-- 🔒 **Segura:** contraseñas con bcrypt, tokens JWT y permisos por rol.
+- 🔒 **Segura:** contraseñas con bcrypt, tokens JWT, permisos por rol, límite de intentos de login y cabeceras de seguridad en producción.
+- 📷 **Escáner integrado:** registra repuestos con la cámara del celular, sin digitar códigos.
 - 🖥️ **Un solo comando:** backend y frontend se levantan juntos con `.\start-dev.ps1`.
 - 📱 **Diseño moderno y responsive:** funciona en computador, tablet y celular.
+- ☁️ **Lista para la nube:** despliegue gratuito con Netlify (frontend), Render (backend) y PostgreSQL (ver sección de despliegue).
 
 ---
 
@@ -130,6 +134,8 @@ La app se despliega en 3 piezas (el repo ya incluye los archivos de configuraci�
 
 El `SECRET_KEY` lo genera Render automáticamente y en producción **la app se niega a arrancar con claves inseguras** (`ENVIRONMENT=production`).
 
+> 🔄 Las tablas y columnas nuevas de la base de datos se crean solas al arrancar el servidor (`Base.metadata.create_all` + micro-migraciones en `app/migrations.py`): no necesitas ejecutar nada manual al desplegar cambios de modelo.
+
 ### 2) Frontend (Netlify)
 
 1. En [Netlify](https://netlify.com): **Add new site → Import an existing project** y conecta el repo.
@@ -139,6 +145,8 @@ El `SECRET_KEY` lo genera Render automáticamente y en producción **la app se n
 4. Despliega. El archivo `_redirects` ya cubre las rutas de React Router.
 
 > Nota: en el plan gratuito de Render el backend "duerme" tras ~15 min sin uso; la primera petición tarda ~1 min en despertarlo.
+>
+> 📷 El escáner de códigos de barras pide **permiso de cámara** en el navegador la primera vez (funciona por HTTPS en Netlify y por `localhost` en desarrollo).
 
 ---
 
@@ -149,12 +157,15 @@ El `SECRET_KEY` lo genera Render automáticamente y en producción **la app se n
 - **Tailwind CSS 4** (tema oscuro personalizado)
 - **React Router** (navegación por módulos)
 - **Axios** (consumo de la API) y **Lucide** (iconos)
+- **ZXing** (`@zxing/browser`) para escanear códigos de barras con la cámara
 
 ### Backend (`autofix-backend-fastapi`)
 - **Python** + **FastAPI**
-- **SQLAlchemy 2** (ORM) + **SQLite** (sin necesidad de instalar base de datos)
+- **SQLAlchemy 2** (ORM) + **SQLite** en local / **PostgreSQL** en producción (driver `psycopg`)
 - **JWT** (PyJWT) + **bcrypt** para autenticación segura
+- **slowapi** (rate limiting anti fuerza bruta) y cabeceras de seguridad HTTP
 - **Pydantic** para validación de datos
+- Micro-migraciones automáticas al arrancar (`app/migrations.py`)
 - Tests con **pytest**
 
 ### Estructura del proyecto
@@ -162,14 +173,18 @@ El `SECRET_KEY` lo genera Render automáticamente y en producción **la app se n
 ```
 Autofix/
 ├── start-dev.ps1                # Levanta backend + frontend (un solo comando)
+├── render.yaml                  # Despliegue del backend + PostgreSQL en Render (Blueprint)
+├── netlify.toml                 # Despliegue del frontend en Netlify
 ├── autofix-backend-fastapi/     # API REST (FastAPI)
 │   ├── app/                     # routers, models, schemas, crud, services...
+│   │   ├── migrations.py        # Micro-migraciones automáticas de la BD
+│   │   └── limiter.py           # Rate limiting (anti fuerza bruta)
 │   ├── tests/                   # Pruebas automatizadas
 │   └── run.py                   # Arranque del servidor
 └── autofix-frontend/            # SPA (React + Vite)
     └── src/
         ├── pages/               # Login, Dashboard, Clientes, Vehículos, Citas...
-        ├── components/          # Sidebar, Header, Tablas, Badges...
+        ├── components/          # Sidebar, Header, EscanerCodigo, Tablas, Badges...
         ├── services/            # Clientes HTTP por módulo
         └── context/             # Sesión (auth) y notificaciones
 ```
