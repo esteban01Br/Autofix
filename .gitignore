@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Backups locales de la BD
+*.db.bak
