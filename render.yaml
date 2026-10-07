@@ -34,6 +34,10 @@ services:
         sync: false # Correo del administrador inicial
       - key: AUTOFIX_ADMIN_PASSWORD
         sync: false # Contraseña segura del administrador inicial
+      - key: AUTOFIX_SUPERADMIN_EMAIL
+        sync: false # Correo del SUPERADMIN de plataforma (tú)
+      - key: AUTOFIX_SUPERADMIN_PASSWORD
+        sync: false # Contraseña segura del SUPERADMIN
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "120"
       - key: RATE_LIMIT_ENABLED
