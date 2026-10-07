@@ -28,6 +28,7 @@ from app.errors import (
     validation_exception_handler,
 )
 from app.limiter import limiter
+from app.migrations import aplicar_migraciones
 import app.models  # noqa: F401  (importa y registra todos los modelos)
 
 OPENAPI_TAGS = [
@@ -48,6 +49,8 @@ OPENAPI_TAGS = [
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     # Crea las tablas si no existen (suficiente para el entorno de desarrollo).
     Base.metadata.create_all(bind=engine)
+    # Agrega columnas nuevas a bases de datos ya existentes (idempotente).
+    aplicar_migraciones()
     yield
 
 

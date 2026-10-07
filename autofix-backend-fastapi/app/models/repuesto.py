@@ -14,6 +14,9 @@ class Repuesto(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String(150), nullable=False, index=True)
     descripcion: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    codigo_barras: Mapped[str | None] = mapped_column(
+        String(50), nullable=True, unique=True, index=True
+    )
     stock: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     precio: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
 

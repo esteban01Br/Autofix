@@ -62,6 +62,20 @@ def listar_repuestos(
 
 
 @router.get(
+    "/por-codigo/{codigo}",
+    response_model=RepuestoResponse,
+    summary="Buscar repuesto por código de barras",
+    description="Usado por el escáner: devuelve 404 si el código no está registrado.",
+)
+def buscar_por_codigo(
+    codigo: str,
+    db: Session = Depends(get_db),
+    _usuario: Usuario = Depends(get_current_user),
+) -> RepuestoResponse:
+    return repuesto_service.obtener_por_codigo(db, codigo)
+
+
+@router.get(
     "/{repuesto_id}",
     response_model=RepuestoResponse,
     summary="Obtener repuesto por id",

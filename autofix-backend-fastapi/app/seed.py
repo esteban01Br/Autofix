@@ -9,6 +9,7 @@ import os
 
 from app.crud import usuario as crud_usuario
 from app.database import Base, SessionLocal, engine
+from app.migrations import aplicar_migraciones
 from app.models.enums import Rol
 from app.models.usuario import Usuario
 from app.security import hash_password
@@ -19,6 +20,7 @@ CONTRASENA_ADMIN: str = os.getenv("AUTOFIX_ADMIN_PASSWORD", "Admin123!")
 
 def seed() -> None:
     Base.metadata.create_all(bind=engine)
+    aplicar_migraciones()
     db = SessionLocal()
     try:
         if crud_usuario.exists_correo(db, CORREO_ADMIN):

@@ -14,18 +14,34 @@ def to_response(repuesto: Repuesto) -> RepuestoResponse:
         id=repuesto.id,
         nombre=repuesto.nombre,
         descripcion=repuesto.descripcion,
+        codigo_barras=repuesto.codigo_barras,
         stock=repuesto.stock,
         precio=repuesto.precio,
     )
+
+
+def _normalizar_codigo(codigo: str | None) -> str | None:
+    """Devuelve el código limpio o None si viene vacío."""
+    if codigo is None:
+        return None
+    limpio = codigo.strip()
+    return limpio or None
 
 
 def crear_repuesto(db, payload: RepuestoCreate) -> RepuestoResponse:
     if crud_repuesto.exists_nombre_ci(db, payload.nombre):
         raise HTTPException(status_code=409, detail="Ya existe un repuesto con ese nombre.")
 
+    codigo = _normalizar_codigo(payload.codigo_barras)
+    if codigo is not None and crud_repuesto.get_by_codigo(db, codigo) is not None:
+        raise HTTPException(
+            status_code=409, detail="Ya existe un repuesto con ese código de barras."
+        )
+
     repuesto = Repuesto(
         nombre=payload.nombre.strip(),
         descripcion=payload.descripcion,
+        codigo_barras=codigo,
         stock=payload.stock,
         precio=payload.precio,
     )
@@ -68,6 +84,17 @@ def obtener_repuesto(db, repuesto_id: int) -> RepuestoResponse:
     return to_response(repuesto)
 
 
+def obtener_por_codigo(db, codigo: str) -> RepuestoResponse:
+    """Busca un repuesto por código de barras (usado por el escáner)."""
+    repuesto = crud_repuesto.get_by_codigo(db, codigo)
+    if repuesto is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No hay ningún repuesto registrado con ese código de barras.",
+        )
+    return to_response(repuesto)
+
+
 def actualizar_repuesto(db, repuesto_id: int, payload: RepuestoUpdate) -> RepuestoResponse:
     repuesto = crud_base.obtener_o_404(
         db, Repuesto, repuesto_id, "Repuesto no encontrado."
@@ -80,6 +107,17 @@ def actualizar_repuesto(db, repuesto_id: int, payload: RepuestoUpdate) -> Repues
         if existente is not None and existente.id != repuesto.id:
             raise HTTPException(status_code=409, detail="Ya existe un repuesto con ese nombre.")
         repuesto.nombre = datos["nombre"].strip()
+
+    if "codigo_barras" in datos:
+        codigo = _normalizar_codigo(datos["codigo_barras"])
+        if codigo is not None:
+            existente = crud_repuesto.get_by_codigo(db, codigo)
+            if existente is not None and existente.id != repuesto.id:
+                raise HTTPException(
+                    status_code=409,
+                    detail="Ya existe un repuesto con ese código de barras.",
+                )
+        repuesto.codigo_barras = codigo
 
     for campo in ("descripcion", "stock", "precio"):
         if campo in datos:

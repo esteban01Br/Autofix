@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Search, Package, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
-import { listarRepuestos, crearRepuesto, actualizarRepuesto, ajustarStockRepuesto, eliminarRepuesto } from '../services/repuestoService';
+import { Plus, Pencil, Trash2, Search, Package, ArrowDownToLine, ArrowUpFromLine, ScanBarcode } from 'lucide-react';
+import { listarRepuestos, crearRepuesto, actualizarRepuesto, ajustarStockRepuesto, eliminarRepuesto, buscarPorCodigo } from '../services/repuestoService';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError, formatearMoneda } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
@@ -8,8 +8,9 @@ import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import EmptyState from '../components/EmptyState';
 import Spinner from '../components/Spinner';
+import EscanerCodigo from '../components/EscanerCodigo';
 
-const estadoInicial = { nombre: '', descripcion: '', stock: 0, precio: '' };
+const estadoInicial = { nombre: '', descripcion: '', codigo_barras: '', stock: 0, precio: '' };
 const stockInicial = { cantidad: 1, tipo: 'entrada' };
 
 export default function Repuestos() {
@@ -25,6 +26,8 @@ export default function Repuestos() {
   const [eliminarId, setEliminarId] = useState(null);
   const [ajuste, setAjuste] = useState(null);
   const [stockForm, setStockForm] = useState(stockInicial);
+  const [escanerAbierto, setEscanerAbierto] = useState(false);
+  const [modoEscaneo, setModoEscaneo] = useState('buscar'); // 'buscar' | 'formulario'
   const { pushToast } = useToast();
 
   const cargar = async () => {
@@ -56,11 +59,45 @@ export default function Repuestos() {
     setFormulario({
       nombre: r.nombre,
       descripcion: r.descripcion ?? '',
+      codigo_barras: r.codigo_barras ?? '',
       stock: r.stock,
       precio: String(r.precio),
     });
     setErrorForm('');
     setModalAbierto(true);
+  };
+
+  const abrirEscaner = (modo) => {
+    setModoEscaneo(modo);
+    setEscanerAbierto(true);
+  };
+
+  /* Flujo principal del escáner: si el código ya existe se ofrece ajustar
+     el stock; si es nuevo, se abre el formulario con el código listo. */
+  const alDetectarCodigo = async (codigo) => {
+    setEscanerAbierto(false);
+
+    if (modoEscaneo === 'formulario') {
+      setFormulario((f) => ({ ...f, codigo_barras: codigo }));
+      pushToast(`Código capturado: ${codigo}`);
+      return;
+    }
+
+    try {
+      const existente = await buscarPorCodigo(codigo);
+      pushToast(`"${existente.nombre}" ya está registrado · ajusta su stock si llegó mercancía.`);
+      abrirAjuste(existente);
+    } catch (err) {
+      if (err.response?.status === 404) {
+        setEditando(null);
+        setFormulario({ ...estadoInicial, codigo_barras: codigo });
+        setErrorForm('');
+        setModalAbierto(true);
+        pushToast('Código nuevo: completa los datos para registrar el repuesto.');
+      } else {
+        pushToast(extraerMensajeError(err, 'No se pudo buscar el código'), 'error');
+      }
+    }
   };
 
   const abrirAjuste = (r) => {
@@ -81,6 +118,7 @@ export default function Repuestos() {
       const datos = {
         nombre: formulario.nombre.trim(),
         descripcion: formulario.descripcion || null,
+        codigo_barras: formulario.codigo_barras.trim() || null,
         stock: Number(formulario.stock),
         precio: String(formulario.precio),
       };
@@ -138,6 +176,9 @@ export default function Repuestos() {
   return (
     <div className="space-y-6">
       <PageHeader titulo="Inventario de repuestos" subtitulo={`${repuestos.length} repuestos`}>
+        <button onClick={() => abrirEscaner('buscar')} className="btn btn-ghost">
+          <ScanBarcode size={16} /> Escanear
+        </button>
         <button onClick={abrirCrear} className="btn btn-primary">
           <Plus size={16} /> Nuevo repuesto
         </button>
@@ -189,7 +230,14 @@ export default function Repuestos() {
               <tbody className="text-text-primary">
                 {filtrados.map((r) => (
                   <tr key={r.id} className="border-b border-border last:border-0 hover:bg-surface-hover/40 transition-colors">
-                    <td className="py-3 px-4 font-medium">{r.nombre}</td>
+                    <td className="py-3 px-4 font-medium">
+                      {r.nombre}
+                      {r.codigo_barras && (
+                        <span className="block text-xs font-mono text-text-secondary font-normal">
+                          {r.codigo_barras}
+                        </span>
+                      )}
+                    </td>
                     <td className="py-3 px-4 text-text-secondary max-w-xs truncate">{r.descripcion ?? '—'}</td>
                     <td className="py-3 px-4 text-center">
                       <span className={`badge ${r.stock === 0 ? 'text-danger bg-danger/10' : r.stock < 10 ? 'text-warning bg-warning/10' : 'text-success bg-success/10'}`}>
@@ -225,6 +273,27 @@ export default function Repuestos() {
           <div>
             <label className="label">Nombre *</label>
             <input name="nombre" value={formulario.nombre} onChange={manejarCambio} className="input" required maxLength={150} />
+          </div>
+          <div>
+            <label className="label">Código de barras</label>
+            <div className="flex gap-2">
+              <input
+                name="codigo_barras"
+                value={formulario.codigo_barras}
+                onChange={manejarCambio}
+                className="input font-mono flex-1"
+                maxLength={50}
+                placeholder="Ej: 7501234567890"
+              />
+              <button
+                type="button"
+                onClick={() => abrirEscaner('formulario')}
+                className="btn btn-ghost shrink-0"
+                title="Escanear con la cámara"
+              >
+                <ScanBarcode size={16} />
+              </button>
+            </div>
           </div>
           <div>
             <label className="label">Descripción</label>
@@ -300,6 +369,12 @@ export default function Repuestos() {
           </div>
         </form>
       </Modal>
+
+      <EscanerCodigo
+        abierto={escanerAbierto}
+        onCerrar={() => setEscanerAbierto(false)}
+        onDetectado={alDetectarCodigo}
+      />
 
       <ConfirmDialog
         abierto={eliminarId !== null}

@@ -10,6 +10,11 @@ export const obtenerRepuesto = async (id) => {
   return response.data;
 };
 
+export const buscarPorCodigo = async (codigo) => {
+  const response = await api.get(`/api/repuestos/por-codigo/${encodeURIComponent(codigo)}`);
+  return response.data;
+};
+
 export const crearRepuesto = async (data) => {
   const response = await api.post('/api/repuestos', data);
   return response.data;

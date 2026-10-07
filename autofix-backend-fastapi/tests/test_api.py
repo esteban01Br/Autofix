@@ -499,6 +499,56 @@ def test_paginacion_filtros_y_orden(client, admin_token):
     assert all("pastilla" in r["nombre"].lower() for r in filtro.json())
 
 
+# =========================================================
+# CÓDIGO DE BARRAS DE REPUESTOS
+# =========================================================
+
+def test_repuesto_codigo_barras_flujo_completo(client, admin_token):
+    h = auth(admin_token)
+
+    # Crear un repuesto con código de barras
+    resp = client.post(
+        "/api/repuestos",
+        json={
+            "nombre": f"Bujía-{uuid.uuid4().hex[:6]}",
+            "stock": 5,
+            "precio": "45.00",
+            "codigo_barras": "7501234567890",
+        },
+        headers=h,
+    )
+    assert resp.status_code == 201, resp.text
+    rid = resp.json()["id"]
+    assert resp.json()["codigo_barras"] == "7501234567890"
+
+    # Buscar por código de barras exacto
+    resp = client.get("/api/repuestos/por-codigo/7501234567890", headers=h)
+    assert resp.status_code == 200
+    assert resp.json()["id"] == rid
+
+    # Código no registrado → 404
+    resp = client.get("/api/repuestos/por-codigo/0000000000000", headers=h)
+    assert resp.status_code == 404
+
+    # No se permite duplicar el código de barras → 409
+    resp = client.post(
+        "/api/repuestos",
+        json={
+            "nombre": f"Otro-{uuid.uuid4().hex[:6]}",
+            "stock": 1,
+            "precio": "10.00",
+            "codigo_barras": "7501234567890",
+        },
+        headers=h,
+    )
+    assert resp.status_code == 409
+
+    # La búsqueda general también encuentra por código de barras
+    resp = client.get("/api/repuestos?busqueda=7501234567890", headers=h)
+    assert resp.status_code == 200
+    assert any(r["id"] == rid for r in resp.json())
+
+
 def test_orden_inexistente_404_y_metodo_no_permitido(client, admin_token):
     resp = client.get("/api/vehiculos/999999", headers=auth(admin_token))
     assert resp.status_code == 404
