@@ -20,6 +20,8 @@ class Vehiculo(Base):
     anio: Mapped[int | None] = mapped_column(Integer, nullable=True)
     color: Mapped[str | None] = mapped_column(String(30), nullable=True)
     kilometraje: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # Fotos del vehículo (JSON array de URLs)
+    fotos: Mapped[str | None] = mapped_column(Text, nullable=True)
     cliente_id: Mapped[int] = mapped_column(
         ForeignKey("clientes.id"), nullable=False, index=True
     )

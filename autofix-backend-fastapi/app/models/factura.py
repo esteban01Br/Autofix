@@ -3,10 +3,11 @@
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, String, UniqueConstraint
+from sqlalchemy import DateTime, Enum, ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.models.pago import EstadoPagoFactura
 from app.utils import ahora_utc
 
 
@@ -29,8 +30,18 @@ class Factura(Base):
     empresa_id: Mapped[int] = mapped_column(
         ForeignKey("empresas.id"), nullable=False, index=True
     )
+    # Estado de pago: PENDIENTE, PARCIAL, PAGADA
+    estado_pago: Mapped[EstadoPagoFactura] = mapped_column(
+        Enum(EstadoPagoFactura, name="estado_pago_factura"),
+        nullable=False,
+        default=EstadoPagoFactura.PENDIENTE,
+    )
+    monto_pagado: Mapped[Decimal] = mapped_column(
+        Numeric(10, 2), nullable=False, default=0
+    )
 
     orden_trabajo = relationship("OrdenTrabajo", back_populates="factura")
+    pagos = relationship("Pago", back_populates="factura", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
-        return f"<Factura {self.id}: total={self.total}>"
+        return f"<Factura {self.id}: total={self.total} · {self.estado_pago}>"

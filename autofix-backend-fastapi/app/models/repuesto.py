@@ -22,6 +22,7 @@ class Repuesto(Base):
         String(50), nullable=True, index=True
     )
     stock: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    stock_minimo: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     precio: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     empresa_id: Mapped[int] = mapped_column(
         ForeignKey("empresas.id"), nullable=False, index=True

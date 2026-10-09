@@ -19,7 +19,7 @@ const Empresas = lazy(() => import('./pages/Empresas'));
 const MiEmpresa = lazy(() => import('./pages/MiEmpresa'));
 const MisOrdenes = lazy(() => import('./pages/MisOrdenes'));
 const Auditoria = lazy(() => import('./pages/Auditoria'));
-const Productividad = lazy(() => import('./pages/productividad'));
+const Productividad = lazy(() => import('./pages/Productividad'));
 const NoEncontrada = lazy(() => import('./pages/NoEncontrada'));
 
 const titulos = {

@@ -17,6 +17,7 @@ class VehiculoCreate(BaseModel):
     anio: int | None = Field(default=None, ge=1950)
     color: str | None = Field(default=None, max_length=30)
     kilometraje: int | None = Field(default=None, ge=0)
+    fotos: list[str] | None = Field(default=None, description="URLs de fotos del vehículo")
     clienteId: int
 
 
@@ -27,6 +28,7 @@ class VehiculoUpdate(BaseModel):
     anio: int | None = Field(default=None, ge=1950)
     color: str | None = Field(default=None, max_length=30)
     kilometraje: int | None = Field(default=None, ge=0)
+    fotos: list[str] | None = Field(default=None, description="URLs de fotos del vehículo")
     clienteId: int | None = None
 
 
@@ -38,5 +40,6 @@ class VehiculoResponse(BaseModel):
     anio: int | None = None
     color: str | None = None
     kilometraje: int | None = None
+    fotos: list[str] | None = None
     clienteId: int
     clienteNombre: str | None = None

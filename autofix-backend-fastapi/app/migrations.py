@@ -197,6 +197,16 @@ def _migrar_indice_placa(conn, insp) -> None:
     )
 
 
+def _migrar_stock_minimo_y_fotos(conn, insp) -> None:
+    """Agrega stock_minimo a repuestos y fotos a vehículos."""
+    if "repuestos" in insp.get_table_names() and "stock_minimo" not in _columnas(insp, "repuestos"):
+        conn.execute(
+            text("ALTER TABLE repuestos ADD COLUMN stock_minimo INTEGER NOT NULL DEFAULT 0")
+        )
+    if "vehiculos" in insp.get_table_names() and "fotos" not in _columnas(insp, "vehiculos"):
+        conn.execute(text("ALTER TABLE vehiculos ADD COLUMN fotos TEXT"))
+
+
 def _migrar_numero_facturas(conn, insp) -> None:
     """Agrega el consecutivo FAC-0001 por empresa y lo rellena."""
     if "facturas" not in insp.get_table_names():
@@ -268,6 +278,7 @@ def _migrar_a_multiempresa(conn, insp) -> None:
 
     _migrar_indice_codigo_barras(conn, insp)
     _migrar_indice_placa(conn, insp)
+    _migrar_stock_minimo_y_fotos(conn, insp)
     _migrar_numero_facturas(conn, insp)
 
 

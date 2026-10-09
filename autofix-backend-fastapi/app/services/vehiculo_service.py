@@ -1,5 +1,7 @@
 """Lógica de negocio de Vehículo."""
 
+import json
+
 from fastapi import HTTPException
 
 from app.crud import vehiculo as crud_vehiculo
@@ -17,6 +19,7 @@ def to_response(vehiculo: Vehiculo) -> VehiculoResponse:
         if cliente is not None
         else None
     )
+    fotos = json.loads(vehiculo.fotos) if vehiculo.fotos else []
     return VehiculoResponse(
         id=vehiculo.id,
         placa=vehiculo.placa,
@@ -25,6 +28,7 @@ def to_response(vehiculo: Vehiculo) -> VehiculoResponse:
         anio=vehiculo.anio,
         color=vehiculo.color,
         kilometraje=vehiculo.kilometraje,
+        fotos=fotos,
         clienteId=vehiculo.cliente_id,
         clienteNombre=nombre,
     )
@@ -45,6 +49,7 @@ def crear_vehiculo(db, empresa_id: int, payload: VehiculoCreate) -> VehiculoResp
         anio=payload.anio,
         color=payload.color,
         kilometraje=payload.kilometraje,
+        fotos=json.dumps(payload.fotos) if payload.fotos else None,
         cliente_id=payload.clienteId,
         empresa_id=empresa_id,
     )
@@ -114,6 +119,9 @@ def actualizar_vehiculo(
     for campo in ("marca", "modelo", "anio", "color", "kilometraje"):
         if campo in datos:
             setattr(vehiculo, campo, datos[campo])
+
+    if "fotos" in datos:
+        vehiculo.fotos = json.dumps(datos["fotos"]) if datos["fotos"] else None
 
     crud_base.actualizar(db, vehiculo)
     return to_response(vehiculo)

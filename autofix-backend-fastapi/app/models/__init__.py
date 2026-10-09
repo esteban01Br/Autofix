@@ -3,6 +3,7 @@ from app.models.enums import EstadoCita, EstadoOrden, Rol
 from app.models.empresa import Empresa
 from app.models.sucursal import Sucursal
 from app.models.auditoria import Auditoria
+from app.models.pago import Pago
 from app.models.usuario import Usuario
 from app.models.cliente import Cliente
 from app.models.vehiculo import Vehiculo
@@ -21,6 +22,7 @@ __all__ = [
     "Empresa",
     "Sucursal",
     "Auditoria",
+    "Pago",
     "Usuario",
     "Cliente",
     "Vehiculo",

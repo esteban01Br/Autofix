@@ -16,6 +16,7 @@ def to_response(repuesto: Repuesto) -> RepuestoResponse:
         descripcion=repuesto.descripcion,
         codigo_barras=repuesto.codigo_barras,
         stock=repuesto.stock,
+        stockMinimo=repuesto.stock_minimo,
         precio=repuesto.precio,
     )
 
@@ -44,6 +45,7 @@ def crear_repuesto(db, empresa_id: int, payload: RepuestoCreate) -> RepuestoResp
         descripcion=payload.descripcion,
         codigo_barras=codigo,
         stock=payload.stock,
+        stock_minimo=payload.stock_minimo,
         precio=payload.precio,
         empresa_id=empresa_id,
     )
@@ -126,7 +128,7 @@ def actualizar_repuesto(
                 )
         repuesto.codigo_barras = codigo
 
-    for campo in ("descripcion", "stock", "precio"):
+    for campo in ("descripcion", "stock", "stock_minimo", "precio"):
         if campo in datos:
             setattr(repuesto, campo, datos[campo])
 
