@@ -71,6 +71,7 @@ def _token_para(client, correo: str, rol, empresa_id):
             usuario_id=usuario.id,
             rol=usuario.rol.value,
             empresa_id=usuario.empresa_id,
+            debe_cambiar=usuario.debe_cambiar_contrasena,
         )
     finally:
         db.close()

@@ -6,7 +6,11 @@ from enum import Enum
 class Rol(str, Enum):
     SUPERADMIN = "SUPERADMIN"  # Dueño de la plataforma: ve todas las empresas
     ADMIN = "ADMIN"
+    GERENTE = "GERENTE"      # Gerente de sucursal: gestiona su sucursal
+    ASESOR = "ASESOR"        # Asesor de servicio: clientes, vehículos, citas
     MECANICO = "MECANICO"
+    BODEGUERO = "BODEGUERO"  # Bodeguero: inventario y stock
+    CAJERO = "CAJERO"        # Cajero: facturación y pagos
     CLIENTE = "CLIENTE"
 
 

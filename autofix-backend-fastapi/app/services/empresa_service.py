@@ -85,6 +85,7 @@ def registrar_empresa(db, payload: EmpresaRegistroRequest) -> EmpresaRegistroRes
         usuario_id=admin.id,
         rol=admin.rol.value,
         empresa_id=admin.empresa_id,
+        debe_cambiar=False,
     )
     return EmpresaRegistroResponse(empresa=to_response(empresa), token=token)
 

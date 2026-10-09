@@ -119,6 +119,11 @@ def _migrar_usuarios(conn, insp, empresa_id: int) -> None:
         )
         conn.execute(
             text(
+                "ALTER TABLE usuarios ADD COLUMN debe_cambiar_contrasena BOOLEAN NOT NULL DEFAULT FALSE"
+            )
+        )
+        conn.execute(
+            text(
                 "UPDATE usuarios SET empresa_id = :eid"
                 " WHERE empresa_id IS NULL AND rol <> 'SUPERADMIN'"
             ),
@@ -154,11 +159,12 @@ def _agregar_empresa_id(conn, insp, tabla: str, empresa_id: int) -> None:
         )
 
 
-def _migrar_rol_superadmin_postgres(conn) -> None:
-    """Agrega SUPERADMIN al enum nativo de PostgreSQL (idempotente)."""
+def _migrar_roles_postgres(conn) -> None:
+    """Agrega los roles nuevos al enum nativo de PostgreSQL (idempotente)."""
     if _es_sqlite():
         return
-    conn.execute(text("ALTER TYPE rol ADD VALUE IF NOT EXISTS 'SUPERADMIN'"))
+    for rol in ("SUPERADMIN", "GERENTE", "ASESOR", "BODEGUERO", "CAJERO"):
+        conn.execute(text(f"ALTER TYPE rol ADD VALUE IF NOT EXISTS '{rol}'"))
 
 
 def _migrar_indice_codigo_barras(conn, insp) -> None:
@@ -242,7 +248,7 @@ def _migrar_a_multiempresa(conn, insp) -> None:
     if "empresas" not in insp.get_table_names():
         return  # create_all aún no la crea (no debería pasar).
 
-    _migrar_rol_superadmin_postgres(conn)
+    _migrar_roles_postgres(conn)
 
     # Solo las bases con datos legados necesitan empresa por defecto
     # para rellenar; en bases nuevas la crea el seed.

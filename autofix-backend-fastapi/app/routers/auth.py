@@ -8,7 +8,7 @@ from app.database import get_db
 from app.limiter import limiter
 from app.models.usuario import Usuario
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
-from app.schemas.usuario import UsuarioResponse
+from app.schemas.usuario import CambioContrasenaRequest, UsuarioResponse
 from app.services import auth_service, usuario_service
 
 router = APIRouter(prefix="/api/auth", tags=["AutenticaciÃ³n"])
@@ -52,3 +52,17 @@ def perfil_usuario(
     usuario: Usuario = Depends(get_current_user),
 ) -> UsuarioResponse:
     return usuario_service.to_response(usuario)
+
+
+@router.post(
+    "/cambiar-contrasena",
+    response_model=TokenResponse,
+    summary="Cambiar contraseña",
+    description="Obligatorio cuando el login indica debeCambiarContrasena=true.",
+)
+def cambiar_contrasena(
+    payload: CambioContrasenaRequest,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(get_current_user),
+) -> TokenResponse:
+    return auth_service.cambiar_contrasena(db, usuario, payload)

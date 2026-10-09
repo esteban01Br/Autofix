@@ -5,6 +5,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 
 const Login = lazy(() => import('./pages/Login'));
 const RegistroEmpresa = lazy(() => import('./pages/RegistroEmpresa'));
+const CambioContrasena = lazy(() => import('./pages/CambioContrasena'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Vehiculos = lazy(() => import('./pages/Vehiculos'));
 const Clientes = lazy(() => import('./pages/Clientes'));
@@ -16,6 +17,9 @@ const Repuestos = lazy(() => import('./pages/Repuestos'));
 const Facturas = lazy(() => import('./pages/Facturas'));
 const Empresas = lazy(() => import('./pages/Empresas'));
 const MiEmpresa = lazy(() => import('./pages/MiEmpresa'));
+const MisOrdenes = lazy(() => import('./pages/MisOrdenes'));
+const Auditoria = lazy(() => import('./pages/Auditoria'));
+const Productividad = lazy(() => import('./pages/productividad'));
 const NoEncontrada = lazy(() => import('./pages/NoEncontrada'));
 
 const titulos = {
@@ -30,6 +34,9 @@ const titulos = {
   '/facturas': 'Facturas',
   '/empresas': 'Empresas',
   '/mi-empresa': 'Mi empresa',
+  '/mis-ordenes': 'Mis órdenes',
+  '/auditoria': 'Auditoría',
+  '/productividad': 'Productividad',
 };
 
 function ConTitulo() {
@@ -50,6 +57,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/registro-empresa" element={<RegistroEmpresa />} />
+        <Route path="/cambiar-contrasena" element={<CambioContrasena />} />
 
         <Route
           element={
@@ -69,6 +77,9 @@ export default function App() {
           <Route path="/facturas" element={<Facturas />} />
           <Route path="/empresas" element={<ProtectedRoute roles={['SUPERADMIN']}><Empresas /></ProtectedRoute>} />
           <Route path="/mi-empresa" element={<ProtectedRoute roles={['ADMIN']}><MiEmpresa /></ProtectedRoute>} />
+          <Route path="/mis-ordenes" element={<ProtectedRoute roles={['MECANICO']}><MisOrdenes /></ProtectedRoute>} />
+          <Route path="/auditoria" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Auditoria /></ProtectedRoute>} />
+          <Route path="/productividad" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Productividad /></ProtectedRoute>} />
         </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

@@ -13,6 +13,8 @@ import {
   ChevronRight,
   Building2,
   Store,
+  ShieldCheck,
+  BarChart3,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Badge from './Badge';
@@ -28,7 +30,10 @@ const modulos = [
   { to: '/mecanicos', label: 'Mecánicos', icon: Activity, roles: ['ADMIN'] },
   { to: '/ordenes', label: 'Órdenes', icon: Wrench, roles: ['ADMIN', 'MECANICO'] },
   { to: '/repuestos', label: 'Repuestos', icon: Package, roles: ['ADMIN', 'MECANICO'] },
-  { to: '/facturas', label: 'Facturas', icon: Receipt, roles: ['ADMIN', 'MECANICO', 'CLIENTE'] },
+  { to: '/facturas', label: 'Facturas', icon: Receipt, roles: ['ADMIN', 'GERENTE', 'ASESOR', 'CAJERO', 'CLIENTE'] },
+  { to: '/mis-ordenes', label: 'Mis órdenes', icon: Activity, roles: ['MECANICO'] },
+  { to: '/auditoria', label: 'Auditoría', icon: ShieldCheck, roles: ['ADMIN', 'GERENTE'] },
+  { to: '/productividad', label: 'Productividad', icon: BarChart3, roles: ['ADMIN', 'GERENTE'] },
 ];
 
 export default function Sidebar({ abierto, cerrar }) {

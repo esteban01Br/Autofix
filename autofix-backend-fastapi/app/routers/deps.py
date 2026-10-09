@@ -63,6 +63,15 @@ def require_roles(*roles: str) -> Callable[..., Usuario]:
 # Dependencias listas para usar en las rutas.
 admin = require_roles("ADMIN")
 superadmin = require_roles("SUPERADMIN")
+gerente = require_roles("GERENTE")
+asesor = require_roles("ASESOR")
+bodeguero = require_roles("BODEGUERO")
+cajero = require_roles("CAJERO")
+mecanico = require_roles("MECANICO")
+# Empleados de la empresa (todos los roles internos)
+empleado = require_roles("ADMIN", "GERENTE", "ASESOR", "MECANICO", "BODEGUERO", "CAJERO")
+# Gestión: admin y gerente
+gestion = require_roles("ADMIN", "GERENTE")
 lectura_administrativa = require_roles("ADMIN", "MECANICO", "CLIENTE")
 
 

@@ -1,6 +1,7 @@
 """Lógica de negocio de OrdenTrabajo."""
 
 from fastapi import HTTPException
+from sqlalchemy import select
 
 from app.crud import orden_trabajo as crud_orden
 from app.crud import base as crud_base
@@ -168,6 +169,17 @@ def asignar_mecanico(db, empresa_id: int | None, orden_id: int, mecanico_id: int
     orden.mecanico_id = mecanico_id
     crud_base.actualizar(db, orden)
     return to_response(orden)
+
+
+def listar_mias(db, mecanico_id: int) -> list[OrdenTrabajoResponse]:
+    """Órdenes asignadas a un mecánico específico (vista del mecánico)."""
+    stmt = (
+        select(OrdenTrabajo)
+        .where(OrdenTrabajo.mecanico_id == mecanico_id)
+        .order_by(OrdenTrabajo.fecha_ingreso.desc())
+    )
+    ordenes = list(db.scalars(stmt).all())
+    return [to_response(o) for o in ordenes]
 
 
 def eliminar_orden(db, empresa_id: int | None, orden_id: int) -> None:

@@ -20,8 +20,47 @@ def to_response(usuario: Usuario) -> UsuarioResponse:
         telefono=usuario.telefono,
         rol=usuario.rol,
         activo=usuario.activo,
+        debeCambiarContrasena=usuario.debe_cambiar_contrasena,
         fechaCreacion=usuario.fecha_creacion,
     )
+
+
+def invitar_empleado(db, empresa_id: int, payload: UsuarioCreate) -> UsuarioResponse:
+    """Crea un empleado con contraseña temporal y cambio obligatorio."""
+    correo = payload.correo.strip().lower()
+    if crud_usuario.exists_correo(db, correo):
+        raise HTTPException(status_code=409, detail="Ya existe un usuario con ese correo.")
+
+    if payload.rol == Rol.SUPERADMIN:
+        raise HTTPException(status_code=403, detail="No se puede crear un usuario SUPERADMIN.")
+
+    usuario = Usuario(
+        nombre=payload.nombre.strip(),
+        apellido=payload.apellido.strip(),
+        correo=correo,
+        contrasena=hash_password(payload.contrasena),
+        telefono=payload.telefono,
+        rol=payload.rol,
+        activo=True,
+        debe_cambiar_contrasena=True,  # Debe cambiarla en su primer login
+        empresa_id=empresa_id,
+    )
+    crud_base.crear(db, usuario)
+    return to_response(usuario)
+
+
+def reestablecer_contrasena(db, empresa_id: int, usuario_id: int, nueva_contrasena: str) -> UsuarioResponse:
+    """El ADMIN genera una nueva contraseña temporal para un empleado."""
+    usuario = crud_base.obtener_o_404(db, Usuario, usuario_id, "Usuario no encontrado.")
+    verificar_empresa(usuario, empresa_id, "Usuario no encontrado.")
+
+    if usuario.rol == Rol.SUPERADMIN:
+        raise HTTPException(status_code=403, detail="No se puede reestablecer la contraseña de un SUPERADMIN.")
+
+    usuario.contrasena = hash_password(nueva_contrasena)
+    usuario.debe_cambiar_contrasena = True
+    crud_base.actualizar(db, usuario)
+    return to_response(usuario)
 
 
 def crear_usuario(db, empresa_id: int, payload: UsuarioCreate) -> UsuarioResponse:

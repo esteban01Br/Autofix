@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Search, Users } from 'lucide-react';
-import { listarUsuarios, crearUsuario, actualizarUsuario, eliminarUsuario } from '../services/usuarioService';
+import { Plus, Pencil, Trash2, Search, Users, UserPlus, KeyRound } from 'lucide-react';
+import { listarUsuarios, crearUsuario, actualizarUsuario, eliminarUsuario, invitarEmpleado, reestablecerContrasena } from '../services/usuarioService';
 import Badge from '../components/Badge';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError, formatearFecha } from '../lib/utils';
@@ -11,6 +11,16 @@ import EmptyState from '../components/EmptyState';
 import Spinner from '../components/Spinner';
 
 const estadoInicial = { nombre: '', apellido: '', correo: '', contrasena: '', telefono: '', rol: 'CLIENTE', activo: true };
+
+const ROLES = [
+  { value: 'CLIENTE', label: 'Cliente' },
+  { value: 'ASESOR', label: 'Asesor' },
+  { value: 'MECANICO', label: 'Mecánico' },
+  { value: 'BODEGUERO', label: 'Bodeguero' },
+  { value: 'CAJERO', label: 'Cajero' },
+  { value: 'GERENTE', label: 'Gerente' },
+  { value: 'ADMIN', label: 'Administrador' },
+];
 
 export default function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
@@ -23,6 +33,10 @@ export default function Usuarios() {
   const [guardando, setGuardando] = useState(false);
   const [errorForm, setErrorForm] = useState('');
   const [eliminarId, setEliminarId] = useState(null);
+  const [invitarAbierto, setInvitarAbierto] = useState(false);
+  const [invitarForm, setInvitarForm] = useState({ nombre: '', apellido: '', correo: '', contrasena: '', telefono: '', rol: 'ASESOR' });
+  const [invitarGuardando, setInvitarGuardando] = useState(false);
+  const [invitarError, setInvitarError] = useState('');
   const { pushToast } = useToast();
 
   const cargar = async () => {
@@ -115,6 +129,55 @@ export default function Usuarios() {
     }
   };
 
+  const abrirInvitar = () => {
+    setInvitarForm({ nombre: '', apellido: '', correo: '', contrasena: '', telefono: '', rol: 'ASESOR' });
+    setInvitarError('');
+    setInvitarAbierto(true);
+  };
+
+  const manejarCambioInvitar = (e) => {
+    const { name, value } = e.target;
+    setInvitarForm((f) => ({ ...f, [name]: value }));
+  };
+
+  const guardarInvitacion = async (e) => {
+    e.preventDefault();
+    setInvitarGuardando(true);
+    setInvitarError('');
+    try {
+      await invitarEmpleado({
+        nombre: invitarForm.nombre.trim(),
+        apellido: invitarForm.apellido.trim(),
+        correo: invitarForm.correo.trim(),
+        contrasena: invitarForm.contrasena,
+        telefono: invitarForm.telefono || null,
+        rol: invitarForm.rol,
+      });
+      pushToast('Empleado invitado. Debe cambiar su contraseña temporal en su primer login.');
+      setInvitarAbierto(false);
+      cargar();
+    } catch (err) {
+      setInvitarError(extraerMensajeError(err, 'No se pudo invitar al empleado'));
+    } finally {
+      setInvitarGuardando(false);
+    }
+  };
+
+  const reestablecer = async (u) => {
+    const nueva = window.prompt(`Nueva contraseña temporal para ${u.correo} (mín. 8 caracteres):`);
+    if (!nueva) return;
+    if (nueva.length < 8) {
+      pushToast('La contraseña debe tener al menos 8 caracteres.', 'error');
+      return;
+    }
+    try {
+      await reestablecerContrasena(u.id, nueva);
+      pushToast(`Contraseña reestablecida para ${u.correo}. Debe cambiarla en su próximo login.`);
+    } catch (err) {
+      pushToast(extraerMensajeError(err, 'No se pudo reestablecer la contraseña'), 'error');
+    }
+  };
+
   const filtrados = usuarios.filter((u) => {
     const texto = busqueda.trim().toLowerCase();
     if (!texto) return true;
@@ -126,6 +189,9 @@ export default function Usuarios() {
   return (
     <div className="space-y-6">
       <PageHeader titulo="Usuarios" subtitulo={`${usuarios.length} usuarios del sistema`}>
+        <button onClick={abrirInvitar} className="btn btn-ghost">
+          <UserPlus size={16} /> Invitar
+        </button>
         <button onClick={abrirCrear} className="btn btn-primary">
           <Plus size={16} /> Nuevo usuario
         </button>
@@ -144,9 +210,9 @@ export default function Usuarios() {
         </div>
         <select value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)} className="input sm:w-44">
           <option value="">Todos los roles</option>
-          <option value="ADMIN">Administrador</option>
-          <option value="MECANICO">Mecánico</option>
-          <option value="CLIENTE">Cliente</option>
+          {ROLES.map((r) => (
+            <option key={r.value} value={r.value}>{r.label}</option>
+          ))}
         </select>
       </div>
 
@@ -188,6 +254,9 @@ export default function Usuarios() {
                     <td className="py-3 px-4 text-right whitespace-nowrap">
                       <button onClick={() => abrirEditar(u)} className="p-1.5 text-text-secondary hover:text-accent transition-colors" title="Editar">
                         <Pencil size={16} />
+                      </button>
+                      <button onClick={() => reestablecer(u)} className="p-1.5 text-text-secondary hover:text-warning transition-colors ml-1" title="Reestablecer contraseña">
+                        <KeyRound size={16} />
                       </button>
                       <button onClick={() => setEliminarId(u.id)} className="p-1.5 text-text-secondary hover:text-danger transition-colors ml-1" title="Eliminar">
                         <Trash2 size={16} />
@@ -231,9 +300,9 @@ export default function Usuarios() {
             <div>
               <label className="label">Rol *</label>
               <select name="rol" value={formulario.rol} onChange={manejarCambio} className="input">
-                <option value="CLIENTE">Cliente</option>
-                <option value="MECANICO">Mecánico</option>
-                <option value="ADMIN">Administrador</option>
+                {ROLES.map((r) => (
+                  <option key={r.value} value={r.value}>{r.label}</option>
+                ))}
               </select>
             </div>
             <div className="flex items-end pb-2">
@@ -258,6 +327,60 @@ export default function Usuarios() {
             <button type="button" onClick={() => setModalAbierto(false)} className="btn btn-ghost">Cancelar</button>
             <button type="submit" className="btn btn-primary" disabled={guardando}>
               {guardando ? 'Guardando...' : editando ? 'Guardar cambios' : 'Crear usuario'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        abierto={invitarAbierto}
+        onCerrar={() => setInvitarAbierto(false)}
+        titulo="Invitar empleado"
+      >
+        <form onSubmit={guardarInvitacion} className="space-y-4">
+          <p className="text-sm text-text-secondary">
+            Se creará el usuario con una <span className="text-accent font-semibold">contraseña temporal</span>.
+            Deberá cambiarla en su primer inicio de sesión.
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="label">Nombre *</label>
+              <input name="nombre" value={invitarForm.nombre} onChange={manejarCambioInvitar} className="input" required maxLength={100} />
+            </div>
+            <div>
+              <label className="label">Apellido *</label>
+              <input name="apellido" value={invitarForm.apellido} onChange={manejarCambioInvitar} className="input" required maxLength={100} />
+            </div>
+            <div className="col-span-2">
+              <label className="label">Correo *</label>
+              <input name="correo" type="email" value={invitarForm.correo} onChange={manejarCambioInvitar} className="input" required maxLength={150} />
+            </div>
+            <div>
+              <label className="label">Contraseña temporal *</label>
+              <input name="contrasena" type="password" value={invitarForm.contrasena} onChange={manejarCambioInvitar} className="input" required minLength={8} placeholder="Mínimo 8 caracteres" />
+            </div>
+            <div>
+              <label className="label">Teléfono</label>
+              <input name="telefono" value={invitarForm.telefono} onChange={manejarCambioInvitar} className="input" maxLength={20} />
+            </div>
+            <div className="col-span-2">
+              <label className="label">Rol *</label>
+              <select name="rol" value={invitarForm.rol} onChange={manejarCambioInvitar} className="input">
+                {ROLES.filter((r) => r.value !== 'ADMIN' && r.value !== 'CLIENTE').map((r) => (
+                  <option key={r.value} value={r.value}>{r.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {invitarError && (
+            <div className="p-3 rounded-lg bg-danger/10 border border-danger/30 text-sm text-danger animate-fade-in">{invitarError}</div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={() => setInvitarAbierto(false)} className="btn btn-ghost">Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={invitarGuardando}>
+              {invitarGuardando ? 'Invitando...' : 'Enviar invitación'}
             </button>
           </div>
         </form>

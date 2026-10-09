@@ -13,6 +13,7 @@ from app.schemas.repuesto import (
     RepuestoUpdate,
 )
 from app.services import repuesto_service
+from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(prefix="/api/repuestos", tags=["Repuestos"])
 
@@ -28,7 +29,17 @@ def crear_repuesto(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> RepuestoResponse:
-    return repuesto_service.crear_repuesto(db, usuario.empresa_id, payload)
+    creado = repuesto_service.crear_repuesto(db, usuario.empresa_id, payload)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="CREAR_REPUESTO",
+        entidad="Repuesto",
+        entidad_id=creado.id,
+        detalle=f"{creado.nombre} · stock {creado.stock} · {creado.precio}",
+    )
+    return creado
 
 
 @router.get(

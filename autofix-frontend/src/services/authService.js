@@ -6,6 +6,11 @@ export const login = async (correo, contrasena) => {
   return response.data;
 };
 
+export const cambiarContrasena = async (data) => {
+  const response = await api.post('/api/auth/cambiar-contrasena', data);
+  return response.data;
+};
+
 export const decodificarToken = (token) => {
   const payload = token.split('.')[1];
   const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
@@ -15,6 +20,7 @@ export const decodificarToken = (token) => {
     id: decoded.id,
     rol: decoded.rol,
     empresaId: decoded.empresa_id ?? null,
+    debeCambiarContrasena: decoded.debe_cambiar ?? false,
     expira: decoded.exp,
   };
 };

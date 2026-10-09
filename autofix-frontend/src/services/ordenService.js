@@ -25,11 +25,19 @@ export const cambiarEstadoOrden = async (id, estado) => {
   return response.data;
 };
 
-export const asignarMecanicoOrden = async (id, mecanicoId) => {
+export const asignarMecanico = async (id, mecanicoId) => {
   const response = await api.patch(`/api/ordenes/${id}/mecanico`, { mecanicoId });
   return response.data;
 };
 
+export const asignarMecanicoOrden = asignarMecanico;
+
 export const eliminarOrden = async (id) => {
   await api.delete(`/api/ordenes/${id}`);
+};
+
+// Vista del mecánico: solo sus órdenes asignadas
+export const obtenerMisOrdenes = async () => {
+  const response = await api.get('/api/ordenes/mias');
+  return response.data;
 };

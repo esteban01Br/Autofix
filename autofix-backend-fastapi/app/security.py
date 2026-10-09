@@ -23,7 +23,7 @@ def verify_password(contrasena: str, hash_almacenado: str) -> bool:
 
 
 def create_access_token(
-    *, correo: str, usuario_id: int, rol: str, empresa_id: int | None = None
+    *, correo: str, usuario_id: int, rol: str, empresa_id: int | None = None, debe_cambiar: bool = False
 ) -> str:
     """Genera un token JWT con expiración configurable.
 
@@ -39,6 +39,7 @@ def create_access_token(
         "id": usuario_id,
         "rol": rol,
         "empresa_id": empresa_id,
+        "debe_cambiar": debe_cambiar,
         "iat": datetime.now(timezone.utc),
         "exp": expira,
     }

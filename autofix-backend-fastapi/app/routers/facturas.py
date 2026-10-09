@@ -10,6 +10,7 @@ from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.factura import FacturaCreate, FacturaResponse
 from app.services import factura_service
+from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(prefix="/api/facturas", tags=["Facturas"])
 
@@ -27,7 +28,17 @@ def crear_factura(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> FacturaResponse:
-    return factura_service.crear_factura(db, usuario.empresa_id, payload)
+    creada = factura_service.crear_factura(db, usuario.empresa_id, payload)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="FACTURAR",
+        entidad="Factura",
+        entidad_id=creada.id,
+        detalle=f"{creada.numero} · total {creada.total}",
+    )
+    return creada
 
 
 @router.get(

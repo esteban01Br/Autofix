@@ -9,6 +9,7 @@ from app.models.empresa import Empresa
 from app.models.enums import Rol
 from app.models.usuario import Usuario
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
+from app.schemas.usuario import CambioContrasenaRequest
 from app.security import create_access_token, hash_password, verify_password
 
 
@@ -45,8 +46,11 @@ def login(db, payload: LoginRequest) -> TokenResponse:
         usuario_id=usuario.id,
         rol=usuario.rol.value,
         empresa_id=usuario.empresa_id,
+        debe_cambiar=usuario.debe_cambiar_contrasena,
     )
-    return TokenResponse(token=token)
+    return TokenResponse(
+        token=token, debeCambiarContrasena=usuario.debe_cambiar_contrasena
+    )
 
 
 def register(db, payload: RegisterRequest) -> TokenResponse:
@@ -73,5 +77,25 @@ def register(db, payload: RegisterRequest) -> TokenResponse:
         usuario_id=usuario.id,
         rol=usuario.rol.value,
         empresa_id=usuario.empresa_id,
+        debe_cambiar=usuario.debe_cambiar_contrasena,
     )
-    return TokenResponse(token=token)
+    return TokenResponse(token=token, debeCambiarContrasena=usuario.debe_cambiar_contrasena)
+
+
+def cambiar_contrasena(db, usuario: Usuario, payload: CambioContrasenaRequest) -> TokenResponse:
+    """El usuario cambia su propia contraseña (obligatorio si es temporal)."""
+    if not verify_password(payload.contrasena_actual, usuario.contrasena):
+        raise HTTPException(status_code=400, detail="La contraseña actual no es correcta.")
+
+    usuario.contrasena = hash_password(payload.contrasena_nueva)
+    usuario.debe_cambiar_contrasena = False
+    crud_base.actualizar(db, usuario)
+
+    token = create_access_token(
+        correo=usuario.correo,
+        usuario_id=usuario.id,
+        rol=usuario.rol.value,
+        empresa_id=usuario.empresa_id,
+        debe_cambiar=False,
+    )
+    return TokenResponse(token=token, debeCambiarContrasena=False)

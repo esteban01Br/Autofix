@@ -25,6 +25,11 @@ class Usuario(Base):
         Enum(Rol, name="rol"), nullable=False, default=Rol.CLIENTE
     )
     activo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    # True cuando el usuario debe cambiar su contraseña en el próximo login
+    # (invitaciones de empleados con contraseña temporal)
+    debe_cambiar_contrasena: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
     # Empresa a la que pertenece (NULL solo para SUPERADMIN de plataforma)
     empresa_id: Mapped[int | None] = mapped_column(
         ForeignKey("empresas.id"), nullable=True, index=True

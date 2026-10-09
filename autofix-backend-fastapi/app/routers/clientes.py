@@ -8,6 +8,7 @@ from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.cliente import ClienteCreate, ClienteResponse, ClienteUpdate
 from app.services import cliente_service
+from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(prefix="/api/clientes", tags=["Clientes"])
 
@@ -23,7 +24,17 @@ def crear_cliente(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> ClienteResponse:
-    return cliente_service.crear_cliente(db, usuario.empresa_id, payload)
+    creado = cliente_service.crear_cliente(db, usuario.empresa_id, payload)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="CREAR_CLIENTE",
+        entidad="Cliente",
+        entidad_id=creado.id,
+        detalle=f"Cliente creado: {creado.usuario.nombre} {creado.usuario.apellido}",
+    )
+    return creado
 
 
 @router.get(

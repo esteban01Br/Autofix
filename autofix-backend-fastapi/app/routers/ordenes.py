@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, empresa_filtro, get_current_user
+from app.routers.deps import admin, empresa_filtro, get_current_user, mecanico
 from app.database import get_db
 from app.models.enums import EstadoOrden
 from app.models.usuario import Usuario
@@ -17,6 +17,7 @@ from app.schemas.orden_trabajo import (
     OrdenTrabajoUpdate,
 )
 from app.services import orden_trabajo_service
+from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(prefix="/api/ordenes", tags=["Órdenes de Trabajo"])
 
@@ -32,7 +33,17 @@ def crear_orden(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> OrdenTrabajoResponse:
-    return orden_trabajo_service.crear_orden(db, usuario.empresa_id, payload)
+    creada = orden_trabajo_service.crear_orden(db, usuario.empresa_id, payload)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="CREAR_ORDEN",
+        entidad="OrdenTrabajo",
+        entidad_id=creada.id,
+        detalle=f"Orden #{creada.id} · vehículo {creada.vehiculoPlaca}",
+    )
+    return creada
 
 
 @router.get(
@@ -73,6 +84,18 @@ def listar_ordenes(
     )
     resp.headers["X-Total-Count"] = str(total)
     return items
+
+
+@router.get(
+    "/mias",
+    response_model=list[OrdenTrabajoResponse],
+    summary="Mis órdenes asignadas (vista del mecánico)",
+)
+def listar_mias(
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(mecanico),
+) -> list[OrdenTrabajoResponse]:
+    return orden_trabajo_service.listar_mias(db, usuario.mecanico.id)
 
 
 @router.get(

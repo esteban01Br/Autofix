@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
 
 from app.routers import (
+    auditoria,
     auth,
     citas,
     clientes,
@@ -17,6 +18,7 @@ from app.routers import (
     facturas,
     mecanicos,
     ordenes,
+    reportes,
     repuestos,
     usuarios,
     vehiculos,
@@ -106,6 +108,8 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 # Rutas
 app.include_router(auth.router)
 app.include_router(empresas.router)
+app.include_router(auditoria.router)
+app.include_router(reportes.router)
 app.include_router(usuarios.router)
 app.include_router(clientes.router)
 app.include_router(vehiculos.router)

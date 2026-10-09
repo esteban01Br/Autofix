@@ -49,4 +49,10 @@ class UsuarioResponse(BaseModel):
     telefono: str | None = None
     rol: Rol
     activo: bool
+    debeCambiarContrasena: bool = False
     fechaCreacion: datetime
+
+
+class CambioContrasenaRequest(BaseModel):
+    contrasena_actual: str = Field(min_length=1, max_length=128)
+    contrasena_nueva: str = Field(min_length=8, max_length=128)

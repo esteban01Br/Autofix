@@ -40,3 +40,7 @@ class RegisterRequest(BaseModel):
 class TokenResponse(BaseModel):
     token: str = Field(description="Token JWT de acceso")
     token_type: str = "bearer"
+    debeCambiarContrasena: bool = Field(
+        default=False,
+        description="True si el usuario debe cambiar su contraseña en este login",
+    )

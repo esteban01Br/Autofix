@@ -91,8 +91,12 @@ export default function Login() {
 
     setCargando(true);
     try {
-      await login(correo.trim(), contrasena);
-      navigate('/dashboard');
+      const datos = await login(correo.trim(), contrasena);
+      if (datos.debeCambiarContrasena) {
+        navigate('/cambiar-contrasena');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       manejarError(err);
     } finally {

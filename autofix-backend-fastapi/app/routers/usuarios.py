@@ -1,6 +1,6 @@
 """Rutas de Usuario (solo administradores)."""
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.routers.deps import admin, empresa_filtro
@@ -9,6 +9,7 @@ from app.models.enums import Rol
 from app.models.usuario import Usuario
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 from app.services import usuario_service
+from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(
     prefix="/api/usuarios",
@@ -28,7 +29,17 @@ def crear_usuario(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> UsuarioResponse:
-    return usuario_service.crear_usuario(db, usuario.empresa_id, payload)
+    creado = usuario_service.crear_usuario(db, usuario.empresa_id, payload)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="CREAR_USUARIO",
+        entidad="Usuario",
+        entidad_id=creado.id,
+        detalle=f"{creado.correo} · rol {creado.rol.value}",
+    )
+    return creado
 
 
 @router.get(
@@ -108,3 +119,52 @@ def eliminar_usuario(
 ) -> Response:
     usuario_service.eliminar_usuario(db, empresa_filtro(usuario), usuario_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/invitar",
+    response_model=UsuarioResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Invitar empleado",
+    description="Crea un usuario con contraseña temporal. El empleado debe "
+    "cambiarla en su primer login (debeCambiarContrasena=true).",
+)
+def invitar_empleado(
+    payload: UsuarioCreate,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
+) -> UsuarioResponse:
+    invitado = usuario_service.invitar_empleado(db, usuario.empresa_id, payload)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="INVITAR_EMPLEADO",
+        entidad="Usuario",
+        entidad_id=invitado.id,
+        detalle=f"{invitado.correo} · rol {invitado.rol.value} · contraseña temporal",
+    )
+    return invitado
+
+
+@router.post(
+    "/{usuario_id}/reestablecer-contrasena",
+    response_model=UsuarioResponse,
+    summary="Reestablecer contraseña de un empleado (ADMIN)",
+    description="Genera una nueva contraseña temporal; el empleado debe "
+    "cambiarla en su próximo login.",
+)
+def reestablecer_contrasena(
+    usuario_id: int,
+    payload: dict,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
+) -> UsuarioResponse:
+    nueva = payload.get("contrasena", "")
+    if len(nueva) < 8:
+        raise HTTPException(
+            status_code=422, detail="La contraseña debe tener al menos 8 caracteres."
+        )
+    return usuario_service.reestablecer_contrasena(
+        db, usuario.empresa_id, usuario_id, nueva
+    )
