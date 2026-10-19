@@ -3,24 +3,12 @@
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, Numeric, String
+from sqlalchemy import DateTime, Enum, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.models.enums import EstadoPagoFactura, MetodoPago
 from app.utils import ahora_utc
-
-
-class MetodoPago(str, Enum):
-    EFECTIVO = "EFECTIVO"
-    TARJETA = "TARJETA"
-    TRANSFERENCIA = "TRANSFERENCIA"
-    OTRO = "OTRO"
-
-
-class EstadoPagoFactura(str, Enum):
-    PENDIENTE = "PENDIENTE"
-    PARCIAL = "PARCIAL"
-    PAGADA = "PAGADA"
 
 
 class Pago(Base):
@@ -43,6 +31,7 @@ class Pago(Base):
     fecha: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=ahora_utc)
 
     factura = relationship("Factura", back_populates="pagos")
+    usuario = relationship("Usuario")
 
     def __repr__(self) -> str:
         return f"<Pago {self.id}: factura {self.factura_id} · {self.monto}>"

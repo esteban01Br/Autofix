@@ -448,6 +448,81 @@ def test_orden_detalle_stock_y_factura(client, admin_token):
     assert any(x["id"] == f["id"] for x in lista_facturas.json())
 
 
+def test_pagos_de_factura_parcial_y_pagada(client, admin_token):
+    """Fase 3: los abonos actualizan PENDIENTE -> PARCIAL -> PAGADA."""
+    h = auth(admin_token)
+    cuid = crear_usuario(client, admin_token, correo_unico("pago"))
+    cid = crear_cliente(client, admin_token, cuid)
+    vid = crear_vehiculo(client, admin_token, cid)
+    rid = crear_repuesto(client, admin_token, stock=10, precio="250.00")
+    oid = crear_orden(client, admin_token, vid)
+    client.post(
+        f"/api/detalles/orden/{oid}",
+        json={"repuestoId": rid, "cantidad": 2},
+        headers=h,
+    )
+
+    factura = client.post(
+        "/api/facturas", json={"ordenTrabajoId": oid}, headers=h
+    )
+    assert factura.status_code == 201, factura.text
+    fid = factura.json()["id"]
+    assert factura.json()["estadoPago"] == "PENDIENTE"
+    assert factura.json()["montoPagado"] == "0.00"
+    assert factura.json()["saldo"] == "595.00"  # 500 + 19% IVA
+
+    # Abono parcial -> PARCIAL.
+    abono = client.post(
+        f"/api/facturas/{fid}/pagos",
+        json={"monto": "200.00", "metodo": "EFECTIVO"},
+        headers=h,
+    )
+    assert abono.status_code == 201, abono.text
+    assert abono.json()["monto"] == "200.00"
+    assert abono.json()["usuarioNombre"] is not None
+
+    f1 = client.get(f"/api/facturas/{fid}", headers=h).json()
+    assert f1["estadoPago"] == "PARCIAL"
+    assert f1["montoPagado"] == "200.00"
+    assert f1["saldo"] == "395.00"
+
+    # Un pago mayor que el saldo -> 409.
+    excede = client.post(
+        f"/api/facturas/{fid}/pagos",
+        json={"monto": "999999.00", "metodo": "EFECTIVO"},
+        headers=h,
+    )
+    assert excede.status_code == 409
+
+    # Método de pago inválido -> 422.
+    assert (
+        client.post(
+            f"/api/facturas/{fid}/pagos",
+            json={"monto": "10.00", "metodo": "CHEQUE"},
+            headers=h,
+        ).status_code
+        == 422
+    )
+
+    # Cubrir el saldo restante -> PAGADA.
+    final = client.post(
+        f"/api/facturas/{fid}/pagos",
+        json={"monto": "395.00", "metodo": "TARJETA"},
+        headers=h,
+    )
+    assert final.status_code == 201, final.text
+
+    f2 = client.get(f"/api/facturas/{fid}", headers=h).json()
+    assert f2["estadoPago"] == "PAGADA"
+    assert f2["montoPagado"] == "595.00"
+    assert f2["saldo"] == "0.00"
+
+    # Historial con los dos pagos registrados.
+    pagos = client.get(f"/api/facturas/{fid}/pagos", headers=h)
+    assert pagos.status_code == 200
+    assert len(pagos.json()) == 2
+
+
 def test_eliminar_detalle_devuelve_stock(client, admin_token):
     h = auth(admin_token)
     cuid = crear_usuario(client, admin_token, correo_unico("dev"))

@@ -42,6 +42,11 @@ def to_response(factura: Factura) -> FacturaResponse:
         ordenTrabajoId=factura.orden_trabajo_id,
         vehiculoPlaca=vehiculo_placa,
         clienteNombre=cliente_nombre,
+        estadoPago=factura.estado_pago,
+        montoPagado=Decimal(factura.monto_pagado or 0).quantize(Decimal("0.01")),
+        saldo=(
+            Decimal(factura.total) - Decimal(factura.monto_pagado or 0)
+        ).quantize(Decimal("0.01")),
     )
 
 

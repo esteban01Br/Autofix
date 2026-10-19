@@ -14,9 +14,18 @@ const mapas = {
   FINALIZADA: { color: 'bg-success-glow text-success' },
 
   // Roles
+  SUPERADMIN: { color: 'bg-danger-glow text-danger' },
   ADMIN: { color: 'bg-accent-glow text-accent' },
+  GERENTE: { color: 'bg-accent-glow text-accent' },
+  ASESOR: { color: 'bg-info-glow text-info' },
   MECANICO: { color: 'bg-info-glow text-info' },
+  BODEGUERO: { color: 'bg-warning-glow text-warning' },
+  CAJERO: { color: 'bg-success-glow text-success' },
   CLIENTE: { color: 'bg-steel/15 text-steel' },
+
+  // Estados de pago de factura
+  PARCIAL: { color: 'bg-info-glow text-info' },
+  PAGADA: { color: 'bg-success-glow text-success' },
 
   // Booleanos
   true: { color: 'bg-success-glow text-success' },

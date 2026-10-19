@@ -5,11 +5,12 @@ from datetime import date, datetime, time
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, empresa_filtro, get_current_user
+from app.routers.deps import admin, empresa_filtro, facturacion, get_current_user
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.factura import FacturaCreate, FacturaResponse
-from app.services import factura_service
+from app.schemas.pago import PagoCreate, PagoResponse
+from app.services import factura_service, pago_service
 from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(prefix="/api/facturas", tags=["Facturas"])
@@ -26,7 +27,7 @@ router = APIRouter(prefix="/api/facturas", tags=["Facturas"])
 def crear_factura(
     payload: FacturaCreate,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(admin),
+    usuario: Usuario = Depends(facturacion),
 ) -> FacturaResponse:
     creada = factura_service.crear_factura(db, usuario.empresa_id, payload)
     auditar(
@@ -102,3 +103,45 @@ def eliminar_factura(
 ) -> Response:
     factura_service.eliminar_factura(db, empresa_filtro(usuario), factura_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get(
+    "/{factura_id}/pagos",
+    response_model=list[PagoResponse],
+    summary="Historial de pagos de una factura",
+)
+def listar_pagos(
+    factura_id: int,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(get_current_user),
+) -> list[PagoResponse]:
+    return pago_service.listar_pagos(db, empresa_filtro(usuario), factura_id)
+
+
+@router.post(
+    "/{factura_id}/pagos",
+    response_model=PagoResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Registrar pago o abono de una factura",
+    description="Un abono parcial marca la factura PARCIAL; al cubrir el "
+    "total queda PAGADA. No se admiten pagos que superen el saldo.",
+)
+def registrar_pago(
+    factura_id: int,
+    payload: PagoCreate,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(facturacion),
+) -> PagoResponse:
+    pago = pago_service.registrar_pago(
+        db, empresa_filtro(usuario), usuario, factura_id, payload
+    )
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="REGISTRAR_PAGO",
+        entidad="Pago",
+        entidad_id=pago.id,
+        detalle=f"Factura #{factura_id} · {pago.monto} · {pago.metodo.value}",
+    )
+    return pago

@@ -74,7 +74,7 @@ export default function App() {
           <Route path="/mecanicos" element={<ProtectedRoute roles={['ADMIN', 'MECANICO']}><Mecanicos /></ProtectedRoute>} />
           <Route path="/ordenes" element={<Ordenes />} />
           <Route path="/repuestos" element={<Repuestos />} />
-          <Route path="/facturas" element={<Facturas />} />
+          <Route path="/facturas" element={<ProtectedRoute roles={['ADMIN', 'GERENTE', 'CAJERO']}><Facturas /></ProtectedRoute>} />
           <Route path="/empresas" element={<ProtectedRoute roles={['SUPERADMIN']}><Empresas /></ProtectedRoute>} />
           <Route path="/mi-empresa" element={<ProtectedRoute roles={['ADMIN']}><MiEmpresa /></ProtectedRoute>} />
           <Route path="/mis-ordenes" element={<ProtectedRoute roles={['MECANICO']}><MisOrdenes /></ProtectedRoute>} />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, Search, Receipt } from 'lucide-react';
-import { listarFacturas, crearFactura, eliminarFactura } from '../services/facturaService';
+import { Plus, Trash2, Search, Receipt, Wallet } from 'lucide-react';
+import { listarFacturas, crearFactura, eliminarFactura, obtenerFactura, listarPagos, registrarPago } from '../services/facturaService';
 import { listarOrdenes } from '../services/ordenService';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError, formatearFechaHora, formatearMoneda } from '../lib/utils';
@@ -9,6 +9,7 @@ import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import EmptyState from '../components/EmptyState';
 import Spinner from '../components/Spinner';
+import Badge from '../components/Badge';
 
 export default function Facturas() {
   const [facturas, setFacturas] = useState([]);
@@ -21,6 +22,15 @@ export default function Facturas() {
   const [guardando, setGuardando] = useState(false);
   const [errorForm, setErrorForm] = useState('');
   const [eliminarId, setEliminarId] = useState(null);
+  // Registro de pagos/abonos
+  const [pagoAbierto, setPagoAbierto] = useState(false);
+  const [facturaPago, setFacturaPago] = useState(null);
+  const [pagoMonto, setPagoMonto] = useState('');
+  const [pagoMetodo, setPagoMetodo] = useState('EFECTIVO');
+  const [pagoHistorial, setPagoHistorial] = useState([]);
+  const [cargandoPagos, setCargandoPagos] = useState(false);
+  const [pagoGuardando, setPagoGuardando] = useState(false);
+  const [pagoError, setPagoError] = useState('');
   const { pushToast } = useToast();
 
   const cargar = async () => {
@@ -81,6 +91,48 @@ export default function Facturas() {
     }
   };
 
+  const abrirPago = async (f) => {
+    setFacturaPago(f);
+    setPagoMonto('');
+    setPagoMetodo('EFECTIVO');
+    setPagoError('');
+    setPagoHistorial([]);
+    setPagoAbierto(true);
+    setCargandoPagos(true);
+    try {
+      const hist = await listarPagos(f.id);
+      setPagoHistorial(hist);
+    } catch {
+      setPagoHistorial([]);
+    } finally {
+      setCargandoPagos(false);
+    }
+  };
+
+  const guardarPago = async (e) => {
+    e.preventDefault();
+    if (!facturaPago) return;
+    setPagoGuardando(true);
+    setPagoError('');
+    try {
+      const pago = await registrarPago(facturaPago.id, {
+        monto: pagoMonto,
+        metodo: pagoMetodo,
+      });
+      const actualizada = await obtenerFactura(facturaPago.id);
+      setFacturas((prev) => prev.map((f) => (f.id === actualizada.id ? actualizada : f)));
+      setPagoHistorial((prev) => [pago, ...prev]);
+      setPagoAbierto(false);
+      pushToast(
+        `Pago de ${formatearMoneda(pago.monto)} registrado. Factura ${actualizada.numero}: ${actualizada.estadoPago}.`
+      );
+    } catch (err) {
+      setPagoError(extraerMensajeError(err, 'No se pudo registrar el pago'));
+    } finally {
+      setPagoGuardando(false);
+    }
+  };
+
   const filtradas = facturas.filter((f) => {
     const texto = busqueda.trim().toLowerCase();
     if (!texto) return true;
@@ -92,10 +144,14 @@ export default function Facturas() {
   });
 
   const totalIngresos = facturas.reduce((acc, f) => acc + Number(f.total), 0);
+  const totalCobrado = facturas.reduce((acc, f) => acc + Number(f.montoPagado ?? 0), 0);
 
   return (
     <div className="space-y-6">
-      <PageHeader titulo="Facturas" subtitulo={`${facturas.length} facturas · ${formatearMoneda(totalIngresos)} en total`}>
+      <PageHeader
+        titulo="Facturas"
+        subtitulo={`${facturas.length} facturas · ${formatearMoneda(totalCobrado)} cobrados de ${formatearMoneda(totalIngresos)}`}
+      >
         <button onClick={abrirModal} className="btn btn-primary">
           <Plus size={16} /> Generar factura
         </button>
@@ -137,6 +193,7 @@ export default function Facturas() {
                   <th className="py-3 px-4 font-medium text-right">Subtotal</th>
                   <th className="py-3 px-4 font-medium text-right">IVA</th>
                   <th className="py-3 px-4 font-medium text-right">Total</th>
+                  <th className="py-3 px-4 font-medium">Estado de pago</th>
                   <th className="py-3 px-4 font-medium text-right">Acciones</th>
                 </tr>
               </thead>
@@ -151,8 +208,21 @@ export default function Facturas() {
                     <td className="py-3 px-4 text-right font-mono">{formatearMoneda(f.subtotal)}</td>
                     <td className="py-3 px-4 text-right font-mono">{formatearMoneda(f.iva)}</td>
                     <td className="py-3 px-4 text-right font-mono font-bold text-text-primary">{formatearMoneda(f.total)}</td>
-                    <td className="py-3 px-4 text-right">
-                      <button onClick={() => setEliminarId(f.id)} className="p-1.5 text-text-secondary hover:text-danger transition-colors" title="Eliminar">
+                    <td className="py-3 px-4">
+                      <Badge valor={f.estadoPago} />
+                      {Number(f.saldo) > 0 && (
+                        <p className="text-xs text-text-secondary mt-1">
+                          Saldo: <span className="font-mono text-warning">{formatearMoneda(f.saldo)}</span>
+                        </p>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-right whitespace-nowrap">
+                      {Number(f.saldo) > 0 && (
+                        <button onClick={() => abrirPago(f)} className="p-1.5 text-text-secondary hover:text-success transition-colors" title="Registrar pago">
+                          <Wallet size={16} />
+                        </button>
+                      )}
+                      <button onClick={() => setEliminarId(f.id)} className="p-1.5 text-text-secondary hover:text-danger transition-colors ml-1" title="Eliminar">
                         <Trash2 size={16} />
                       </button>
                     </td>
@@ -207,6 +277,87 @@ export default function Facturas() {
             </>
           )}
         </form>
+      </Modal>
+
+      <Modal
+        abierto={pagoAbierto}
+        onCerrar={() => setPagoAbierto(false)}
+        titulo={`Registrar pago — ${facturaPago?.numero ?? ''}`}
+        tamanio="max-w-md"
+      >
+        {facturaPago && (
+          <form onSubmit={guardarPago} className="space-y-4">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="p-3 rounded-lg bg-surface-hover/40">
+                <p className="text-xs text-text-secondary">Total</p>
+                <p className="font-mono font-bold text-text-primary">{formatearMoneda(facturaPago.total)}</p>
+              </div>
+              <div className="p-3 rounded-lg bg-surface-hover/40">
+                <p className="text-xs text-text-secondary">Pagado</p>
+                <p className="font-mono font-bold text-success">{formatearMoneda(facturaPago.montoPagado)}</p>
+              </div>
+              <div className="p-3 rounded-lg bg-surface-hover/40">
+                <p className="text-xs text-text-secondary">Saldo</p>
+                <p className="font-mono font-bold text-warning">{formatearMoneda(facturaPago.saldo)}</p>
+              </div>
+            </div>
+
+            <div>
+              <label className="label">Monto a pagar *</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                max={facturaPago.saldo}
+                value={pagoMonto}
+                onChange={(e) => setPagoMonto(e.target.value)}
+                className="input"
+                required
+                placeholder={`Máximo ${formatearMoneda(facturaPago.saldo)}`}
+              />
+            </div>
+            <div>
+              <label className="label">Método de pago *</label>
+              <select value={pagoMetodo} onChange={(e) => setPagoMetodo(e.target.value)} className="input">
+                <option value="EFECTIVO">Efectivo</option>
+                <option value="TARJETA">Tarjeta</option>
+                <option value="TRANSFERENCIA">Transferencia</option>
+                <option value="OTRO">Otro</option>
+              </select>
+            </div>
+
+            {cargandoPagos ? (
+              <div className="flex items-center justify-center gap-2 py-3 text-text-secondary text-sm">
+                <Spinner size={16} /> Cargando historial...
+              </div>
+            ) : pagoHistorial.length > 0 ? (
+              <div>
+                <p className="label">Historial de pagos</p>
+                <div className="space-y-1 max-h-40 overflow-y-auto">
+                  {pagoHistorial.map((p) => (
+                    <div key={p.id} className="flex justify-between items-center text-xs py-1.5 border-b border-border last:border-0">
+                      <span className="text-text-secondary">
+                        {formatearFechaHora(p.fecha)} · {p.metodo} · {p.usuarioNombre ?? '—'}
+                      </span>
+                      <span className="font-mono text-text-primary font-semibold">{formatearMoneda(p.monto)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {pagoError && (
+              <div className="p-3 rounded-lg bg-danger/10 border border-danger/30 text-sm text-danger animate-fade-in">{pagoError}</div>
+            )}
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button type="button" onClick={() => setPagoAbierto(false)} className="btn btn-ghost">Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={pagoGuardando}>
+                {pagoGuardando ? 'Registrando...' : 'Registrar pago'}
+              </button>
+            </div>
+          </form>
+        )}
       </Modal>
 
       <ConfirmDialog

@@ -28,3 +28,20 @@ class EstadoOrden(str, Enum):
     ESPERANDO_REPUESTOS = "ESPERANDO_REPUESTOS"
     LISTO = "LISTO"
     ENTREGADO = "ENTREGADO"
+
+
+class MetodoPago(str, Enum):
+    """Método de pago de un abono/pago de factura."""
+
+    EFECTIVO = "EFECTIVO"
+    TARJETA = "TARJETA"
+    TRANSFERENCIA = "TRANSFERENCIA"
+    OTRO = "OTRO"
+
+
+class EstadoPagoFactura(str, Enum):
+    """Estado de pago de una factura: PENDIENTE, PARCIAL, PAGADA."""
+
+    PENDIENTE = "PENDIENTE"
+    PARCIAL = "PARCIAL"
+    PAGADA = "PAGADA"

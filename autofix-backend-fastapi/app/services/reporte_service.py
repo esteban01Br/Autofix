@@ -11,7 +11,6 @@ from app.models.factura import Factura
 from app.models.mecanico import Mecanico
 from app.models.orden_trabajo import OrdenTrabajo
 from app.models.usuario import Usuario
-from app.services.base import verificar_empresa
 
 
 def productividad_mecanicos(
@@ -39,7 +38,10 @@ def productividad_mecanicos(
         stmt = stmt.where(OrdenTrabajo.fecha_ingreso >= desde)
     if hasta is not None:
         stmt = stmt.where(OrdenTrabajo.fecha_ingreso <= hasta)
-    stmt = stmt.group_by(Mecanico.id).order_by(func.count(OrdenTrabajo.id).desc())
+    # PostgreSQL exige agrupar también las columnas de usuarios seleccionadas.
+    stmt = stmt.group_by(Mecanico.id, Usuario.nombre, Usuario.apellido).order_by(
+        func.count(OrdenTrabajo.id).desc()
+    )
 
     resultados = []
     for fila in db.execute(stmt).all():
@@ -90,12 +92,16 @@ def ventas_por_empleado(
 
 
 def resumen_empresa(db, empresa_id: int | None) -> dict:
-    """Resumen general de una empresa: conteos de entidades."""
+    """Resumen general de una empresa: conteos de entidades.
+
+    La búsqueda ya es por el id de la empresa del usuario, así que
+    obtener_o_404 garantiza la pertenencia (no aplica verificar_empresa:
+    el modelo Empresa no tiene columna empresa_id).
+    """
     if empresa_id is None:
         return {}
 
     empresa = crud_base.obtener_o_404(db, Empresa, empresa_id, "Empresa no encontrada.")
-    verificar_empresa(empresa, empresa_id, "Empresa no encontrada.")
 
     return {
         "empresaId": empresa_id,

@@ -18,3 +18,14 @@ export const crearFactura = async (data) => {
 export const eliminarFactura = async (id) => {
   await api.delete(`/api/facturas/${id}`);
 };
+
+// Pagos y abonos de una factura
+export const listarPagos = async (facturaId) => {
+  const response = await api.get(`/api/facturas/${facturaId}/pagos`);
+  return response.data;
+};
+
+export const registrarPago = async (facturaId, data) => {
+  const response = await api.post(`/api/facturas/${facturaId}/pagos`, data);
+  return response.data;
+};

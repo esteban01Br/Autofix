@@ -254,6 +254,58 @@ def _migrar_numero_facturas(conn, insp) -> None:
     )
 
 
+def _migrar_pagos(conn, insp) -> None:
+    """Agrega estado_pago/monto_pagado a facturas (Fase 3 — pagos).
+
+    La tabla ``pagos`` la crea ``create_all`` (es nueva y su tipo enum
+    ``metodo_pago`` se crea junto); aquí solo complementamos columnas
+    de una tabla ``facturas`` ya existente.
+    """
+    if "facturas" not in insp.get_table_names():
+        return
+    cols = _columnas(insp, "facturas")
+
+    if "monto_pagado" not in cols:
+        conn.execute(
+            text(
+                "ALTER TABLE facturas ADD COLUMN monto_pagado"
+                " NUMERIC(10,2) NOT NULL DEFAULT 0"
+            )
+        )
+
+    if "estado_pago" not in cols:
+        if _es_sqlite():
+            # SQLite: VARCHAR con default constante (sin CHECK: la tabla
+            # vieja no lo tiene y el ORM escribe valores válidos).
+            conn.execute(
+                text(
+                    "ALTER TABLE facturas ADD COLUMN estado_pago VARCHAR(20)"
+                    " NOT NULL DEFAULT 'PENDIENTE'"
+                )
+            )
+        else:
+            # PostgreSQL: el tipo enum debe existir antes del ADD COLUMN.
+            existe = conn.execute(
+                text(
+                    "SELECT EXISTS (SELECT 1 FROM pg_type"
+                    " WHERE typname = 'estado_pago_factura')"
+                )
+            ).scalar()
+            if not existe:
+                conn.execute(
+                    text(
+                        "CREATE TYPE estado_pago_factura AS ENUM"
+                        " ('PENDIENTE','PARCIAL','PAGADA')"
+                    )
+                )
+            conn.execute(
+                text(
+                    "ALTER TABLE facturas ADD COLUMN estado_pago"
+                    " estado_pago_factura NOT NULL DEFAULT 'PENDIENTE'"
+                )
+            )
+
+
 def _migrar_a_multiempresa(conn, insp) -> None:
     if "empresas" not in insp.get_table_names():
         return  # create_all aún no la crea (no debería pasar).
@@ -280,6 +332,7 @@ def _migrar_a_multiempresa(conn, insp) -> None:
     _migrar_indice_placa(conn, insp)
     _migrar_stock_minimo_y_fotos(conn, insp)
     _migrar_numero_facturas(conn, insp)
+    _migrar_pagos(conn, insp)
 
 
 # ------------------------------------------------------------------

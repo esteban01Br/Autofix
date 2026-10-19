@@ -72,6 +72,8 @@ mecanico = require_roles("MECANICO")
 empleado = require_roles("ADMIN", "GERENTE", "ASESOR", "MECANICO", "BODEGUERO", "CAJERO")
 # Gestión: admin y gerente
 gestion = require_roles("ADMIN", "GERENTE")
+# Facturación y pagos: admin, gerente y cajero
+facturacion = require_roles("ADMIN", "GERENTE", "CAJERO")
 lectura_administrativa = require_roles("ADMIN", "MECANICO", "CLIENTE")
 
 
