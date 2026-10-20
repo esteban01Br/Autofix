@@ -21,6 +21,7 @@ from app.routers import (
     reportes,
     repuestos,
     servicios,
+    suscripciones,
     usuarios,
     vehiculos,
 )
@@ -121,6 +122,7 @@ app.include_router(detalles.router)
 app.include_router(repuestos.router)
 app.include_router(servicios.router)
 app.include_router(facturas.router)
+app.include_router(suscripciones.router)
 
 
 @app.get("/", tags=["Estado"], summary="InformaciÃ³n de la API")

@@ -5,6 +5,8 @@ from decimal import Decimal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+from app.models.enums import PlanSuscripcion
+
 
 class EmpresaRegistroRequest(BaseModel):
     """Registro público: crea la empresa y su usuario administrador."""
@@ -14,6 +16,9 @@ class EmpresaRegistroRequest(BaseModel):
     nit: str | None = Field(default=None, max_length=20)
     direccion: str | None = Field(default=None, max_length=200)
     telefono_empresa: str | None = Field(default=None, max_length=20)
+
+    # Plan contratado en el portal de ventas (compra simulada por ahora).
+    plan: PlanSuscripcion = PlanSuscripcion.BASICO
 
     # Datos del administrador (dueño del taller)
     nombre: str = Field(min_length=1, max_length=100)
@@ -61,6 +66,18 @@ class EmpresaResponse(BaseModel):
     consecutivo_factura: int
     activa: bool
     fecha_creacion: datetime
+    # URL confidencial de acceso de la empresa (portal /acceso/{slug})
+    slug: str | None = None
+
+
+class EmpresaPublicaResponse(BaseModel):
+    """Datos públicos mínimos para brandear la página de acceso de una empresa."""
+
+    slug: str
+    nombre: str
+    logo_url: str | None = None
+    color_primario: str
+    color_secundario: str
 
 
 class EmpresaRegistroResponse(BaseModel):

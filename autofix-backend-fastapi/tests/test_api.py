@@ -815,6 +815,130 @@ def test_aislamiento_servicios_entre_empresas(client):
     assert resp.status_code == 201, resp.text
 
 
+def test_planes_publicos_del_portal(client):
+    """El catálogo de planes es público (lo muestra el portal de ventas)."""
+    resp = client.get("/api/suscripciones/planes")
+    assert resp.status_code == 200
+    planes = resp.json()
+    assert len(planes) >= 3
+    ids = {p["id"] for p in planes}
+    assert {"BASICO", "PRO", "PREMIUM"} <= ids
+    for p in planes:
+        assert p["precioAnual"] > 0
+        assert p["precioMensual"] > 0
+        assert p["caracteristicas"]
+
+
+def test_registro_con_plan_crea_slug_y_suscripcion(client):
+    nombre = f"Taller SaaS-{uuid.uuid4().hex[:6]}"
+    correo = f"saas-{uuid.uuid4().hex[:6]}@correo.com"
+    resp = client.post(
+        "/api/empresas/registro",
+        json={
+            "nombre_empresa": nombre,
+            "plan": "PRO",
+            "nombre": "Dueño",
+            "apellido": "Prueba",
+            "correo": correo,
+            "contrasena": "Clave123!",
+        },
+    )
+    assert resp.status_code == 201, resp.text
+    datos = resp.json()
+    slug = datos["empresa"]["slug"]
+    assert slug and slug.startswith("taller-saas")
+
+    # Branding público de la página de acceso (/acceso/{slug})
+    pub = client.get(f"/api/empresas/publico/{slug}")
+    assert pub.status_code == 200
+    assert pub.json()["nombre"] == nombre
+    # Solo datos públicos: nada de NIT, correos ni configuración interna.
+    assert set(pub.json()) == {
+        "slug",
+        "nombre",
+        "logo_url",
+        "color_primario",
+        "color_secundario",
+    }
+
+    # Slug inexistente → 404
+    assert client.get("/api/empresas/publico/no-existe").status_code == 404
+
+    # La suscripción creada queda vigente con el plan elegido (compra simulada)
+    sub = client.get("/api/suscripciones/actual", headers=auth(datos["token"]))
+    assert sub.status_code == 200
+    assert sub.json()["plan"] == "PRO"
+    assert sub.json()["vigente"] is True
+    assert sub.json()["diasRestantes"] > 360
+
+    # Login vinculado al slug: su slug funciona; el de otra empresa → 404
+    ok = client.post(
+        "/api/auth/login",
+        json={"correo": correo, "contrasena": "Clave123!", "slug": slug},
+    )
+    assert ok.status_code == 200
+    malo = client.post(
+        "/api/auth/login",
+        json={"correo": correo, "contrasena": "Clave123!", "slug": "otro-slug"},
+    )
+    assert malo.status_code == 404
+
+
+def test_suscripcion_vencida_bloquea_login_y_superadmin_la_gestiona(
+    client, superadmin_token
+):
+    nombre = f"Taller Vencido-{uuid.uuid4().hex[:6]}"
+    correo = f"venc-{uuid.uuid4().hex[:6]}@correo.com"
+    resp = client.post(
+        "/api/empresas/registro",
+        json={
+            "nombre_empresa": nombre,
+            "nombre": "Dueño",
+            "apellido": "Prueba",
+            "correo": correo,
+            "contrasena": "Clave123!",
+        },
+    )
+    assert resp.status_code == 201, resp.text
+    eid = resp.json()["empresa"]["id"]
+
+    # Login inicial: la suscripción recién creada está vigente.
+    login = client.post(
+        "/api/auth/login", json={"correo": correo, "contrasena": "Clave123!"}
+    )
+    assert login.status_code == 200
+
+    # SUPERADMIN la marca como vencida (soporte).
+    vencida = client.post(
+        f"/api/suscripciones/empresas/{eid}",
+        json={"fecha_fin": "2020-01-01T00:00:00"},
+        headers=auth(superadmin_token),
+    )
+    assert vencida.status_code == 200, vencida.text
+    assert vencida.json()["vigente"] is False
+
+    # El login queda bloqueado con el código que entiende el portal.
+    bloqueo = client.post(
+        "/api/auth/login", json={"correo": correo, "contrasena": "Clave123!"}
+    )
+    assert bloqueo.status_code == 403
+    assert bloqueo.json()["detail"]["codigo"] == "SUSCRIPCION_VENCIDA"
+
+    # El superadmin renueva y el login vuelve a funcionar.
+    renovada = client.post(
+        f"/api/suscripciones/empresas/{eid}",
+        json={"plan": "PRO", "dias": 365},
+        headers=auth(superadmin_token),
+    )
+    assert renovada.status_code == 200
+    assert renovada.json()["vigente"] is True
+    assert renovada.json()["plan"] == "PRO"
+    login2 = client.post(
+        "/api/auth/login", json={"correo": correo, "contrasena": "Clave123!"}
+    )
+    assert login2.status_code == 200
+
+
 def test_aislamiento_clientes_y_usuarios(client):
     token_a, _ = _registrar_empresa(client, f"TallerC-{uuid.uuid4().hex[:6]}", f"c-{uuid.uuid4().hex[:6]}@c.com")
     token_b, _ = _registrar_empresa(client, f"TallerD-{uuid.uuid4().hex[:6]}", f"d-{uuid.uuid4().hex[:6]}@d.com")

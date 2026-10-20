@@ -8,6 +8,7 @@ from app.database import get_db
 from app.limiter import limiter
 from app.models.usuario import Usuario
 from app.schemas.empresa import (
+    EmpresaPublicaResponse,
     EmpresaRegistroRequest,
     EmpresaRegistroResponse,
     EmpresaResponse,
@@ -31,6 +32,19 @@ def registrar_empresa(
     request: Request, payload: EmpresaRegistroRequest, db: Session = Depends(get_db)
 ) -> EmpresaRegistroResponse:
     return empresa_service.registrar_empresa(db, payload)
+
+
+@router.get(
+    "/publico/{slug}",
+    response_model=EmpresaPublicaResponse,
+    summary="Branding de la página de acceso de una empresa",
+    description="Ruta pública: devuelve solo el nombre y los colores "
+    "necesarios para brandear /acceso/{slug} en el portal.",
+)
+def obtener_empresa_publica(
+    slug: str, db: Session = Depends(get_db)
+) -> EmpresaPublicaResponse:
+    return empresa_service.obtener_publica(db, slug)
 
 
 @router.get(

@@ -6,6 +6,9 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 class LoginRequest(BaseModel):
     correo: EmailStr = Field(description="Correo electrónico del usuario")
     contrasena: str = Field(min_length=1, max_length=128, description="Contraseña")
+    # Acceso privado por empresa: si viene del portal /acceso/{slug},
+    # se verifica que el usuario pertenezca a esa empresa.
+    slug: str | None = Field(default=None, max_length=80, description="Slug del acceso de la empresa")
 
 
 class RegisterRequest(BaseModel):

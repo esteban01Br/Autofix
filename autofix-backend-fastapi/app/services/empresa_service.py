@@ -10,12 +10,15 @@ from app.models.enums import Rol
 from app.models.sucursal import Sucursal
 from app.models.usuario import Usuario
 from app.schemas.empresa import (
+    EmpresaPublicaResponse,
     EmpresaRegistroRequest,
     EmpresaRegistroResponse,
     EmpresaResponse,
     EmpresaUpdate,
 )
 from app.security import create_access_token, hash_password
+from app.services import suscripcion_service
+from app.utils import generar_slug
 
 
 def to_response(empresa: Empresa) -> EmpresaResponse:
@@ -33,6 +36,31 @@ def to_response(empresa: Empresa) -> EmpresaResponse:
         consecutivo_factura=empresa.consecutivo_factura,
         activa=empresa.activa,
         fecha_creacion=empresa.fecha_creacion,
+        slug=empresa.slug,
+    )
+
+
+def _slug_unico(db, nombre: str) -> str:
+    """Slug único de acceso a partir del nombre de la empresa."""
+    base = generar_slug(nombre)
+    candidato, intento = base, 2
+    while crud_empresa.get_by_slug(db, candidato) is not None:
+        candidato = f"{base}-{intento}"
+        intento += 1
+    return candidato
+
+
+def obtener_publica(db, slug: str) -> EmpresaPublicaResponse:
+    """Branding mínimo de la página de acceso (/acceso/{slug}) — público."""
+    empresa = crud_empresa.get_by_slug(db, slug or "")
+    if empresa is None or not empresa.activa:
+        raise HTTPException(status_code=404, detail="Página de acceso no encontrada.")
+    return EmpresaPublicaResponse(
+        slug=empresa.slug,
+        nombre=empresa.nombre,
+        logo_url=empresa.logo_url,
+        color_primario=empresa.color_primario,
+        color_secundario=empresa.color_secundario,
     )
 
 
@@ -59,12 +87,19 @@ def registrar_empresa(db, payload: EmpresaRegistroRequest) -> EmpresaRegistroRes
         nit=nit,
         direccion=payload.direccion,
         telefono=payload.telefono_empresa,
+        slug=_slug_unico(db, payload.nombre_empresa),
     )
     db.add(empresa)
     db.flush()  # Obtiene empresa.id antes del commit
 
     # Jerarquía: toda empresa arranca con su sucursal principal (Fase 2).
     db.add(Sucursal(nombre="Principal", empresa_id=empresa.id))
+
+    # Compra simulada: la empresa nace con su suscripción de 12 meses
+    # del plan elegido en el portal (Fase 4 — SaaS).
+    suscripcion_service.aplicar(
+        db, empresa.id, plan=payload.plan, dias=suscripcion_service.DIAS_POR_DEFECTO
+    )
 
     admin = Usuario(
         nombre=payload.nombre.strip(),

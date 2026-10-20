@@ -17,6 +17,7 @@ $ErrorActionPreference = "Stop"
 $root      = Split-Path -Parent $MyInvocation.MyCommand.Path
 $backend   = Join-Path $root "autofix-backend-fastapi"
 $frontend  = Join-Path $root "autofix-frontend"
+$portal    = Join-Path $root "autofix-portal"
 $py        = Join-Path $backend ".venv\Scripts\python.exe"
 
 function Escribir($mensaje, $color = "Cyan") {
@@ -66,6 +67,20 @@ if (-not (Test-Path (Join-Path $frontend "node_modules"))) {
     Pop-Location
 } else {
     Escribir "[frontend] Dependencias ya instaladas." "DarkGray"
+}
+
+# ------------------------------------------------------------------
+# 2b) Preparar el portal de ventas (login + suscripciones): node_modules
+# ------------------------------------------------------------------
+if (Test-Path $portal) {
+    if (-not (Test-Path (Join-Path $portal "node_modules"))) {
+        Escribir "[portal] Instalando dependencias (npm install)..."
+        Push-Location $portal
+        npm install
+        Pop-Location
+    } else {
+        Escribir "[portal] Dependencias ya instaladas." "DarkGray"
+    }
 }
 
 # ------------------------------------------------------------------
@@ -121,17 +136,33 @@ $jobFrontend = Start-Job -Name "AutoFix-Frontend" -ScriptBlock {
     Pop-Location
 } -ArgumentList $frontend
 
+if (Test-Path $portal) {
+    Escribir "[portal] Iniciando portal de ventas Vite (puerto 5174)..."
+    $jobPortal = Start-Job -Name "AutoFix-Portal" -ScriptBlock {
+        param($dir)
+        Push-Location $dir
+        npm run dev
+        Pop-Location
+    } -ArgumentList $portal
+}
+
 Write-Host ""
 Write-Host "  Backend  -> http://localhost:8081   (docs: /docs)" -ForegroundColor Green
 Write-Host "  Frontend -> http://localhost:5173"                 -ForegroundColor Green
+if (Test-Path $portal) {
+    Write-Host "  Portal   -> http://localhost:5174   (login + planes)" -ForegroundColor Green
+}
 Write-Host ""
 Write-Host "  Credenciales por defecto: admin@autofix.com / Admin123!" -ForegroundColor DarkGray
-Write-Host "  Pulsa Ctrl+C para detener ambos servicios."              -ForegroundColor DarkGray
+Write-Host "  Pulsa Ctrl+C para detener los servicios."                -ForegroundColor DarkGray
 Write-Host ""
+
+$jobs = @("AutoFix-Backend", "AutoFix-Frontend")
+if (Test-Path $portal) { $jobs += "AutoFix-Portal" }
 
 try {
     while ($true) {
-        foreach ($nombre in "AutoFix-Backend", "AutoFix-Frontend") {
+        foreach ($nombre in $jobs) {
             $job = Get-Job -Name $nombre -ErrorAction SilentlyContinue
             if (-not $job) { continue }
             try {
@@ -156,7 +187,8 @@ try {
 finally {
     Write-Host ""
     Escribir "Deteniendo servicios..." "Yellow"
-    Stop-Job -Name "AutoFix-Backend", "AutoFix-Frontend" -ErrorAction SilentlyContinue
-    Remove-Job -Name "AutoFix-Backend", "AutoFix-Frontend" -Force -ErrorAction SilentlyContinue
+    $todos = @("AutoFix-Backend", "AutoFix-Frontend", "AutoFix-Portal")
+    Stop-Job -Name $todos -ErrorAction SilentlyContinue
+    Remove-Job -Name $todos -Force -ErrorAction SilentlyContinue
     Escribir "Todo detenido. Hasta pronto." "DarkGray"
 }

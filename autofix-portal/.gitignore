@@ -1,0 +1,16 @@
+# Dependencias y build
+node_modules
+dist
+dist-ssr
+*.local
+
+# Variables de entorno (nunca se suben)
+.env
+.env.*
+!.env.example
+
+# Vite / editores
+.vite
+.vscode
+.idea
+.DS_Store

@@ -10,9 +10,12 @@ Nota: se ejecutan en AUTOCOMMIT porque algunos pasos lo requieren
 ``ALTER TYPE ... ADD VALUE`` de PostgreSQL tampoco en versiones antiguas).
 """
 
+from datetime import timedelta
+
 from sqlalchemy import inspect, text
 
 from app.database import engine
+from app.utils import ahora_utc, generar_slug
 
 # Tablas operativas que reciben empresa_id (usuarios tiene flujo propio).
 TABLAS_CON_EMPRESA = [
@@ -306,6 +309,58 @@ def _migrar_pagos(conn, insp) -> None:
             )
 
 
+def _migrar_slug_y_suscripciones(conn, insp) -> None:
+    """Agrega slug a empresas y crea la suscripción de las que no tienen.
+
+    Fase 4 (SaaS): cada empresa necesita su URL de acceso confidencial
+    y una suscripción vigente para poder iniciar sesión.
+    """
+    if "empresas" not in insp.get_table_names():
+        return
+
+    if "slug" not in _columnas(insp, "empresas"):
+        conn.execute(text("ALTER TABLE empresas ADD COLUMN slug VARCHAR(80)"))
+        usados: set[str] = set()
+        filas = conn.execute(
+            text("SELECT id, nombre FROM empresas ORDER BY id")
+        ).fetchall()
+        for fid, fnombre in filas:
+            base = generar_slug(fnombre or "")
+            candidato, intento = base, 2
+            while candidato in usados:
+                candidato = f"{base}-{intento}"
+                intento += 1
+            usados.add(candidato)
+            conn.execute(
+                text("UPDATE empresas SET slug = :slug WHERE id = :id"),
+                {"slug": candidato, "id": fid},
+            )
+        conn.execute(
+            text("CREATE UNIQUE INDEX IF NOT EXISTS uq_empresas_slug ON empresas (slug)")
+        )
+
+    # Suscripción de cortesía (12 meses) para empresas ya existentes.
+    if "suscripciones" not in insp.get_table_names():
+        return
+    registradas = {
+        fila[0]
+        for fila in conn.execute(text("SELECT empresa_id FROM suscripciones")).fetchall()
+    }
+    fin = (ahora_utc() + timedelta(days=365)).isoformat(sep=" ")
+    for (eid,) in conn.execute(text("SELECT id FROM empresas")).fetchall():
+        if eid in registradas:
+            continue
+        conn.execute(
+            text(
+                "INSERT INTO suscripciones (empresa_id, plan, estado,"
+                " fecha_inicio, fecha_fin, monto, fecha_creacion)"
+                " VALUES (:eid, 'BASICO', 'ACTIVA',"
+                " CURRENT_TIMESTAMP, :fin, 0, CURRENT_TIMESTAMP)"
+            ),
+            {"eid": eid, "fin": fin},
+        )
+
+
 def _migrar_a_multiempresa(conn, insp) -> None:
     if "empresas" not in insp.get_table_names():
         return  # create_all aún no la crea (no debería pasar).
@@ -333,6 +388,7 @@ def _migrar_a_multiempresa(conn, insp) -> None:
     _migrar_stock_minimo_y_fotos(conn, insp)
     _migrar_numero_facturas(conn, insp)
     _migrar_pagos(conn, insp)
+    _migrar_slug_y_suscripciones(conn, insp)
 
 
 # ------------------------------------------------------------------

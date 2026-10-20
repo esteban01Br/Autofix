@@ -33,6 +33,12 @@ class Empresa(Base):
         String(7), nullable=False, default="#1f2937"
     )
 
+    # Acceso confidencial de la empresa: URL /acceso/{slug} en el portal.
+    # Nullable en BD por tablas legadas; el servicio siempre lo asigna.
+    slug: Mapped[str | None] = mapped_column(
+        String(80), unique=True, nullable=True, index=True
+    )
+
     # Configuración de facturación
     iva_porcentaje: Mapped[Decimal] = mapped_column(
         Numeric(5, 2), nullable=False, default=Decimal("19.00")

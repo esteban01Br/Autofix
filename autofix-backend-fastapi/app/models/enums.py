@@ -45,3 +45,19 @@ class EstadoPagoFactura(str, Enum):
     PENDIENTE = "PENDIENTE"
     PARCIAL = "PARCIAL"
     PAGADA = "PAGADA"
+
+
+class PlanSuscripcion(str, Enum):
+    """Planes de suscripción del SaaS (catálogo del portal)."""
+
+    BASICO = "BASICO"
+    PRO = "PRO"
+    PREMIUM = "PREMIUM"
+
+
+class EstadoSuscripcion(str, Enum):
+    """Estado de la suscripción de una empresa."""
+
+    ACTIVA = "ACTIVA"
+    VENCIDA = "VENCIDA"
+    CANCELADA = "CANCELADA"

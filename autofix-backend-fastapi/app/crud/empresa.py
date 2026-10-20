@@ -19,6 +19,11 @@ def get_by_nombre_ci(db, nombre: str) -> Empresa | None:
     return db.scalars(stmt).first()
 
 
+def get_by_slug(db, slug: str) -> Empresa | None:
+    stmt = select(Empresa).where(Empresa.slug == slug.strip().lower()).limit(1)
+    return db.scalars(stmt).first()
+
+
 def listar_todas(db) -> list[Empresa]:
     stmt = select(Empresa).order_by(Empresa.id.asc())
     return list(db.scalars(stmt).all())

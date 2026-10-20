@@ -14,6 +14,7 @@ from app.models.orden_trabajo import OrdenTrabajo
 from app.models.detalle_orden import DetalleOrden
 from app.models.factura import Factura
 from app.models.servicio import Servicio
+from app.models.suscripcion import Suscripcion
 
 __all__ = [
     "Base",
@@ -34,4 +35,5 @@ __all__ = [
     "DetalleOrden",
     "Factura",
     "Servicio",
+    "Suscripcion",
 ]

@@ -6,7 +6,9 @@ This repository contains the AutoFix workshop management application. Use the pr
 
 - Root: orchestration and shared startup scripts.
 - `autofix-backend-fastapi/`: FastAPI API server.
-- `autofix-frontend/`: React + Vite frontend.
+- `autofix-frontend/`: React + Vite frontend (app operativa del taller).
+- `autofix-portal/`: React + Vite portal de ventas (landing, planes, compra de
+  suscripciones y login; entrega la sesión a la app vía `/?token=`).
 
 See the root docs for product context:
 - [README.md](README.md)

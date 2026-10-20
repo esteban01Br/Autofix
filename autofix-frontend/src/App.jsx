@@ -23,6 +23,19 @@ const Productividad = lazy(() => import('./pages/Productividad'));
 const Servicios = lazy(() => import('./pages/Servicios'));
 const NoEncontrada = lazy(() => import('./pages/NoEncontrada'));
 
+// El portal de ventas (app separada) concentra el login, el registro de
+// empresas y la compra de suscripciones. En producción se define
+// VITE_PORTAL_URL en Netlify; sin él (deploy viejo) queda el login propio.
+const PORTAL_URL = import.meta.env.VITE_PORTAL_URL
+  ? import.meta.env.VITE_PORTAL_URL.replace(/\/+$/, '')
+  : import.meta.env.DEV
+    ? 'http://localhost:5174'
+    : null;
+
+function irAlPortal(ruta) {
+  return PORTAL_URL ? <Navigate to={`${PORTAL_URL}${ruta}`} replace /> : null;
+}
+
 const titulos = {
   '/dashboard': 'Panel',
   '/usuarios': 'Usuarios',
@@ -57,8 +70,11 @@ export default function App() {
       }
     >
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/registro-empresa" element={<RegistroEmpresa />} />
+        <Route path="/login" element={irAlPortal('/login') || <Login />} />
+        <Route
+          path="/registro-empresa"
+          element={irAlPortal('/comprar/basico') || <RegistroEmpresa />}
+        />
         <Route path="/cambiar-contrasena" element={<CambioContrasena />} />
 
         <Route

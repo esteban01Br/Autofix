@@ -32,7 +32,7 @@ def _asegurar_empresa_defecto(db) -> Empresa:
     """Devuelve la primera empresa; si no hay ninguna, crea 'AutoFix'."""
     empresa = db.scalar(select(Empresa).order_by(Empresa.id).limit(1))
     if empresa is None:
-        empresa = Empresa(nombre="AutoFix", nit="900.000.000-1")
+        empresa = Empresa(nombre="AutoFix", nit="900.000.000-1", slug="autofix")
         db.add(empresa)
         db.commit()
         db.refresh(empresa)

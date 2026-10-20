@@ -11,6 +11,7 @@ from app.models.usuario import Usuario
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
 from app.schemas.usuario import CambioContrasenaRequest
 from app.security import create_access_token, hash_password, verify_password
+from app.services import suscripcion_service
 
 
 def _empresa_defecto(db) -> Empresa:
@@ -40,6 +41,20 @@ def login(db, payload: LoginRequest) -> TokenResponse:
             detail="Credenciales incorrectas.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    # Acceso privado por empresa (portal /acceso/{slug}): si el login viene
+    # de la URL de una empresa, el usuario debe pertenecer a esa empresa.
+    if payload.slug:
+        empresa = db.get(Empresa, usuario.empresa_id) if usuario.empresa_id else None
+        if usuario.rol != Rol.SUPERADMIN and (
+            empresa is None or empresa.slug != payload.slug.strip().lower()
+        ):
+            raise HTTPException(
+                status_code=404, detail="Este acceso no corresponde a tu empresa."
+            )
+
+    # Suscripción de la empresa vencida → no se abre sesión (Fase 4 — SaaS).
+    suscripcion_service.verificar_acceso(db, usuario)
 
     token = create_access_token(
         correo=usuario.correo,
