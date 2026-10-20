@@ -20,6 +20,7 @@ from app.routers import (
     ordenes,
     reportes,
     repuestos,
+    servicios,
     usuarios,
     vehiculos,
 )
@@ -118,6 +119,7 @@ app.include_router(citas.router)
 app.include_router(ordenes.router)
 app.include_router(detalles.router)
 app.include_router(repuestos.router)
+app.include_router(servicios.router)
 app.include_router(facturas.router)
 
 

@@ -20,6 +20,7 @@ const MiEmpresa = lazy(() => import('./pages/MiEmpresa'));
 const MisOrdenes = lazy(() => import('./pages/MisOrdenes'));
 const Auditoria = lazy(() => import('./pages/Auditoria'));
 const Productividad = lazy(() => import('./pages/Productividad'));
+const Servicios = lazy(() => import('./pages/Servicios'));
 const NoEncontrada = lazy(() => import('./pages/NoEncontrada'));
 
 const titulos = {
@@ -37,6 +38,7 @@ const titulos = {
   '/mis-ordenes': 'Mis órdenes',
   '/auditoria': 'Auditoría',
   '/productividad': 'Productividad',
+  '/servicios': 'Servicios',
 };
 
 function ConTitulo() {
@@ -80,6 +82,7 @@ export default function App() {
           <Route path="/mis-ordenes" element={<ProtectedRoute roles={['MECANICO']}><MisOrdenes /></ProtectedRoute>} />
           <Route path="/auditoria" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Auditoria /></ProtectedRoute>} />
           <Route path="/productividad" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Productividad /></ProtectedRoute>} />
+          <Route path="/servicios" element={<ProtectedRoute roles={['ADMIN', 'GERENTE', 'ASESOR']}><Servicios /></ProtectedRoute>} />
         </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

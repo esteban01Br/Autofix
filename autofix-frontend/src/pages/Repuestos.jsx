@@ -10,7 +10,7 @@ import EmptyState from '../components/EmptyState';
 import Spinner from '../components/Spinner';
 import EscanerCodigo from '../components/EscanerCodigo';
 
-const estadoInicial = { nombre: '', descripcion: '', codigo_barras: '', stock: 0, precio: '' };
+const estadoInicial = { nombre: '', descripcion: '', codigo_barras: '', stock: 0, stock_minimo: 0, precio: '' };
 const stockInicial = { cantidad: 1, tipo: 'entrada' };
 
 export default function Repuestos() {
@@ -61,6 +61,7 @@ export default function Repuestos() {
       descripcion: r.descripcion ?? '',
       codigo_barras: r.codigo_barras ?? '',
       stock: r.stock,
+      stock_minimo: r.stockMinimo ?? 0,
       precio: String(r.precio),
     });
     setErrorForm('');
@@ -120,6 +121,7 @@ export default function Repuestos() {
         descripcion: formulario.descripcion || null,
         codigo_barras: formulario.codigo_barras.trim() || null,
         stock: Number(formulario.stock),
+        stock_minimo: Number(formulario.stock_minimo),
         precio: String(formulario.precio),
       };
       if (editando) {
@@ -162,14 +164,18 @@ export default function Repuestos() {
     }
   };
 
+  // Umbral de alerta: usa el stock mínimo del repuesto (o < 10 por defecto).
+  const umbral = (r) => (r.stockMinimo > 0 ? r.stockMinimo : 9);
+  const estaBajo = (r) => r.stock > 0 && r.stock <= umbral(r);
+
   const filtrados = repuestos.filter((r) => {
     const texto = busqueda.trim().toLowerCase();
     const coincideTexto = !texto || `${r.nombre} ${r.descripcion ?? ''}`.toLowerCase().includes(texto);
     const coincideStock =
       filtroStock === 'todos' ||
       (filtroStock === 'agotados' && r.stock === 0) ||
-      (filtroStock === 'bajos' && r.stock > 0 && r.stock < 10) ||
-      (filtroStock === 'ok' && r.stock >= 10);
+      (filtroStock === 'bajos' && estaBajo(r)) ||
+      (filtroStock === 'ok' && r.stock > 0 && !estaBajo(r));
     return coincideTexto && coincideStock;
   });
 
@@ -198,7 +204,7 @@ export default function Repuestos() {
         <select value={filtroStock} onChange={(e) => setFiltroStock(e.target.value)} className="input sm:w-48">
           <option value="todos">Todo el inventario</option>
           <option value="agotados">Agotados</option>
-          <option value="bajos">Stock bajo (&lt; 10)</option>
+          <option value="bajos">Stock bajo (mínimo)</option>
           <option value="ok">Stock suficiente</option>
         </select>
       </div>
@@ -240,8 +246,11 @@ export default function Repuestos() {
                     </td>
                     <td className="py-3 px-4 text-text-secondary max-w-xs truncate">{r.descripcion ?? '—'}</td>
                     <td className="py-3 px-4 text-center">
-                      <span className={`badge ${r.stock === 0 ? 'text-danger bg-danger/10' : r.stock < 10 ? 'text-warning bg-warning/10' : 'text-success bg-success/10'}`}>
-                        {r.stock === 0 ? 'Agotado' : r.stock < 10 ? `${r.stock} · bajo` : r.stock}
+                      <span
+                        className={`badge ${r.stock === 0 ? 'text-danger bg-danger/10' : estaBajo(r) ? 'text-warning bg-warning/10' : 'text-success bg-success/10'}`}
+                        title={r.stockMinimo > 0 ? `Stock mínimo definido: ${r.stockMinimo}` : 'Sin stock mínimo definido (umbral 10)'}
+                      >
+                        {r.stock === 0 ? 'Agotado' : estaBajo(r) ? `${r.stock} · bajo` : r.stock}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right font-mono text-accent">{formatearMoneda(r.precio)}</td>
@@ -303,6 +312,10 @@ export default function Repuestos() {
             <div>
               <label className="label">Stock *</label>
               <input name="stock" type="number" min="0" value={formulario.stock} onChange={manejarCambio} className="input" required />
+            </div>
+            <div>
+              <label className="label">Stock mínimo (alerta)</label>
+              <input name="stock_minimo" type="number" min="0" value={formulario.stock_minimo} onChange={manejarCambio} className="input" placeholder="0 = sin alerta" />
             </div>
             <div>
               <label className="label">Precio unitario *</label>

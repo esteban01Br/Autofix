@@ -13,6 +13,7 @@ from app.models.repuesto import Repuesto
 from app.models.orden_trabajo import OrdenTrabajo
 from app.models.detalle_orden import DetalleOrden
 from app.models.factura import Factura
+from app.models.servicio import Servicio
 
 __all__ = [
     "Base",
@@ -32,4 +33,5 @@ __all__ = [
     "OrdenTrabajo",
     "DetalleOrden",
     "Factura",
+    "Servicio",
 ]

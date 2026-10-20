@@ -523,6 +523,96 @@ def test_pagos_de_factura_parcial_y_pagada(client, admin_token):
     assert len(pagos.json()) == 2
 
 
+def test_catalogo_servicios_crud(client, admin_token):
+    h = auth(admin_token)
+    nombre = f"Diagnostico-{uuid.uuid4().hex[:6]}"
+
+    # Crear servicio del catálogo.
+    resp = client.post(
+        "/api/servicios",
+        json={
+            "nombre": nombre,
+            "descripcion": "Revisión general",
+            "precio": "80.00",
+            "duracion_minutos": 45,
+        },
+        headers=h,
+    )
+    assert resp.status_code == 201, resp.text
+    sid = resp.json()["id"]
+    assert resp.json()["precio"] == "80.00"
+    assert resp.json()["duracionMinutos"] == 45
+    assert resp.json()["activo"] is True
+
+    # Nombre duplicado en la misma empresa -> 409.
+    dup = client.post(
+        "/api/servicios", json={"nombre": nombre, "precio": "90.00"}, headers=h
+    )
+    assert dup.status_code == 409
+
+    # Listar y obtener.
+    lista = client.get("/api/servicios", headers=h)
+    assert lista.status_code == 200
+    assert any(s["id"] == sid for s in lista.json())
+    assert client.get(f"/api/servicios/{sid}", headers=h).status_code == 200
+
+    # Actualizar precio y desactivar.
+    act = client.put(
+        f"/api/servicios/{sid}",
+        json={"precio": "95.50", "activo": False},
+        headers=h,
+    )
+    assert act.status_code == 200, act.text
+    assert act.json()["precio"] == "95.50"
+    assert act.json()["activo"] is False
+
+    # solo_activos excluye el desactivado.
+    activos = client.get("/api/servicios?solo_activos=true", headers=h)
+    assert all(s["id"] != sid for s in activos.json())
+
+    # Eliminar.
+    assert client.delete(f"/api/servicios/{sid}", headers=h).status_code == 204
+    assert client.get(f"/api/servicios/{sid}", headers=h).status_code == 404
+
+
+def test_servicios_mutaciones_solo_gestion(client, admin_token):
+    h = auth(admin_token)
+    email = correo_unico("meca")
+    resp = client.post(
+        "/api/usuarios",
+        json={
+            "nombre": "Meca",
+            "apellido": "Prueba",
+            "correo": email,
+            "contrasena": "Password123!",
+            "rol": "MECANICO",
+        },
+        headers=h,
+    )
+    assert resp.status_code == 201, resp.text
+
+    login = client.post(
+        "/api/auth/login", json={"correo": email, "contrasena": "Password123!"}
+    )
+    assert login.status_code == 200
+    hm = auth(login.json()["token"])
+
+    # Un mecánico puede leer el catálogo...
+    assert client.get("/api/servicios", headers=hm).status_code == 200
+    # ...pero no crear, editar ni eliminar (solo ADMIN/GERENTE).
+    assert (
+        client.post(
+            "/api/servicios", json={"nombre": "X", "precio": "10.00"}, headers=hm
+        ).status_code
+        == 403
+    )
+    assert (
+        client.put("/api/servicios/1", json={"precio": "10.00"}, headers=hm).status_code
+        == 403
+    )
+    assert client.delete("/api/servicios/1", headers=hm).status_code == 403
+
+
 def test_eliminar_detalle_devuelve_stock(client, admin_token):
     h = auth(admin_token)
     cuid = crear_usuario(client, admin_token, correo_unico("dev"))
@@ -697,6 +787,32 @@ def test_aislamiento_empresa_a_no_ve_datos_de_b(client):
     # B tampoco puede modificar ni borrar el repuesto de A
     assert client.put(f"/api/repuestos/{repuesto_a_id}", json={"stock": 99}, headers=hb).status_code == 404
     assert client.delete(f"/api/repuestos/{repuesto_a_id}", headers=hb).status_code == 404
+
+
+def test_aislamiento_servicios_entre_empresas(client):
+    token_a, _ = _registrar_empresa(client, f"TallerS-{uuid.uuid4().hex[:6]}", f"s-{uuid.uuid4().hex[:6]}@s.com")
+    token_b, _ = _registrar_empresa(client, f"TallerT-{uuid.uuid4().hex[:6]}", f"t-{uuid.uuid4().hex[:6]}@t.com")
+    ha, hb = auth(token_a), auth(token_b)
+    nombre = f"Alineacion-{uuid.uuid4().hex[:6]}"
+
+    # A crea un servicio en su catálogo
+    resp = client.post(
+        "/api/servicios", json={"nombre": nombre, "precio": "50.00"}, headers=ha
+    )
+    assert resp.status_code == 201, resp.text
+    sid = resp.json()["id"]
+
+    # B no lo ve en su lista ni por id, y no puede tocarlo
+    assert all(s["id"] != sid for s in client.get("/api/servicios", headers=hb).json())
+    assert client.get(f"/api/servicios/{sid}", headers=hb).status_code == 404
+    assert client.put(f"/api/servicios/{sid}", json={"precio": "1.00"}, headers=hb).status_code == 404
+    assert client.delete(f"/api/servicios/{sid}", headers=hb).status_code == 404
+
+    # B sí puede crear un servicio con el mismo nombre en SU empresa
+    resp = client.post(
+        "/api/servicios", json={"nombre": nombre, "precio": "60.00"}, headers=hb
+    )
+    assert resp.status_code == 201, resp.text
 
 
 def test_aislamiento_clientes_y_usuarios(client):

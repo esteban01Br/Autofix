@@ -15,6 +15,7 @@ import {
   Store,
   ShieldCheck,
   BarChart3,
+  ClipboardList,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Badge from './Badge';
@@ -31,6 +32,7 @@ const modulos = [
   { to: '/ordenes', label: 'Órdenes', icon: Wrench, roles: ['ADMIN', 'MECANICO'] },
   { to: '/repuestos', label: 'Repuestos', icon: Package, roles: ['ADMIN', 'MECANICO'] },
   { to: '/facturas', label: 'Facturas', icon: Receipt, roles: ['ADMIN', 'GERENTE', 'CAJERO'] },
+  { to: '/servicios', label: 'Servicios', icon: ClipboardList, roles: ['ADMIN', 'GERENTE', 'ASESOR'] },
   { to: '/mis-ordenes', label: 'Mis órdenes', icon: Activity, roles: ['MECANICO'] },
   { to: '/auditoria', label: 'Auditoría', icon: ShieldCheck, roles: ['ADMIN', 'GERENTE'] },
   { to: '/productividad', label: 'Productividad', icon: BarChart3, roles: ['ADMIN', 'GERENTE'] },
