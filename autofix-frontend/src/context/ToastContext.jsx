@@ -8,14 +8,17 @@ let contador = 0;
 const estilos = {
   success: {
     container: 'bg-success/10 border-success/30',
+    circulo: 'bg-success/15',
     icono: <CircleCheckBig size={18} className="text-success" />,
   },
   error: {
     container: 'bg-danger/10 border-danger/30',
+    circulo: 'bg-danger/15',
     icono: <CircleX size={18} className="text-danger" />,
   },
   info: {
     container: 'bg-info/10 border-info/30',
+    circulo: 'bg-info/15',
     icono: <Info size={18} className="text-info" />,
   },
 };
@@ -25,7 +28,7 @@ export function ToastProvider({ children }) {
 
   const pushToast = useCallback((mensaje, tipo = 'success', duracion = 4000) => {
     const id = ++contador;
-    setToasts((prev) => [...prev, { id, mensaje, tipo }]);
+    setToasts((prev) => [...prev, { id, mensaje, tipo, duracion }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, duracion);
@@ -45,13 +48,28 @@ export function ToastProvider({ children }) {
           return (
             <div
               key={toast.id}
-              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-lg border bg-surface shadow-lg shadow-black/30 animate-slide-up min-w-[260px] max-w-[420px] ${estilo.container}`}
+              className={`pointer-events-auto relative flex min-w-[260px] max-w-[420px] items-center gap-3 overflow-hidden rounded-xl border bg-surface/95 px-4 py-3 shadow-xl shadow-black/40 backdrop-blur-md animate-slide-up ${estilo.container}`}
             >
-              {estilo.icono}
-              <p className="text-sm text-text-primary flex-1">{toast.mensaje}</p>
-              <button onClick={() => cerrarToast(toast.id)} className="p-1 text-text-secondary hover:text-text-primary transition-colors">
+              <span
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${estilo.circulo}`}
+              >
+                {estilo.icono}
+              </span>
+              <p className="flex-1 text-sm text-text-primary">{toast.mensaje}</p>
+              <button
+                onClick={() => cerrarToast(toast.id)}
+                className="p-1 text-text-secondary transition-colors hover:text-text-primary"
+                aria-label="Cerrar notificación"
+              >
                 <X size={14} />
               </button>
+              <span
+                aria-hidden="true"
+                className="absolute bottom-0 left-0 h-0.5 w-full origin-left bg-white/15"
+                style={{
+                  animation: `toast-progress ${toast.duracion}ms linear forwards`,
+                }}
+              />
             </div>
           );
         })}

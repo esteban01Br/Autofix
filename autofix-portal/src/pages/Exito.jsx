@@ -37,9 +37,15 @@ export default function Exito() {
       <Nav compacto />
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-xl text-center animate-slide-up">
-          <span className="w-16 h-16 mx-auto rounded-full bg-success-glow flex items-center justify-center text-success mb-5">
-            <CheckCircle2 size={34} />
-          </span>
+          <div className="relative mx-auto mb-5 h-16 w-16">
+            <span
+              className="pulso-exito absolute inset-0 rounded-full bg-success-glow"
+              aria-hidden="true"
+            />
+            <span className="relative flex h-16 w-16 items-center justify-center rounded-full bg-success-glow text-success ring-1 ring-success/30">
+              <CheckCircle2 size={34} />
+            </span>
+          </div>
 
           <h1 className="titulo-seccion">¡Tu taller ya está en AutoFix!</h1>
           <p className="text-text-secondary mt-3">
@@ -48,7 +54,7 @@ export default function Exito() {
           </p>
 
           {/* URL de acceso privada */}
-          <div className="card p-5 mt-8 text-left">
+          <div className="card mt-8 border-accent/20 p-5 text-left shadow-2xl shadow-black/30">
             <p className="label mb-2">Tu página de acceso (compártela con tu equipo)</p>
             <div className="flex flex-col sm:flex-row gap-2">
               <code className="flex-1 px-3 py-2.5 rounded-lg bg-base-bg border border-border font-mono text-sm text-accent truncate">

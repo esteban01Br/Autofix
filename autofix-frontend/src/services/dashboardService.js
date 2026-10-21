@@ -19,3 +19,9 @@ export const obtenerRepuestos = async () => {
   const response = await api.get('/api/repuestos');
   return response.data;
 };
+
+/** Facturas del período; solo disponible para roles de facturación. */
+export const obtenerFacturas = async () => {
+  const response = await api.get('/api/facturas');
+  return response.data;
+};

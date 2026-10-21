@@ -3,29 +3,34 @@ import { Wrench } from 'lucide-react';
 
 export default function Nav({ compacto = false }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface-glass backdrop-blur">
-      <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <span className="w-9 h-9 rounded-lg bg-accent flex items-center justify-center text-base-bg transition-transform group-hover:scale-105">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface-glass backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
+        <Link to="/" className="group flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent-hover via-accent to-[#d98200] text-base-bg shadow-[0_8px_24px_-10px_var(--color-accent)] transition-transform group-hover:scale-105 group-hover:-rotate-3">
             <Wrench size={18} strokeWidth={2.5} />
           </span>
-          <span className="font-display text-2xl font-bold tracking-wide uppercase">
+          <span className="font-display text-2xl font-bold uppercase tracking-wide">
             Auto<span className="text-accent">Fix</span>
           </span>
-          <span className="badge bg-info/10 text-info hidden sm:inline-flex">SaaS</span>
+          <span className="badge hidden bg-info/10 text-info sm:inline-flex">SaaS</span>
         </Link>
 
         {!compacto && (
-          <nav className="hidden md:flex items-center gap-6 text-sm text-text-secondary">
-            <a href="#caracteristicas" className="hover:text-text-primary transition-colors">
-              Características
-            </a>
-            <a href="#como-funciona" className="hover:text-text-primary transition-colors">
-              Cómo funciona
-            </a>
-            <a href="#planes" className="hover:text-text-primary transition-colors">
-              Planes
-            </a>
+          <nav className="hidden items-center gap-7 text-sm text-text-secondary md:flex">
+            {[
+              { href: '#caracteristicas', label: 'Características' },
+              { href: '#como-funciona', label: 'Cómo funciona' },
+              { href: '#planes', label: 'Planes' },
+            ].map((enlace) => (
+              <a
+                key={enlace.href}
+                href={enlace.href}
+                className="group relative py-1 transition-colors hover:text-text-primary"
+              >
+                {enlace.label}
+                <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-accent transition-all duration-300 group-hover:w-full" />
+              </a>
+            ))}
           </nav>
         )}
 

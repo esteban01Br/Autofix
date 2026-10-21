@@ -128,10 +128,32 @@ export default function Comprar() {
             <ArrowLeft size={15} /> Cambiar de plan
           </Link>
 
+          <ol className="mb-6 flex flex-wrap items-center gap-2 text-xs text-text-secondary">
+            {['Plan', 'Tu taller', 'Acceso'].map((paso, indice) => (
+              <li key={paso} className="flex items-center gap-2">
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${
+                    indice === 0
+                      ? 'bg-success/15 text-success'
+                      : indice === 1
+                        ? 'bg-accent text-base-bg'
+                        : 'bg-surface-hover text-text-secondary'
+                  }`}
+                >
+                  {indice === 0 ? <Check size={12} /> : indice + 1}
+                </span>
+                <span className={indice === 1 ? 'font-medium text-text-primary' : ''}>
+                  {paso}
+                </span>
+                {indice < 2 && <span className="mx-1 h-px w-6 bg-border" aria-hidden="true" />}
+              </li>
+            ))}
+          </ol>
+
           <div className="grid lg:grid-cols-5 gap-6">
             {/* Resumen del plan */}
             <aside className="lg:col-span-2">
-              <div className="card p-6 sticky top-24">
+              <div className="card p-6 sticky top-24 shadow-2xl shadow-black/30">
                 <span className="badge bg-accent/10 text-accent">Plan elegido</span>
                 <h2 className="font-display text-3xl font-bold uppercase mt-3">
                   {plan.nombre}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { KeyRound, Loader2, ShieldCheck } from 'lucide-react';
+import { KeyRound, Loader2, Lock, ShieldCheck } from 'lucide-react';
 import { empresaPublica } from '../services/authService';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
@@ -82,39 +82,52 @@ export default function Acceso() {
         <div className="w-full max-w-md animate-slide-up">
           {/* Marca de la empresa (branding de su página privada) */}
           <div className="text-center mb-6">
-            {empresa.logo_url ? (
-              <img
-                src={empresa.logo_url}
-                alt={empresa.nombre}
-                className="w-16 h-16 mx-auto rounded-2xl object-cover border border-border mb-4"
-              />
-            ) : (
+            <div className="relative mx-auto mb-4 w-fit">
               <span
-                className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-2xl font-bold mb-4 text-base-bg"
+                aria-hidden="true"
+                className="absolute inset-0 rounded-2xl opacity-40 blur-2xl"
                 style={{ background: empresa.color_primario }}
-                aria-hidden
-              >
-                {empresa.nombre.trim().slice(0, 1).toUpperCase()}
+              />
+              {empresa.logo_url ? (
+                <img
+                  src={empresa.logo_url}
+                  alt={empresa.nombre}
+                  className="relative h-16 w-16 rounded-2xl border border-white/10 object-cover shadow-xl"
+                />
+              ) : (
+                <span
+                  className="relative flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-bold text-base-bg shadow-xl ring-1 ring-white/15"
+                  style={{ background: empresa.color_primario }}
+                  aria-hidden="true"
+                >
+                  {empresa.nombre.trim().slice(0, 1).toUpperCase()}
+                </span>
+              )}
+              <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-base-bg bg-success text-base-bg">
+                <ShieldCheck size={12} />
               </span>
-            )}
-            <h1 className="titulo-seccion break-words" style={{ color: empresa.color_primario }}>
+            </div>
+            <h1
+              className="break-words font-display text-3xl font-bold tracking-wide"
+              style={{ color: empresa.color_primario }}
+            >
               {empresa.nombre}
             </h1>
-            <p className="text-sm text-text-secondary mt-2 flex items-center justify-center gap-1.5">
-              <ShieldCheck size={14} /> Acceso privado de tu taller
+            <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-text-secondary">
+              <Lock size={12} /> Acceso privado de tu taller
             </p>
           </div>
 
           <div
-            className="card p-6 sm:p-8 border-t-2"
+            className="card border-t-2 p-6 shadow-2xl shadow-black/40 sm:p-8"
             style={{ borderTopColor: empresa.color_primario }}
           >
             <FormLogin slug={empresa.slug} />
           </div>
 
-          <p className="text-center text-xs text-text-secondary mt-6">
+          <p className="mt-6 text-center text-xs text-text-secondary">
             ¿No reconoces esta página?{' '}
-            <Link to="/" className="hover:text-accent transition-colors">
+            <Link to="/" className="transition-colors hover:text-accent">
               Vuelve al portal
             </Link>
           </p>

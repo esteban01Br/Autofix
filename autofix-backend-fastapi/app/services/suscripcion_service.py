@@ -24,7 +24,7 @@ PLANES: list[dict] = [
         "id": PlanSuscripcion.BASICO,
         "nombre": "Básico",
         "precioMensual": 99000,
-        "precioAnual": 1188000,
+        "precioAnual": 950000,
         "destacado": False,
         "caracteristicas": [
             "Panel de control y agenda de citas",
@@ -38,7 +38,7 @@ PLANES: list[dict] = [
         "id": PlanSuscripcion.PRO,
         "nombre": "Profesional",
         "precioMensual": 179000,
-        "precioAnual": 2148000,
+        "precioAnual": 1720000,
         "destacado": True,
         "caracteristicas": [
             "Todo lo del plan Básico",
@@ -53,7 +53,7 @@ PLANES: list[dict] = [
         "id": PlanSuscripcion.PREMIUM,
         "nombre": "Premium",
         "precioMensual": 299000,
-        "precioAnual": 3588000,
+        "precioAnual": 2870000,
         "destacado": False,
         "caracteristicas": [
             "Todo lo del plan Profesional",

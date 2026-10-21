@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Lock, Mail } from 'lucide-react';
+import { ArrowRight, Loader2, Lock, Mail } from 'lucide-react';
 import { login } from '../services/authService';
 import { entrarALaApp, mensajeError } from '../lib/app';
 
@@ -83,7 +83,9 @@ export default function FormLogin({ slug }) {
 
       <button type="submit" className="btn btn-primary w-full btn-lg" disabled={cargando}>
         {cargando ? (
-          'Verificando...'
+          <>
+            <Loader2 size={16} className="animate-spin" /> Verificando...
+          </>
         ) : (
           <>
             Iniciar sesión <ArrowRight size={16} />
