@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -32,8 +32,21 @@ const PORTAL_URL = import.meta.env.VITE_PORTAL_URL
     ? 'http://localhost:5174'
     : null;
 
-function irAlPortal(ruta) {
-  return PORTAL_URL ? <Navigate to={`${PORTAL_URL}${ruta}`} replace /> : null;
+/**
+ * Redirección al portal. Debe hacerse con `window.location.replace`:
+ * React Router interpreta una URL absoluta como ruta interna y terminaba
+ * en `/login/http://portal/...`.
+ */
+function RedirigirAlPortal({ ruta }) {
+  useEffect(() => {
+    if (PORTAL_URL) window.location.replace(`${PORTAL_URL}${ruta}`);
+  }, [ruta]);
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-workshop text-sm text-muted">
+      Abriendo el portal…
+    </div>
+  );
 }
 
 const titulos = {
@@ -70,10 +83,19 @@ export default function App() {
       }
     >
       <Routes>
-        <Route path="/login" element={irAlPortal('/login') || <Login />} />
+        <Route
+          path="/login"
+          element={PORTAL_URL ? <RedirigirAlPortal ruta="/login" /> : <Login />}
+        />
         <Route
           path="/registro-empresa"
-          element={irAlPortal('/comprar/basico') || <RegistroEmpresa />}
+          element={
+            PORTAL_URL ? (
+              <RedirigirAlPortal ruta="/comprar/basico" />
+            ) : (
+              <RegistroEmpresa />
+            )
+          }
         />
         <Route path="/cambiar-contrasena" element={<CambioContrasena />} />
 

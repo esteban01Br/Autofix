@@ -13,8 +13,8 @@ const estadoInicial = {
   telefono: '',
   correo: '',
   logo_url: '',
-  color_primario: '#f59e0b',
-  color_secundario: '#1f2937',
+  color_primario: '#663af3',
+  color_secundario: '#05060f',
   iva_porcentaje: '19.00',
 };
 
@@ -37,8 +37,8 @@ export default function MiEmpresa() {
           telefono: datos.telefono ?? '',
           correo: datos.correo ?? '',
           logo_url: datos.logo_url ?? '',
-          color_primario: datos.color_primario ?? '#f59e0b',
-          color_secundario: datos.color_secundario ?? '#1f2937',
+          color_primario: datos.color_primario ?? '#663af3',
+          color_secundario: datos.color_secundario ?? '#05060f',
           iva_porcentaje: String(datos.iva_porcentaje ?? '19.00'),
         });
       } catch (err) {

@@ -21,23 +21,23 @@ export default function Modal({ abierto, onCerrar, titulo, children, tamanio = '
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm animate-fade-in sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[#02030a]/80 p-0 backdrop-blur-md animate-fade-in sm:items-center sm:p-4"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onCerrar();
       }}
     >
       <div
-        className={`flex max-h-[92vh] w-full flex-col border border-border bg-surface shadow-[0_40px_90px_-25px_rgba(0,0,0,0.85)] ring-1 ring-white/5 rounded-t-2xl sm:rounded-xl ${tamanio} animate-slide-up sm:animate-scale-in`}
+        className={`flex max-h-[92vh] w-full flex-col rounded-t-2xl border border-[rgba(186,215,247,0.12)] bg-[#05060f]/97 shadow-[inset_0_1px_1px_rgba(216,236,248,0.2),inset_0_24px_48px_rgba(168,216,245,0.06),0_16px_32px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:rounded-2xl ${tamanio} animate-slide-up sm:animate-scale-in`}
         role="dialog"
         aria-modal="true"
       >
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h3 className="font-display text-lg font-semibold tracking-wide text-text-primary">
+          <h3 className="font-display text-lg font-medium tracking-tight text-text-primary">
             {titulo}
           </h3>
           <button
             onClick={onCerrar}
-            className="rounded-md p-1.5 text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
+            className="rounded-full p-1.5 text-muted transition-colors hover:bg-glass-fuerte hover:text-text-primary"
             aria-label="Cerrar"
           >
             <X size={18} />

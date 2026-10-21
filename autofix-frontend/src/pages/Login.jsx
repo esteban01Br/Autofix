@@ -117,34 +117,36 @@ export default function Login() {
           aria-hidden
         />
         <div
-          className="absolute top-1/4 -left-16 w-64 h-64 rounded-full opacity-10 blur-3xl bg-danger"
+          className="absolute -bottom-40 -left-24 w-96 h-96 rounded-full opacity-15 blur-3xl bg-steel"
           aria-hidden
         />
 
-        <div className="relative z-10 flex items-center justify-between">
+        <div className="relative z-10 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-accent flex items-center justify-center text-base-bg shadow-lg shadow-accent-glow">
-              <Wrench size={22} />
+            <div className="marca-violeta flex h-11 w-11 items-center justify-center rounded-full text-white">
+              <Wrench size={21} />
             </div>
             <div>
-              <h1 className="font-display text-3xl font-bold tracking-wide text-text-primary">
-                AUTO<span className="text-accent">FIX</span>
+              <h1 className="font-display text-3xl font-medium tracking-tight text-text-primary">
+                AUTO<span className="texto-degradado">FIX</span>
               </h1>
-              <p className="text-xs text-text-secondary">Sistema de gestión de taller</p>
+              <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
+                Sistema de gestión de taller
+              </p>
             </div>
           </div>
 
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/25 text-xs font-semibold text-success animate-fade-in">
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/25 text-xs font-medium text-success animate-fade-in">
             <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse-subtle" />
             Sistema operativo
           </span>
         </div>
 
         <div className="relative z-10 max-w-lg">
-          <h2 className="font-display text-5xl font-extrabold leading-tight text-text-primary">
+          <h2 className="font-display text-5xl font-medium leading-[1.08] tracking-tight text-text-primary">
             Tu taller mecánico,
             <br />
-            <span className="text-accent">bajo control total.</span>
+            <span className="texto-degradado">bajo control total.</span>
           </h2>
           <p className="mt-5 text-text-secondary leading-relaxed">
             Gestiona clientes, vehículos, citas, órdenes de trabajo, repuestos y
@@ -156,9 +158,9 @@ export default function Login() {
             {funcionalidades.map(({ icon: Icon, texto }) => (
               <div
                 key={texto}
-                className="flex items-center gap-2.5 py-2.5 px-3 rounded-lg bg-surface/70 border border-border/70 backdrop-blur-sm"
+                className="flex items-center gap-2.5 py-2.5 px-3 rounded-xl bg-[rgba(186,214,247,0.04)] border border-border/70 backdrop-blur-sm"
               >
-                <span className="w-7 h-7 rounded-md bg-accent-glow flex items-center justify-center text-accent shrink-0">
+                <span className="w-7 h-7 rounded-full bg-accent-glow flex items-center justify-center text-accent shrink-0">
                   <Icon size={14} />
                 </span>
                 <span className="text-sm text-text-primary">{texto}</span>
@@ -169,10 +171,10 @@ export default function Login() {
           <div className="mt-10 grid grid-cols-4 gap-3">
             {estadisticas.map(({ icon: Icon, etiqueta, valor }) => (
               <div key={etiqueta} className="text-center">
-                <div className="mx-auto w-9 h-9 rounded-lg bg-steel/15 border border-steel/20 flex items-center justify-center text-steel">
+                <div className="mx-auto w-9 h-9 rounded-full bg-[rgba(186,214,247,0.06)] ring-1 ring-[rgba(186,215,247,0.12)] flex items-center justify-center text-frost">
                   <Icon size={16} />
                 </div>
-                <p className="font-display text-2xl font-bold text-text-primary mt-2">{valor}</p>
+                <p className="font-display text-2xl font-medium text-text-primary mt-2">{valor}</p>
                 <p className="text-[11px] text-text-secondary leading-tight">{etiqueta}</p>
               </div>
             ))}
@@ -188,11 +190,11 @@ export default function Login() {
       <div className="flex items-center justify-center p-6 bg-base-bg">
         <div className="w-full max-w-sm animate-slide-up">
           <div className="lg:hidden mb-8 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-base-bg">
+            <div className="marca-violeta w-10 h-10 flex items-center justify-center rounded-full text-white">
               <Wrench size={20} />
             </div>
-            <h1 className="font-display text-2xl font-bold tracking-wide text-text-primary">
-              AUTO<span className="text-accent">FIX</span>
+            <h1 className="font-display text-2xl font-medium tracking-tight text-text-primary">
+              AUTO<span className="texto-degradado">FIX</span>
             </h1>
           </div>
 
@@ -201,7 +203,7 @@ export default function Login() {
               <ShieldCheck size={18} />
               <span className="text-xs font-semibold uppercase tracking-wider">Acceso restringido</span>
             </div>
-            <h2 className="font-display text-2xl font-bold text-text-primary">Iniciar sesión</h2>
+            <h2 className="font-display text-2xl font-medium tracking-tight text-text-primary">Iniciar sesión</h2>
             <p className="text-sm text-text-secondary mt-1 mb-6">
               Ingresa tus credenciales para acceder al panel del taller.
             </p>
@@ -263,7 +265,7 @@ export default function Login() {
               {error && (
                 <div
                   role="alert"
-                  className="flex items-start gap-2.5 p-3 rounded-lg bg-danger/10 border border-danger/30 text-sm text-danger animate-fade-in"
+                  className="flex items-start gap-2.5 p-3 rounded-md bg-danger-glow border border-danger/30 text-sm text-danger animate-fade-in"
                 >
                   <AlertCircle size={16} className="shrink-0 mt-0.5" />
                   <span>{error}</span>

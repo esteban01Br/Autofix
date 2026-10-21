@@ -48,6 +48,9 @@ export default function MetricCard({
 }) {
   const mostrado = useContador(valor);
   const Etiqueta = onClick ? 'button' : 'div';
+  // Sin actividad no se dibuja la línea: una raya plana al pie de la tarjeta
+  // se lee como un adorno roto, no como información.
+  const hayActividad = Array.isArray(serie) && serie.some((punto) => punto > 0);
 
   return (
     <Etiqueta
@@ -62,33 +65,35 @@ export default function MetricCard({
         aria-hidden="true"
         className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full blur-2xl opacity-40 transition-opacity duration-300 group-hover:opacity-80"
         style={{
-          background: acento ? 'var(--color-accent-glow)' : 'rgba(74, 144, 164, 0.18)',
+          background: acento ? 'rgba(102, 58, 243, 0.3)' : 'rgba(124, 145, 182, 0.14)',
         }}
       />
 
       <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-text-secondary">
+          <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted">
             {titulo}
           </p>
-          <p className="mt-1 font-display text-3xl font-bold tabular-nums text-text-primary transition-colors group-hover:text-accent">
+          <p className="mt-1.5 font-display text-3xl font-medium tabular-nums tracking-tight text-text-primary transition-colors group-hover:text-frost">
             {mostrado}
           </p>
           {detalle && (
-            <p className="mt-1 truncate text-xs text-text-secondary">{detalle}</p>
+            <p className="mt-1 truncate text-xs text-muted">{detalle}</p>
           )}
         </div>
 
         <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-110 ${
-            acento ? 'bg-accent-glow text-accent' : 'bg-steel/15 text-steel'
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-110 ${
+            acento
+              ? 'bg-accent-glow text-[#b9a5ff] shadow-[inset_0_0_0_1px_rgba(102,58,243,0.38)]'
+              : 'tile-icono'
           }`}
         >
           {Icon && <Icon size={20} />}
         </div>
       </div>
 
-      {serie && serie.length > 1 && (
+      {hayActividad && serie.length > 1 && (
         <div className="relative mt-3 flex justify-end opacity-80 transition-opacity group-hover:opacity-100">
           <MiniTendencia
             datos={serie}

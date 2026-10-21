@@ -39,7 +39,7 @@ export default function FormLogin({ slug }) {
           Correo electrónico
         </label>
         <div className="relative">
-          <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none" />
+          <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
           <input
             id="correo"
             type="email"
@@ -58,7 +58,7 @@ export default function FormLogin({ slug }) {
           Contraseña
         </label>
         <div className="relative">
-          <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none" />
+          <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
           <input
             id="contrasena"
             type="password"
@@ -75,7 +75,7 @@ export default function FormLogin({ slug }) {
       {error && (
         <div
           role="alert"
-          className="p-3 rounded-lg bg-danger/10 border border-danger/30 text-sm text-danger animate-fade-in"
+          className="p-3 rounded-md bg-danger-glow border border-danger/30 text-sm text-danger animate-fade-in"
         >
           {error}
         </div>

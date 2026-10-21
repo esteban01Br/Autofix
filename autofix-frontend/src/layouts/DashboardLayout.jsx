@@ -17,7 +17,7 @@ export default function DashboardLayout({ titulo }) {
 
         <button
           onClick={() => setMenuAbierto(true)}
-          className="fixed left-4 top-4 z-20 rounded-md border border-border bg-surface p-2 text-text-primary shadow-lg transition-colors hover:border-accent/40 lg:hidden"
+          className="fixed left-4 top-4 z-20 rounded-full border border-border bg-surface-glass p-2 text-text-primary shadow-lg backdrop-blur-xl transition-colors hover:border-accent/40 lg:hidden"
           aria-label="Abrir menú"
         >
           <Menu size={20} />

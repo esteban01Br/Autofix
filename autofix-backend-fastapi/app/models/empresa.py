@@ -27,10 +27,10 @@ class Empresa(Base):
     # Marca propia (branding)
     logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     color_primario: Mapped[str] = mapped_column(
-        String(7), nullable=False, default="#f59e0b"
+        String(7), nullable=False, default="#663af3"
     )
     color_secundario: Mapped[str] = mapped_column(
-        String(7), nullable=False, default="#1f2937"
+        String(7), nullable=False, default="#05060f"
     )
 
     # Acceso confidencial de la empresa: URL /acceso/{slug} en el portal.

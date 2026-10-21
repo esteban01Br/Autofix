@@ -53,7 +53,7 @@ export default function Acceso() {
             <span className="w-14 h-14 mx-auto rounded-full bg-danger-glow flex items-center justify-center text-danger mb-4">
               <KeyRound size={26} />
             </span>
-            <h1 className="font-display text-2xl font-bold uppercase">
+            <h1 className="font-display text-2xl font-medium tracking-tight">
               Página no encontrada
             </h1>
             <p className="text-sm text-text-secondary mt-3">
@@ -96,7 +96,7 @@ export default function Acceso() {
                 />
               ) : (
                 <span
-                  className="relative flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-bold text-base-bg shadow-xl ring-1 ring-white/15"
+                  className="relative flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-medium text-white shadow-xl ring-1 ring-white/15"
                   style={{ background: empresa.color_primario }}
                   aria-hidden="true"
                 >
@@ -108,7 +108,7 @@ export default function Acceso() {
               </span>
             </div>
             <h1
-              className="break-words font-display text-3xl font-bold tracking-wide"
+              className="break-words font-display text-3xl font-medium tracking-tight"
               style={{ color: empresa.color_primario }}
             >
               {empresa.nombre}

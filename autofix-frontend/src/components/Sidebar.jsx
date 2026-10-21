@@ -84,7 +84,8 @@ export default function Sidebar({ abierto, cerrar }) {
     navigate('/login');
   };
 
-  const iniciales = (usuario?.sub ?? '?').slice(0, 2).toUpperCase();
+  const nombreUsuario = usuario?.sub?.split('@')[0] ?? 'Usuario';
+  const iniciales = nombreUsuario.slice(0, 2).toUpperCase();
   const visibles = secciones
     .map((seccion) => ({
       ...seccion,
@@ -102,28 +103,28 @@ export default function Sidebar({ abierto, cerrar }) {
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-border bg-surface transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-border bg-surface-glass backdrop-blur-2xl transition-transform duration-300 lg:translate-x-0 ${
           abierto ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Marca */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent-hover via-accent to-[#d98200] text-base-bg shadow-[0_8px_24px_-10px_var(--color-accent)]">
-              <Wrench size={19} strokeWidth={2.4} />
+            <div className="marca-violeta flex h-10 w-10 items-center justify-center rounded-full text-white">
+              <Wrench size={18} strokeWidth={2.2} />
             </div>
             <div>
-              <h1 className="font-display text-xl font-bold tracking-wide text-text-primary">
-                AUTO<span className="text-accent">FIX</span>
+              <h1 className="font-display text-xl font-medium tracking-tight text-text-primary">
+                AUTO<span className="texto-degradado">FIX</span>
               </h1>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-text-secondary">
+              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
                 Gestión de taller
               </p>
             </div>
           </div>
           <button
             onClick={cerrar}
-            className="rounded-md p-1.5 text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary lg:hidden"
+            className="rounded-full p-1.5 text-muted transition-colors hover:bg-glass-fuerte hover:text-text-primary lg:hidden"
             aria-label="Cerrar menú"
           >
             <X size={17} />
@@ -134,7 +135,7 @@ export default function Sidebar({ abierto, cerrar }) {
         <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
           {visibles.map((seccion) => (
             <div key={seccion.titulo}>
-              <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-text-secondary/70">
+              <p className="mb-1.5 px-3 font-mono text-[9px] font-medium uppercase tracking-[0.18em] text-muted/80">
                 {seccion.titulo}
               </p>
               <div className="space-y-0.5">
@@ -144,10 +145,10 @@ export default function Sidebar({ abierto, cerrar }) {
                     to={to}
                     onClick={cerrar}
                     className={({ isActive }) =>
-                      `group relative flex items-center gap-3 rounded-lg py-2.5 pl-3.5 pr-3 text-sm font-medium transition-all duration-200 ${
+                      `group relative flex items-center gap-3 rounded-full py-2.5 pl-3.5 pr-3 text-sm font-medium transition-all duration-200 ${
                         isActive
-                          ? 'bg-accent-glow text-accent'
-                          : 'text-text-secondary hover:translate-x-0.5 hover:bg-surface-hover hover:text-text-primary'
+                          ? 'bg-accent-glow text-white shadow-[inset_0_1px_1px_rgba(216,236,248,0.08)]'
+                          : 'text-text-secondary hover:translate-x-0.5 hover:bg-glass-fuerte hover:text-white'
                       }`
                     }
                   >
@@ -156,19 +157,19 @@ export default function Sidebar({ abierto, cerrar }) {
                         <span
                           aria-hidden="true"
                           className={`absolute left-0 top-2 bottom-2 w-[3px] rounded-full transition-all duration-200 ${
-                            isActive ? 'bg-accent' : 'bg-transparent'
+                            isActive ? 'bg-accent-hover' : 'bg-transparent'
                           }`}
                         />
                         <Icon
                           size={17}
                           className={`shrink-0 transition-transform duration-200 ${
-                            isActive ? '' : 'group-hover:scale-110'
+                            isActive ? 'text-blueprint' : 'group-hover:scale-110'
                           }`}
                         />
                         <span className="flex-1">{label}</span>
                         <span
                           aria-hidden="true"
-                          className={`h-1.5 w-1.5 rounded-full bg-current transition-opacity ${
+                          className={`h-1.5 w-1.5 rounded-full bg-accent-hover transition-opacity ${
                             isActive ? 'opacity-100' : 'opacity-0'
                           }`}
                         />
@@ -183,12 +184,12 @@ export default function Sidebar({ abierto, cerrar }) {
 
         {/* Sesión */}
         <div className="border-t border-border px-3 py-3">
-          <div className="mb-2 flex items-center gap-2.5 rounded-lg bg-surface-hover/60 px-2.5 py-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-steel to-[#2f6b7d] text-[11px] font-bold text-white">
+          <div className="mb-2 flex items-center gap-2.5 rounded-2xl bg-white/[0.04] px-2.5 py-2 ring-1 ring-[rgba(186,215,247,0.08)]">
+            <div className="tile-icono h-8 w-8 shrink-0 text-[10px] font-semibold">
               {iniciales}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-medium text-text-primary">{usuario?.sub}</p>
+              <p className="truncate text-xs font-medium text-text-primary">{nombreUsuario}</p>
               <div className="mt-0.5">
                 <Badge valor={usuario?.rol} dot={false} />
               </div>
@@ -196,7 +197,7 @@ export default function Sidebar({ abierto, cerrar }) {
           </div>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-danger-glow hover:text-danger"
+            className="flex w-full items-center gap-3 rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-danger-glow hover:text-danger"
           >
             <LogOut size={17} />
             Cerrar sesión

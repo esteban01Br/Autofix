@@ -57,7 +57,7 @@ export default function Exito() {
           <div className="card mt-8 border-accent/20 p-5 text-left shadow-2xl shadow-black/30">
             <p className="label mb-2">Tu página de acceso (compártela con tu equipo)</p>
             <div className="flex flex-col sm:flex-row gap-2">
-              <code className="flex-1 px-3 py-2.5 rounded-lg bg-base-bg border border-border font-mono text-sm text-accent truncate">
+              <code className="flex-1 px-3 py-2.5 rounded-md bg-base-bg border border-border font-mono text-sm text-blueprint truncate">
                 {urlAcceso}
               </code>
               <button onClick={copiar} className="btn btn-ghost shrink-0" type="button">

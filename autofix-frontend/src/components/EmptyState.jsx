@@ -14,13 +14,13 @@ export default function EmptyState({
           aria-hidden="true"
           className="absolute inset-0 rounded-full bg-accent-glow blur-xl"
         />
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-border bg-surface-hover text-text-secondary">
+        <div className="tile-icono relative h-16 w-16">
           <Icon size={26} />
         </div>
       </div>
       <p className="text-sm font-medium text-text-primary">{mensaje}</p>
       {sugerencia && (
-        <p className="mt-1 max-w-sm text-xs text-text-secondary">{sugerencia}</p>
+        <p className="mt-1 max-w-sm text-xs text-muted">{sugerencia}</p>
       )}
       {accionLabel && accionClick && (
         <button onClick={accionClick} className="btn btn-primary btn-sm mt-4">

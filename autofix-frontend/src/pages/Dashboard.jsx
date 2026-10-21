@@ -24,12 +24,12 @@ import {
 } from '../services/dashboardService';
 
 const SEGMENTOS_ESTADO = [
-  { estado: 'RECIBIDO', color: '#6E9EFF' },
-  { estado: 'DIAGNOSTICO', color: '#C084FC' },
-  { estado: 'EN_REPARACION', color: '#F5A623' },
-  { estado: 'ESPERANDO_REPUESTOS', color: '#E5484D' },
-  { estado: 'LISTO', color: '#3DD68C' },
-  { estado: 'ENTREGADO', color: '#8B9099' },
+  { estado: 'RECIBIDO', color: '#6ea8ff' },
+  { estado: 'DIAGNOSTICO', color: '#a78bfa' },
+  { estado: 'EN_REPARACION', color: '#663af3' },
+  { estado: 'ESPERANDO_REPUESTOS', color: '#e46d4c' },
+  { estado: 'LISTO', color: '#35d39a' },
+  { estado: 'ENTREGADO', color: '#6b7385' },
 ];
 
 const ACCIONES = [
@@ -364,7 +364,7 @@ export default function Dashboard() {
           <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">
             <Sparkles size={12} /> Panel de control
           </p>
-          <h1 className="mt-1 font-display text-3xl font-bold tracking-wide text-text-primary">
+          <h1 className="mt-1 font-display text-3xl font-medium tracking-tight text-text-primary">
             {saludo},{' '}
             <span className="texto-degradado">{nombreCorto || 'equipo'}</span>
           </h1>

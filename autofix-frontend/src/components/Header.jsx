@@ -46,15 +46,16 @@ export default function Header({ titulo }) {
     }
   };
 
-  const iniciales = (usuario?.sub ?? '?').slice(0, 2).toUpperCase();
+  const nombreUsuario = usuario?.sub?.split('@')[0] ?? 'Usuario';
+  const iniciales = nombreUsuario.slice(0, 2).toUpperCase();
 
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b border-border bg-surface-glass pl-16 pr-4 backdrop-blur-xl lg:pl-8 lg:pr-8">
       <div className="min-w-0">
-        <p className="hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-text-secondary/70 sm:block">
+        <p className="hidden font-mono text-[9px] uppercase tracking-[0.2em] text-muted sm:block">
           AutoFix
         </p>
-        <h2 className="truncate font-display text-lg font-semibold tracking-wide text-text-primary sm:text-xl">
+        <h2 className="truncate font-display text-lg font-medium tracking-tight text-text-primary sm:text-xl">
           {titulo}
         </h2>
       </div>
@@ -84,12 +85,12 @@ export default function Header({ titulo }) {
         </form>
 
         <div className="hidden items-center gap-2.5 border-l border-border pl-3 md:flex">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-accent-hover via-accent to-[#d98200] text-[11px] font-bold text-base-bg">
+          <div className="tile-icono h-8 w-8 text-[10px] font-semibold">
             {iniciales}
           </div>
           <div className="leading-tight">
             <p className="max-w-[150px] truncate text-xs font-medium text-text-primary">
-              {usuario?.sub}
+              {nombreUsuario}
             </p>
             <div className="mt-0.5">
               <Badge valor={usuario?.rol} dot={false} />

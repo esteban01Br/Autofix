@@ -102,7 +102,7 @@ export default function Comprar() {
         <Nav compacto />
         <main className="flex-1 flex items-center justify-center px-4">
           <div className="card max-w-md w-full p-8 text-center">
-            <h1 className="font-display text-2xl font-bold uppercase">Plan no encontrado</h1>
+            <h1 className="font-display text-2xl font-medium tracking-tight">Plan no encontrado</h1>
             <p className="text-sm text-text-secondary mt-3">
               El plan que intentas contratar no existe.
             </p>
@@ -136,7 +136,7 @@ export default function Comprar() {
                     indice === 0
                       ? 'bg-success/15 text-success'
                       : indice === 1
-                        ? 'bg-accent text-base-bg'
+                        ? 'bg-accent text-white'
                         : 'bg-surface-hover text-text-secondary'
                   }`}
                 >
@@ -154,12 +154,12 @@ export default function Comprar() {
             {/* Resumen del plan */}
             <aside className="lg:col-span-2">
               <div className="card p-6 sticky top-24 shadow-2xl shadow-black/30">
-                <span className="badge bg-accent/10 text-accent">Plan elegido</span>
-                <h2 className="font-display text-3xl font-bold uppercase mt-3">
+                <span className="badge bg-accent-glow text-frost">Plan elegido</span>
+                <h2 className="font-display text-3xl font-medium tracking-tight mt-3">
                   {plan.nombre}
                 </h2>
                 <div className="mt-3 flex items-end gap-1">
-                  <span className="font-display text-4xl font-extrabold text-accent">
+                  <span className="texto-degradado font-display text-4xl font-medium tracking-tight">
                     {formatearCOP(plan.precioMensual)}
                   </span>
                   <span className="text-sm text-text-secondary mb-1">/mes</span>
@@ -190,7 +190,7 @@ export default function Comprar() {
             {/* Registro */}
             <div className="lg:col-span-3">
               <div className="card p-6 sm:p-8 animate-slide-up">
-                <h1 className="font-display text-3xl font-bold uppercase">
+                <h1 className="font-display text-3xl font-medium tracking-tight">
                   Crea tu taller
                 </h1>
                 <p className="text-sm text-text-secondary mt-1">

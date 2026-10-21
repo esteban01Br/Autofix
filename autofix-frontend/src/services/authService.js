@@ -16,6 +16,7 @@ export const decodificarToken = (token) => {
   const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
   const decoded = JSON.parse(decodeURIComponent(escape(atob(base64))));
   return {
+    sub: decoded.sub,
     correo: decoded.sub,
     id: decoded.id,
     rol: decoded.rol,

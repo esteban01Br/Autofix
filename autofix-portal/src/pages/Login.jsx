@@ -15,13 +15,15 @@ export default function Login() {
             <div className="relative mx-auto mb-4 w-fit">
               <span
                 aria-hidden="true"
-                className="absolute inset-0 rounded-2xl bg-accent opacity-40 blur-2xl"
+                className="absolute inset-0 rounded-full bg-accent opacity-40 blur-2xl"
               />
-              <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-hover via-accent to-[#d98200] text-base-bg shadow-xl">
-                <Wrench size={26} strokeWidth={2.5} />
+              <span className="marca-violeta relative flex h-14 w-14 items-center justify-center rounded-full text-white">
+                <Wrench size={26} strokeWidth={2.4} />
               </span>
             </div>
-            <h1 className="titulo-seccion">Bienvenido de nuevo</h1>
+            <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">
+              Bienvenido de nuevo
+            </h1>
             <p className="mt-2 text-sm text-text-secondary">
               Ingresa con tu correo y contraseña para entrar a AutoFix.
             </p>
@@ -33,7 +35,7 @@ export default function Login() {
 
           <p className="text-center text-sm text-text-secondary mt-6">
             ¿Aún no tienes cuenta?{' '}
-            <Link to="/comprar/basico" className="text-accent font-semibold hover:underline">
+            <Link to="/comprar/basico" className="text-blueprint font-medium hover:text-frost">
               Adquiere un plan
             </Link>
           </p>

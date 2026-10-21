@@ -48,7 +48,7 @@ export function ToastProvider({ children }) {
           return (
             <div
               key={toast.id}
-              className={`pointer-events-auto relative flex min-w-[260px] max-w-[420px] items-center gap-3 overflow-hidden rounded-xl border bg-surface/95 px-4 py-3 shadow-xl shadow-black/40 backdrop-blur-md animate-slide-up ${estilo.container}`}
+              className={`pointer-events-auto relative flex min-w-[260px] max-w-[420px] items-center gap-3 overflow-hidden rounded-2xl border bg-[#0b0e1b]/95 px-4 py-3 shadow-xl shadow-black/40 backdrop-blur-md animate-slide-up ${estilo.container}`}
             >
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${estilo.circulo}`}
@@ -58,7 +58,7 @@ export function ToastProvider({ children }) {
               <p className="flex-1 text-sm text-text-primary">{toast.mensaje}</p>
               <button
                 onClick={() => cerrarToast(toast.id)}
-                className="p-1 text-text-secondary transition-colors hover:text-text-primary"
+                className="p-1 text-muted transition-colors hover:text-text-primary"
                 aria-label="Cerrar notificación"
               >
                 <X size={14} />

@@ -61,14 +61,14 @@ export default function CambioContrasena() {
     <div className="min-h-screen bg-base-bg flex items-center justify-center p-6">
       <div className="w-full max-w-md animate-slide-up">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-11 h-11 rounded-xl bg-accent flex items-center justify-center text-base-bg shadow-lg shadow-accent-glow">
+          <div className="marca-violeta w-11 h-11 flex items-center justify-center rounded-full text-white">
             <KeyRound size={22} />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-bold tracking-wide text-text-primary">
+            <h1 className="font-display text-2xl font-medium tracking-tight text-text-primary">
               Cambio de contraseña
             </h1>
-            <p className="text-xs text-text-secondary">Por seguridad, debes cambiar tu contraseña temporal</p>
+            <p className="mt-0.5 text-xs text-muted">Por seguridad, debes cambiar tu contraseña temporal</p>
           </div>
         </div>
 

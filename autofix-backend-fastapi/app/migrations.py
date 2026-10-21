@@ -65,7 +65,7 @@ def _empresa_defecto_id(conn) -> int:
         text(
             "INSERT INTO empresas (nombre, nit, color_primario, color_secundario,"
             " iva_porcentaje, consecutivo_factura, activa, fecha_creacion)"
-            " VALUES ('AutoFix', '900.000.000-1', '#f59e0b', '#1f2937',"
+            " VALUES ('AutoFix', '900.000.000-1', '#663af3', '#05060f',"
             " 19.00, 0, TRUE, CURRENT_TIMESTAMP)"
         )
     )

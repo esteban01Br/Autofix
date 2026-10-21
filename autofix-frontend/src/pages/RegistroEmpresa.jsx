@@ -71,14 +71,16 @@ export default function RegistroEmpresa() {
     <div className="min-h-screen bg-base-bg flex items-center justify-center p-6">
       <div className="w-full max-w-2xl animate-slide-up">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-11 h-11 rounded-xl bg-accent flex items-center justify-center text-base-bg shadow-lg shadow-accent-glow">
+          <div className="marca-violeta w-11 h-11 flex items-center justify-center rounded-full text-white">
             <Wrench size={22} />
           </div>
           <div>
-            <h1 className="font-display text-3xl font-bold tracking-wide text-text-primary">
-              AUTO<span className="text-accent">FIX</span>
+            <h1 className="font-display text-3xl font-medium tracking-tight text-text-primary">
+              AUTO<span className="texto-degradado">FIX</span>
             </h1>
-            <p className="text-xs text-text-secondary">Registra tu taller en la plataforma</p>
+            <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
+              Registra tu taller en la plataforma
+            </p>
           </div>
         </div>
 
