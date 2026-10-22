@@ -97,9 +97,6 @@
   70% { box-shadow: 0 0 0 16px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
-@keyframes rueda-girar {
-  to { transform: rotate(360deg); }
-}
 @keyframes carro-flotar {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
@@ -107,11 +104,6 @@
 @keyframes carro-particula {
   0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.15; }
   50% { transform: translate3d(0, -16px, 0); opacity: 0.75; }
-}
-@keyframes carro-barrido {
-  0%, 58% { transform: translateX(0); opacity: 0; }
-  64% { opacity: 0.55; }
-  86%, 100% { transform: translateX(920px); opacity: 0; }
 }
 
 * { box-sizing: border-box; }
@@ -483,57 +475,18 @@ body {
   .carro-particula-3 { bottom: 30%; left: 8%; animation-delay: -4.8s; }
   .carro-particula-4 { top: 12%; right: 32%; animation-delay: -6.1s; }
 
-  .carro-3d {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    transform-style: preserve-3d;
-    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .carro-flota {
-    animation: carro-flotar 7s ease-in-out infinite;
-    transform-style: preserve-3d;
-  }
-  .carro-cuerpo {
-    position: relative;
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    aspect-ratio: 720 / 330;
-    transform-style: preserve-3d;
-  }
-  .carro-capa {
+  .carro-lienzo {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
+    z-index: 1;
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    cursor: grab;
+    touch-action: none;
   }
-  .carro-frente {
-    filter: drop-shadow(0 26px 30px rgba(0, 0, 0, 0.5));
-  }
-  .carro-barrido {
-    animation: carro-barrido 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  }
-
-  .rueda {
-    transform-box: view-box;
-    animation: rueda-girar 7s linear infinite;
-  }
-  .carro-escena.acelerando .rueda {
-    animation-duration: 0.7s;
-  }
-
-  .carro-haz {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  .carro-escena.faros .carro-haz {
-    opacity: 0.9;
-  }
-  .carro-escena.faros .carro-faro {
-    filter: drop-shadow(0 0 10px rgba(216, 236, 248, 0.95));
+  .carro-lienzo:active {
+    cursor: grabbing;
   }
 
   .carro-chip {
