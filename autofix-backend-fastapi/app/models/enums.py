@@ -30,6 +30,19 @@ class EstadoOrden(str, Enum):
     ENTREGADO = "ENTREGADO"
 
 
+class EstadoCotizacion(str, Enum):
+    """Ciclo de vida de una cotización.
+
+    BORRADOR → ENVIADA → APROBADA / RECHAZADA / VENCIDA.
+    """
+
+    BORRADOR = "BORRADOR"
+    ENVIADA = "ENVIADA"
+    APROBADA = "APROBADA"
+    RECHAZADA = "RECHAZADA"
+    VENCIDA = "VENCIDA"
+
+
 class MetodoPago(str, Enum):
     """Método de pago de un abono/pago de factura."""
 

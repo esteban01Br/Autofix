@@ -361,6 +361,33 @@ def _migrar_slug_y_suscripciones(conn, insp) -> None:
         )
 
 
+def _migrar_cotizaciones(conn, insp) -> None:
+    """Agrega el consecutivo COT-0001 por empresa (Fase 3 — cotizaciones).
+
+    Las tablas ``cotizaciones`` y ``detalle_cotizacion`` las crea
+    ``create_all`` (son nuevas); aquí solo complementamos la columna del
+    consecutivo en ``empresas`` ya existente.
+    """
+    if "empresas" not in insp.get_table_names():
+        return
+    if "consecutivo_cotizacion" not in _columnas(insp, "empresas"):
+        conn.execute(
+            text(
+                "ALTER TABLE empresas ADD COLUMN consecutivo_cotizacion"
+                " INTEGER NOT NULL DEFAULT 0"
+            )
+        )
+    # El contador arranca desde las cotizaciones ya registradas.
+    if "cotizaciones" in insp.get_table_names():
+        conn.execute(
+            text(
+                "UPDATE empresas SET consecutivo_cotizacion ="
+                " (SELECT COUNT(*) FROM cotizaciones"
+                "  WHERE cotizaciones.empresa_id = empresas.id)"
+            )
+        )
+
+
 def _migrar_a_multiempresa(conn, insp) -> None:
     if "empresas" not in insp.get_table_names():
         return  # create_all aún no la crea (no debería pasar).
@@ -389,6 +416,7 @@ def _migrar_a_multiempresa(conn, insp) -> None:
     _migrar_numero_facturas(conn, insp)
     _migrar_pagos(conn, insp)
     _migrar_slug_y_suscripciones(conn, insp)
+    _migrar_cotizaciones(conn, insp)
 
 
 # ------------------------------------------------------------------

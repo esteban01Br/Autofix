@@ -46,6 +46,9 @@ class Empresa(Base):
     consecutivo_factura: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0
     )
+    consecutivo_cotizacion: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0
+    )
 
     activa: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     fecha_creacion: Mapped[datetime] = mapped_column(

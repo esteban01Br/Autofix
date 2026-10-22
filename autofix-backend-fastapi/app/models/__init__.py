@@ -15,6 +15,8 @@ from app.models.detalle_orden import DetalleOrden
 from app.models.factura import Factura
 from app.models.servicio import Servicio
 from app.models.suscripcion import Suscripcion
+from app.models.cotizacion import Cotizacion
+from app.models.detalle_cotizacion import DetalleCotizacion
 
 __all__ = [
     "Base",
@@ -36,4 +38,6 @@ __all__ = [
     "Factura",
     "Servicio",
     "Suscripcion",
+    "Cotizacion",
+    "DetalleCotizacion",
 ]

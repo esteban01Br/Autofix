@@ -38,6 +38,13 @@ from app.schemas.detalle_orden import (
     DetalleOrdenUpdate,
 )
 from app.schemas.factura import FacturaCreate, FacturaResponse
+from app.schemas.cotizacion import (
+    CotizacionCreate,
+    CotizacionEstadoRequest,
+    CotizacionResponse,
+    CotizacionUpdate,
+    DetalleCotizacionResponse,
+)
 
 __all__ = [
     "LoginRequest",
@@ -75,4 +82,9 @@ __all__ = [
     "DetalleOrdenResponse",
     "FacturaCreate",
     "FacturaResponse",
+    "CotizacionCreate",
+    "CotizacionUpdate",
+    "CotizacionEstadoRequest",
+    "CotizacionResponse",
+    "DetalleCotizacionResponse",
 ]
