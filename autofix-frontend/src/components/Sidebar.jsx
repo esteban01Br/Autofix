@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   BarChart3,
   ClipboardList,
+  FileText,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Badge from './Badge';
@@ -56,6 +57,7 @@ const secciones = [
         roles: ['ADMIN', 'GERENTE', 'BODEGUERO', 'MECANICO'],
       },
       { to: '/servicios', label: 'Servicios', icon: ClipboardList, roles: ['ADMIN', 'GERENTE', 'ASESOR'] },
+      { to: '/cotizaciones', label: 'Cotizaciones', icon: FileText, roles: ['ADMIN', 'GERENTE'] },
     ],
   },
   {

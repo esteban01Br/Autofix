@@ -21,6 +21,7 @@ const MisOrdenes = lazy(() => import('./pages/MisOrdenes'));
 const Auditoria = lazy(() => import('./pages/Auditoria'));
 const Productividad = lazy(() => import('./pages/Productividad'));
 const Servicios = lazy(() => import('./pages/Servicios'));
+const Cotizaciones = lazy(() => import('./pages/Cotizaciones'));
 const NoEncontrada = lazy(() => import('./pages/NoEncontrada'));
 
 // El portal de ventas (app separada) concentra el login, el registro de
@@ -121,6 +122,7 @@ export default function App() {
           <Route path="/auditoria" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Auditoria /></ProtectedRoute>} />
           <Route path="/productividad" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Productividad /></ProtectedRoute>} />
           <Route path="/servicios" element={<ProtectedRoute roles={['ADMIN', 'GERENTE', 'ASESOR']}><Servicios /></ProtectedRoute>} />
+        <Route path="/cotizaciones" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Cotizaciones /></ProtectedRoute>} />
         </Route>
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

@@ -27,6 +27,13 @@ const mapas = {
   PARCIAL: { color: 'bg-info-glow text-info' },
   PAGADA: { color: 'bg-success-glow text-success' },
 
+  // Estados de cotización
+  BORRADOR: { color: 'bg-steel/15 text-steel' },
+  ENVIADA: { color: 'bg-info-glow text-info' },
+  APROBADA: { color: 'bg-success-glow text-success' },
+  RECHAZADA: { color: 'bg-danger-glow text-danger' },
+  VENCIDA: { color: 'bg-warning-glow text-warning' },
+
   // Booleanos
   true: { color: 'bg-success-glow text-success' },
   false: { color: 'bg-danger-glow text-danger' },
