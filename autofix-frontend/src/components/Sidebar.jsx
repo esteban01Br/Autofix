@@ -17,6 +17,7 @@ import {
   BarChart3,
   ClipboardList,
   FileText,
+  Truck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Badge from './Badge';
@@ -55,6 +56,12 @@ const secciones = [
         label: 'Repuestos',
         icon: Package,
         roles: ['ADMIN', 'GERENTE', 'BODEGUERO', 'MECANICO'],
+      },
+      {
+        to: '/proveedores',
+        label: 'Proveedores',
+        icon: Truck,
+        roles: ['ADMIN', 'GERENTE', 'BODEGUERO'],
       },
       { to: '/servicios', label: 'Servicios', icon: ClipboardList, roles: ['ADMIN', 'GERENTE', 'ASESOR'] },
       { to: '/cotizaciones', label: 'Cotizaciones', icon: FileText, roles: ['ADMIN', 'GERENTE'] },

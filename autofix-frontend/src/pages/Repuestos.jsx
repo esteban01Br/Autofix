@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, Search, Package, ArrowDownToLine, ArrowUpFromLine, ScanBarcode } from 'lucide-react';
 import { listarRepuestos, crearRepuesto, actualizarRepuesto, ajustarStockRepuesto, eliminarRepuesto, buscarPorCodigo } from '../services/repuestoService';
+import { listarProveedores } from '../services/proveedorService';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError, formatearMoneda } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
@@ -10,7 +11,7 @@ import EmptyState from '../components/EmptyState';
 import Spinner from '../components/Spinner';
 import EscanerCodigo from '../components/EscanerCodigo';
 
-const estadoInicial = { nombre: '', descripcion: '', codigo_barras: '', stock: 0, stock_minimo: 0, precio: '' };
+const estadoInicial = { nombre: '', descripcion: '', codigo_barras: '', stock: 0, stock_minimo: 0, precio: '', proveedorId: '' };
 const stockInicial = { cantidad: 1, tipo: 'entrada' };
 
 export default function Repuestos() {
@@ -28,6 +29,7 @@ export default function Repuestos() {
   const [stockForm, setStockForm] = useState(stockInicial);
   const [escanerAbierto, setEscanerAbierto] = useState(false);
   const [modoEscaneo, setModoEscaneo] = useState('buscar'); // 'buscar' | 'formulario'
+  const [proveedores, setProveedores] = useState([]);
   const { pushToast } = useToast();
 
   const cargar = async () => {
@@ -52,6 +54,16 @@ export default function Repuestos() {
     setFormulario(estadoInicial);
     setErrorForm('');
     setModalAbierto(true);
+    cargarProveedores();
+  };
+
+  const cargarProveedores = async () => {
+    try {
+      setProveedores(await listarProveedores({ activo: true }));
+    } catch {
+      // El selector es opcional: no bloquea el formulario si falla.
+      setProveedores([]);
+    }
   };
 
   const abrirEditar = (r) => {
@@ -63,9 +75,11 @@ export default function Repuestos() {
       stock: r.stock,
       stock_minimo: r.stockMinimo ?? 0,
       precio: String(r.precio),
+      proveedorId: r.proveedorId != null ? String(r.proveedorId) : '',
     });
     setErrorForm('');
     setModalAbierto(true);
+    cargarProveedores();
   };
 
   const abrirEscaner = (modo) => {
@@ -123,6 +137,7 @@ export default function Repuestos() {
         stock: Number(formulario.stock),
         stock_minimo: Number(formulario.stock_minimo),
         precio: String(formulario.precio),
+        proveedorId: formulario.proveedorId ? Number(formulario.proveedorId) : null,
       };
       if (editando) {
         await actualizarRepuesto(editando.id, datos);
@@ -321,6 +336,22 @@ export default function Repuestos() {
               <label className="label">Precio unitario *</label>
               <input name="precio" type="number" min="0.01" step="0.01" value={formulario.precio} onChange={manejarCambio} className="input" required placeholder="0.00" />
             </div>
+          </div>
+          <div>
+            <label className="label">Proveedor (opcional)</label>
+            <select
+              name="proveedorId"
+              value={formulario.proveedorId}
+              onChange={manejarCambio}
+              className="input"
+            >
+              <option value="">Sin proveedor asignado</option>
+              {proveedores.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nombre}
+                </option>
+              ))}
+            </select>
           </div>
 
           {errorForm && (
