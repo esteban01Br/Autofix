@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
-import { BarChart3, Wrench, TrendingUp } from 'lucide-react';
-import { productividadMecanicos, resumenEmpresa } from '../services/reporteService';
-import { extraerMensajeError, formatearMoneda } from '../lib/utils';
+import { BarChart3, Wrench, LineChart } from 'lucide-react';
+import { productividadMecanicos, resumenEmpresa, ventasMensuales } from '../services/reporteService';
+import { extraerMensajeError } from '../lib/utils';
 import { useToast } from '../context/ToastContext';
 import PageHeader from '../components/PageHeader';
 import EmptyState from '../components/EmptyState';
+import GraficaVentas from '../components/GraficaVentas';
 import Spinner from '../components/Spinner';
 
 export default function Productividad() {
   const [mecanicos, setMecanicos] = useState([]);
   const [resumen, setResumen] = useState(null);
+  const [serie, setSerie] = useState([]);
   const [cargando, setCargando] = useState(true);
   const { pushToast } = useToast();
 
@@ -17,12 +19,14 @@ export default function Productividad() {
     const cargar = async () => {
       setCargando(true);
       try {
-        const [prod, res] = await Promise.all([
+        const [prod, res, mensual] = await Promise.all([
           productividadMecanicos(),
           resumenEmpresa(),
+          ventasMensuales(12),
         ]);
         setMecanicos(prod);
         setResumen(res);
+        setSerie(mensual);
       } catch (err) {
         pushToast(extraerMensajeError(err, 'No se pudieron cargar los reportes'), 'error');
       } finally {
@@ -67,6 +71,23 @@ export default function Productividad() {
           </div>
         </div>
       )}
+
+      <div className="card overflow-hidden animate-fade-in">
+        <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
+          <LineChart size={18} className="text-accent" />
+          <h3 className="font-display text-lg font-semibold text-text-primary">
+            Facturación mensual
+          </h3>
+        </div>
+        {serie.every((m) => m.total === 0) ? (
+          <EmptyState
+            icono={LineChart}
+            mensaje="Aún no hay facturas emitidas para mostrar la tendencia."
+          />
+        ) : (
+          <GraficaVentas datos={serie} />
+        )}
+      </div>
 
       <div className="card overflow-hidden animate-fade-in">
         <div className="flex items-center gap-2 px-5 py-4 border-b border-border">

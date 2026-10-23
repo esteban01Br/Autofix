@@ -473,6 +473,31 @@ def test_factura_pdf(client, admin_token):
     assert f"{factura['numero']}.pdf" in pdf.headers["content-disposition"]
 
 
+def test_reporte_ventas_mensuales(client, admin_token):
+    """El reporte mensual devuelve una serie continua con el mes actual."""
+    h = auth(admin_token)
+    cuid = crear_usuario(client, admin_token, correo_unico("mes"))
+    cid = crear_cliente(client, admin_token, cuid)
+    vid = crear_vehiculo(client, admin_token, cid)
+    rid = crear_repuesto(client, admin_token, stock=10, precio="100.00")
+    oid = crear_orden(client, admin_token, vid)
+    client.post(
+        f"/api/detalles/orden/{oid}",
+        json={"repuestoId": rid, "cantidad": 1},
+        headers=h,
+    )
+    client.post("/api/facturas", json={"ordenTrabajoId": oid}, headers=h)
+
+    resp = client.get("/api/reportes/ventas-mensuales?meses=6", headers=h)
+    assert resp.status_code == 200
+    serie = resp.json()
+    assert len(serie) == 6  # una fila por mes, incluso sin facturas
+    assert all({"mes", "facturas", "total"} <= set(f) for f in serie)
+    # El último mes es el actual y al menos tiene la factura recién creada.
+    assert serie[-1]["facturas"] >= 1
+    assert serie[-1]["total"] > 0
+
+
 def test_pagos_de_factura_parcial_y_pagada(client, admin_token):
     """Fase 3: los abonos actualizan PENDIENTE -> PARCIAL -> PAGADA."""
     h = auth(admin_token)

@@ -14,6 +14,22 @@ router = APIRouter(prefix="/api/reportes", tags=["Reportes"])
 
 
 @router.get(
+    "/ventas-mensuales",
+    summary="Facturación por mes (últimos N meses)",
+    description=(
+        "Serie mensual de facturación para gráficas: total facturado y "
+        "cantidad de facturas por mes. Incluye los meses sin facturas (0)."
+    ),
+)
+def ventas_mensuales(
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(admin),
+    meses: int = Query(12, ge=1, le=24, description="Cantidad de meses (máx. 24)"),
+) -> list[dict]:
+    return reporte_service.ventas_mensuales(db, empresa_filtro(usuario), meses=meses)
+
+
+@router.get(
     "/productividad",
     summary="Productividad por mecánico (órdenes entregadas)",
 )
