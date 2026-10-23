@@ -134,6 +134,13 @@ def obtener_factura(db, empresa_id: int | None, factura_id: int) -> FacturaRespo
     return to_response(factura)
 
 
+def obtener_factura_modelo(db, empresa_id: int | None, factura_id: int) -> Factura:
+    """Devuelve el objeto ORM de la factura (para el PDF, con relaciones)."""
+    factura = crud_base.obtener_o_404(db, Factura, factura_id, "Factura no encontrada.")
+    verificar_empresa(factura, empresa_id, "Factura no encontrada.")
+    return factura
+
+
 def eliminar_factura(db, empresa_id: int | None, factura_id: int) -> None:
     factura = crud_base.obtener_o_404(db, Factura, factura_id, "Factura no encontrada.")
     verificar_empresa(factura, empresa_id, "Factura no encontrada.")

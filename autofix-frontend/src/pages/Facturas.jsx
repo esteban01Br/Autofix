@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, Search, Receipt, Wallet } from 'lucide-react';
-import { listarFacturas, crearFactura, eliminarFactura, obtenerFactura, listarPagos, registrarPago } from '../services/facturaService';
+import { Plus, Trash2, Search, Receipt, Wallet, Download } from 'lucide-react';
+import { listarFacturas, crearFactura, eliminarFactura, obtenerFactura, listarPagos, registrarPago, descargarFacturaPDF } from '../services/facturaService';
 import { listarOrdenes } from '../services/ordenService';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError, formatearFechaHora, formatearMoneda } from '../lib/utils';
@@ -31,6 +31,7 @@ export default function Facturas() {
   const [cargandoPagos, setCargandoPagos] = useState(false);
   const [pagoGuardando, setPagoGuardando] = useState(false);
   const [pagoError, setPagoError] = useState('');
+  const [descargandoId, setDescargandoId] = useState(null);
   const { pushToast } = useToast();
 
   const cargar = async () => {
@@ -88,6 +89,18 @@ export default function Facturas() {
       pushToast('Factura eliminada.');
     } catch (err) {
       pushToast(extraerMensajeError(err, 'No se pudo eliminar la factura'), 'error');
+    }
+  };
+
+  const descargarPDF = async (f) => {
+    setDescargandoId(f.id);
+    try {
+      await descargarFacturaPDF(f.id, f.numero);
+      pushToast(`Descargando ${f.numero}.pdf.`);
+    } catch (err) {
+      pushToast(extraerMensajeError(err, 'No se pudo generar el PDF'), 'error');
+    } finally {
+      setDescargandoId(null);
     }
   };
 
@@ -217,8 +230,16 @@ export default function Facturas() {
                       )}
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
+                      <button
+                        onClick={() => descargarPDF(f)}
+                        disabled={descargandoId === f.id}
+                        className="p-1.5 text-text-secondary hover:text-accent transition-colors disabled:opacity-50"
+                        title="Descargar PDF"
+                      >
+                        <Download size={16} className={descargandoId === f.id ? 'animate-pulse' : ''} />
+                      </button>
                       {Number(f.saldo) > 0 && (
-                        <button onClick={() => abrirPago(f)} className="p-1.5 text-text-secondary hover:text-success transition-colors" title="Registrar pago">
+                        <button onClick={() => abrirPago(f)} className="p-1.5 text-text-secondary hover:text-success transition-colors ml-1" title="Registrar pago">
                           <Wallet size={16} />
                         </button>
                       )}

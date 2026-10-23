@@ -448,6 +448,31 @@ def test_orden_detalle_stock_y_factura(client, admin_token):
     assert any(x["id"] == f["id"] for x in lista_facturas.json())
 
 
+def test_factura_pdf(client, admin_token):
+    """El PDF de la factura se genera con los datos del taller y del vehículo."""
+    h = auth(admin_token)
+    cuid = crear_usuario(client, admin_token, correo_unico("pdf"))
+    cid = crear_cliente(client, admin_token, cuid)
+    vid = crear_vehiculo(client, admin_token, cid)
+    rid = crear_repuesto(client, admin_token, stock=3, precio="500.00")
+    oid = crear_orden(client, admin_token, vid)
+    client.post(
+        f"/api/detalles/orden/{oid}",
+        json={"repuestoId": rid, "cantidad": 2},
+        headers=h,
+    )
+    factura = client.post(
+        "/api/facturas", json={"ordenTrabajoId": oid}, headers=h
+    ).json()
+
+    pdf = client.get(f"/api/facturas/{factura['id']}/pdf", headers=h)
+    assert pdf.status_code == 200, pdf.text
+    assert pdf.headers["content-type"] == "application/pdf"
+    assert pdf.content[:5] == b"%PDF-"  # cabecera mágica del PDF
+    assert len(pdf.content) > 500  # tiene contenido real
+    assert f"{factura['numero']}.pdf" in pdf.headers["content-disposition"]
+
+
 def test_pagos_de_factura_parcial_y_pagada(client, admin_token):
     """Fase 3: los abonos actualizan PENDIENTE -> PARCIAL -> PAGADA."""
     h = auth(admin_token)
@@ -646,8 +671,11 @@ def test_paginacion_filtros_y_orden(client, admin_token):
             headers=h,
         )
 
+    # Acota a los repuestos de ESTE test: la BD de pruebas es compartida
+    # entre tests, y otros tests crean repuestos con precios distintos.
     resp = client.get(
-        "/api/repuestos?limit=2&offset=1&orden=precio&direccion=desc", headers=h
+        "/api/repuestos?busqueda=pastilla&limit=2&offset=1&orden=precio&direccion=desc",
+        headers=h,
     )
     assert resp.status_code == 200
     assert len(resp.json()) == 2

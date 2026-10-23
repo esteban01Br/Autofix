@@ -19,6 +19,24 @@ export const eliminarFactura = async (id) => {
   await api.delete(`/api/facturas/${id}`);
 };
 
+// Descarga el PDF del comprobante interno de la factura.
+export const descargarFacturaPDF = async (id, numero) => {
+  const response = await api.get(`/api/facturas/${id}/pdf`, {
+    responseType: 'blob',
+  });
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const enlace = document.createElement('a');
+  enlace.href = url;
+  // El backend entrega el nombre sugerido en el header; si no, usamos el número.
+  const disposition = response.headers?.['content-disposition'];
+  const nombre = disposition?.match(/filename="?(.+?)"?;?$/)?.[1] || `${numero || 'factura'}.pdf`;
+  enlace.download = nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  window.URL.revokeObjectURL(url);
+};
+
 // Pagos y abonos de una factura
 export const listarPagos = async (facturaId) => {
   const response = await api.get(`/api/facturas/${facturaId}/pagos`);

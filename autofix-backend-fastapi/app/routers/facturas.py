@@ -7,10 +7,12 @@ from sqlalchemy.orm import Session
 
 from app.routers.deps import admin, empresa_filtro, facturacion, get_current_user
 from app.database import get_db
+from app.models.empresa import Empresa
 from app.models.usuario import Usuario
 from app.schemas.factura import FacturaCreate, FacturaResponse
 from app.schemas.pago import PagoCreate, PagoResponse
 from app.services import factura_service, pago_service
+from app.services.factura_pdf_service import generar_pdf_factura
 from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(prefix="/api/facturas", tags=["Facturas"])
@@ -89,6 +91,34 @@ def obtener_factura(
     usuario: Usuario = Depends(get_current_user),
 ) -> FacturaResponse:
     return factura_service.obtener_factura(db, empresa_filtro(usuario), factura_id)
+
+
+@router.get(
+    "/{factura_id}/pdf",
+    summary="Descargar factura en PDF",
+    description=(
+        "Comprobante interno del taller en PDF: encabezado con los datos "
+        "de la empresa, cliente, vehículo, desglose de repuestos, totales "
+        "y estado de pago."
+    ),
+)
+def descargar_pdf(
+    factura_id: int,
+    db: Session = Depends(get_db),
+    usuario: Usuario = Depends(facturacion),
+) -> Response:
+    factura = factura_service.obtener_factura_modelo(
+        db, empresa_filtro(usuario), factura_id
+    )
+    empresa = db.get(Empresa, factura.empresa_id)
+    contenido = generar_pdf_factura(factura, empresa)
+    return Response(
+        content=contenido,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{factura.numero}.pdf"'
+        },
+    )
 
 
 @router.delete(
