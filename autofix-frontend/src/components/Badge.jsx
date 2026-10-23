@@ -34,6 +34,14 @@ const mapas = {
   RECHAZADA: { color: 'bg-danger-glow text-danger' },
   VENCIDA: { color: 'bg-warning-glow text-warning' },
 
+  // Estados de suscripción (SaaS)
+  ACTIVA: { color: 'bg-success-glow text-success' },
+
+  // Planes de suscripción
+  BASICO: { color: 'bg-steel/15 text-steel' },
+  PRO: { color: 'bg-info-glow text-info' },
+  PREMIUM: { color: 'bg-accent-glow text-accent' },
+
   // Booleanos
   true: { color: 'bg-success-glow text-success' },
   false: { color: 'bg-danger-glow text-danger' },

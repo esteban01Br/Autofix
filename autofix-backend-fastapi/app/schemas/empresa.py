@@ -6,6 +6,7 @@ from decimal import Decimal
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.models.enums import PlanSuscripcion
+from app.schemas.suscripcion import SuscripcionResumen
 
 
 class EmpresaRegistroRequest(BaseModel):
@@ -68,6 +69,8 @@ class EmpresaResponse(BaseModel):
     fecha_creacion: datetime
     # URL confidencial de acceso de la empresa (portal /acceso/{slug})
     slug: str | None = None
+    # Solo se popula en el panel SUPERADMIN (listado de empresas).
+    suscripcion: SuscripcionResumen | None = None
 
 
 class EmpresaPublicaResponse(BaseModel):

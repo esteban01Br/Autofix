@@ -1053,6 +1053,52 @@ def test_superadmin_ve_todas_las_empresas(client, superadmin_token):
     assert client.get("/api/empresas", headers=auth(token_a)).status_code == 403
 
 
+def test_panel_superadmin_muestra_suscripcion(client, superadmin_token):
+    """El listado de empresas (SUPERADMIN) incluye el resumen de suscripción."""
+    # Empresa creada por registro: genera su suscripción (12 meses, BASICO).
+    nombre = f"Taller Panel-{uuid.uuid4().hex[:6]}"
+    correo = f"panel-{uuid.uuid4().hex[:6]}@correo.com"
+    resp = client.post(
+        "/api/empresas/registro",
+        json={
+            "nombre_empresa": nombre,
+            "nombre": "Dueño",
+            "apellido": "Panel",
+            "correo": correo,
+            "contrasena": "Clave123!",
+        },
+    )
+    assert resp.status_code == 201, resp.text
+    eid = resp.json()["empresa"]["id"]
+
+    # En el listado: cada empresa trae el campo suscripcion (aunque sea None).
+    empresas = client.get("/api/empresas", headers=auth(superadmin_token))
+    assert empresas.status_code == 200
+    data = empresas.json()
+    assert all("suscripcion" in e for e in data)
+
+    # La empresa recién registrada tiene su suscripción vigente poblada.
+    creada = next(e for e in data if e["id"] == eid)
+    assert creada["suscripcion"] is not None
+    assert creada["suscripcion"]["plan"] == "BASICO"
+    assert creada["suscripcion"]["vigente"] is True
+
+    # Gestión del SUPERADMIN: cambiar plan y días sobre esa empresa.
+    gestionada = client.post(
+        f"/api/suscripciones/empresas/{eid}",
+        json={"plan": "PRO", "dias": 30},
+        headers=auth(superadmin_token),
+    )
+    assert gestionada.status_code in (200, 201), gestionada.text
+    assert gestionada.json()["plan"] == "PRO"
+    assert gestionada.json()["diasRestantes"] >= 29
+
+    # Refrescando el listado, el resumen refleja el cambio de plan.
+    refrescado = client.get("/api/empresas", headers=auth(superadmin_token)).json()
+    actualizada = next(e for e in refrescado if e["id"] == eid)
+    assert actualizada["suscripcion"]["plan"] == "PRO"
+
+
 def test_consecutivo_factura_es_por_empresa(client):
     token_a, _ = _registrar_empresa(client, f"FacA-{uuid.uuid4().hex[:6]}", f"fa-{uuid.uuid4().hex[:6]}@a.com")
     token_b, _ = _registrar_empresa(client, f"FacB-{uuid.uuid4().hex[:6]}", f"fb-{uuid.uuid4().hex[:6]}@b.com")

@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Building2, Power, Search } from 'lucide-react';
+import { Building2, Power, Search, CreditCard } from 'lucide-react';
 import { listarEmpresas, cambiarEstadoEmpresa } from '../services/empresaService';
+import { gestionarSuscripcion } from '../services/suscripcionService';
+import Badge from '../components/Badge';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
+import Modal from '../components/Modal';
 import EmptyState from '../components/EmptyState';
 import Spinner from '../components/Spinner';
 
@@ -11,6 +14,10 @@ export default function Empresas() {
   const [empresas, setEmpresas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [busqueda, setBusqueda] = useState('');
+  // Panel SUPERADMIN: gestión de la suscripción de una empresa.
+  const [suscripcionDe, setSuscripcionDe] = useState(null);
+  const [formSuscripcion, setFormSuscripcion] = useState({ plan: 'BASICO', dias: 365, estado: 'ACTIVA' });
+  const [guardando, setGuardando] = useState(false);
   const { pushToast } = useToast();
 
   const cargar = async () => {
@@ -40,6 +47,37 @@ export default function Empresas() {
       );
     } catch (err) {
       pushToast(extraerMensajeError(err, 'No se pudo cambiar el estado'), 'error');
+    }
+  };
+
+  const abrirGestion = (empresa) => {
+    const sus = empresa.suscripcion;
+    setSuscripcionDe(empresa);
+    setFormSuscripcion({
+      plan: sus?.plan ?? 'BASICO',
+      dias: 365,
+      estado: sus?.estado ?? 'ACTIVA',
+    });
+  };
+
+  const guardarSuscripcion = async (e) => {
+    e.preventDefault();
+    setGuardando(true);
+    try {
+      const gestionada = await gestionarSuscripcion(suscripcionDe.id, {
+        plan: formSuscripcion.plan,
+        dias: Number(formSuscripcion.dias),
+        estado: formSuscripcion.estado,
+      });
+      setEmpresas((prev) =>
+        prev.map((emp) => (emp.id === suscripcionDe.id ? { ...emp, suscripcion: gestionada } : emp))
+      );
+      pushToast(`Suscripción de "${suscripcionDe.nombre}" actualizada.`);
+      setSuscripcionDe(null);
+    } catch (err) {
+      pushToast(extraerMensajeError(err, 'No se pudo gestionar la suscripción'), 'error');
+    } finally {
+      setGuardando(false);
     }
   };
 
@@ -82,7 +120,8 @@ export default function Empresas() {
                   <th className="py-3 px-4 font-medium">Empresa</th>
                   <th className="py-3 px-4 font-medium">NIT</th>
                   <th className="py-3 px-4 font-medium">Contacto</th>
-                  <th className="py-3 px-4 font-medium text-center">Facturas</th>
+                  <th className="py-3 px-4 font-medium">Plan</th>
+                  <th className="py-3 px-4 font-medium">Suscripción</th>
                   <th className="py-3 px-4 font-medium text-center">Estado</th>
                   <th className="py-3 px-4 font-medium text-right">Acciones</th>
                 </tr>
@@ -111,13 +150,36 @@ export default function Empresas() {
                       {e.correo ?? '—'}
                       {e.telefono && <span className="block text-xs">{e.telefono}</span>}
                     </td>
-                    <td className="py-3 px-4 text-center font-mono">{e.consecutivo_factura}</td>
+                    <td className="py-3 px-4">
+                      {e.suscripcion ? <Badge valor={e.suscripcion.plan} /> : <span className="text-text-secondary">—</span>}
+                    </td>
+                    <td className="py-3 px-4">
+                      {e.suscripcion ? (
+                        <div className="flex flex-col gap-1">
+                          <Badge valor={e.suscripcion.estado} />
+                          <span className="text-xs text-text-secondary">
+                            {e.suscripcion.vigente
+                              ? `${e.suscripcion.diasRestantes} días restantes`
+                              : `Venció ${new Date(e.suscripcion.fechaFin).toLocaleDateString('es-CO')}`}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-text-secondary">Sin suscripción</span>
+                      )}
+                    </td>
                     <td className="py-3 px-4 text-center">
                       <span className={`badge ${e.activa ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}`}>
                         {e.activa ? 'Activa' : 'Suspendida'}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
+                      <button
+                        onClick={() => abrirGestion(e)}
+                        className="p-1.5 text-text-secondary hover:text-accent transition-colors"
+                        title="Gestionar suscripción"
+                      >
+                        <CreditCard size={16} />
+                      </button>
                       <button
                         onClick={() => alternarEstado(e)}
                         className={`p-1.5 transition-colors ${e.activa ? 'text-text-secondary hover:text-danger' : 'text-text-secondary hover:text-success'}`}
@@ -133,6 +195,75 @@ export default function Empresas() {
           </div>
         )}
       </div>
+
+      <Modal
+        abierto={suscripcionDe !== null}
+        onCerrar={() => setSuscripcionDe(null)}
+        titulo={`Suscripción de ${suscripcionDe?.nombre ?? ''}`}
+        tamanio="max-w-md"
+      >
+        <form onSubmit={guardarSuscripcion} className="space-y-4">
+          <div>
+            <label className="label">Plan</label>
+            <select
+              value={formSuscripcion.plan}
+              onChange={(e) => setFormSuscripcion((f) => ({ ...f, plan: e.target.value }))}
+              className="input"
+            >
+              <option value="BASICO">Básico</option>
+              <option value="PRO">Pro</option>
+              <option value="PREMIUM">Premium</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="label">Días de vigencia</label>
+            <input
+              type="number"
+              min="0"
+              max="3650"
+              value={formSuscripcion.dias}
+              onChange={(e) => setFormSuscripcion((f) => ({ ...f, dias: e.target.value }))}
+              className="input"
+              required
+            />
+            <p className="mt-1 text-xs text-text-secondary">
+              La vigencia se calcula desde hoy (o desde la fecha vigente si sigue activa).
+            </p>
+          </div>
+
+          <div>
+            <label className="label">Estado</label>
+            <select
+              value={formSuscripcion.estado}
+              onChange={(e) => setFormSuscripcion((f) => ({ ...f, estado: e.target.value }))}
+              className="input"
+            >
+              <option value="ACTIVA">Activa</option>
+              <option value="VENCIDA">Vencida (bloquea el acceso)</option>
+              <option value="CANCELADA">Cancelada</option>
+            </select>
+          </div>
+
+          {suscripcionDe?.suscripcion && (
+            <p className="text-xs text-text-secondary">
+              Vigencia actual:{' '}
+              {suscripcionDe.suscripcion.vigente
+                ? `${suscripcionDe.suscripcion.diasRestantes} días restantes`
+                : `venció el ${new Date(suscripcionDe.suscripcion.fechaFin).toLocaleDateString('es-CO')}`}
+            </p>
+          )}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={() => setSuscripcionDe(null)} className="btn btn-ghost">
+              Cancelar
+            </button>
+            <button type="submit" className="btn btn-primary" disabled={guardando}>
+              {guardando ? 'Guardando...' : 'Guardar suscripción'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

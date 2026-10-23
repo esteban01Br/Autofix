@@ -19,6 +19,16 @@ class PlanInfo(BaseModel):
     caracteristicas: list[str]
 
 
+class SuscripcionResumen(BaseModel):
+    """Resumen de la suscripción de una empresa (panel SUPERADMIN)."""
+
+    plan: PlanSuscripcion
+    estado: EstadoSuscripcion
+    fechaFin: datetime
+    vigente: bool
+    diasRestantes: int
+
+
 class SuscripcionResponse(BaseModel):
     id: int
     empresaId: int

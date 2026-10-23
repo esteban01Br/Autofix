@@ -15,7 +15,7 @@ from app.crud import base as crud_base
 from app.models.enums import EstadoSuscripcion, PlanSuscripcion, Rol
 from app.models.suscripcion import Suscripcion
 from app.models.usuario import Usuario
-from app.schemas.suscripcion import PlanInfo, SuscripcionResponse
+from app.schemas.suscripcion import PlanInfo, SuscripcionResumen, SuscripcionResponse
 from app.utils import ahora_utc
 
 # Catálogo publicado en el portal de ventas (precios en COP).
@@ -192,3 +192,27 @@ def to_response(suscripcion: Suscripcion) -> SuscripcionResponse:
         vigente=es_vigente(suscripcion),
         diasRestantes=restantes,
     )
+
+
+def to_resumen(suscripcion: Suscripcion) -> SuscripcionResumen:
+    """Resumen compacto para el panel SUPERADMIN (sin id ni monto)."""
+    restantes = int(
+        max(0, (suscripcion.fecha_fin - ahora_utc()).total_seconds()) // 86400
+    )
+    return SuscripcionResumen(
+        plan=suscripcion.plan,
+        estado=suscripcion.estado,
+        fechaFin=suscripcion.fecha_fin,
+        vigente=es_vigente(suscripcion),
+        diasRestantes=restantes,
+    )
+
+
+def resumen_por_empresa(db) -> dict[int, SuscripcionResumen]:
+    """Mapa empresa_id → resumen de su suscripción (una sola consulta)."""
+    stmt = select(Suscripcion).order_by(Suscripcion.id.desc())
+    resumenes: dict[int, SuscripcionResumen] = {}
+    for suscripcion in db.scalars(stmt).all():
+        # La última por empresa gana (hay una sola por empresa).
+        resumenes.setdefault(suscripcion.empresa_id, to_resumen(suscripcion))
+    return resumenes

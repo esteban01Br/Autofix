@@ -21,7 +21,7 @@ from app.services import suscripcion_service
 from app.utils import generar_slug
 
 
-def to_response(empresa: Empresa) -> EmpresaResponse:
+def to_response(empresa: Empresa, suscripcion=None) -> EmpresaResponse:
     return EmpresaResponse(
         id=empresa.id,
         nombre=empresa.nombre,
@@ -37,6 +37,8 @@ def to_response(empresa: Empresa) -> EmpresaResponse:
         activa=empresa.activa,
         fecha_creacion=empresa.fecha_creacion,
         slug=empresa.slug,
+        # Resumen de la suscripción (solo lo inyecta el listado SUPERADMIN).
+        suscripcion=suscripcion,
     )
 
 
@@ -126,8 +128,12 @@ def registrar_empresa(db, payload: EmpresaRegistroRequest) -> EmpresaRegistroRes
 
 
 def listar_empresas(db) -> list[EmpresaResponse]:
-    """Solo SUPERADMIN: todas las empresas de la plataforma."""
-    return [to_response(e) for e in crud_empresa.listar_todas(db)]
+    """Solo SUPERADMIN: todas las empresas con su suscripción."""
+    resumenes = suscripcion_service.resumen_por_empresa(db)
+    return [
+        to_response(e, suscripcion=resumenes.get(e.id))
+        for e in crud_empresa.listar_todas(db)
+    ]
 
 
 def obtener_actual(db, empresa_id: int | None) -> EmpresaResponse:
