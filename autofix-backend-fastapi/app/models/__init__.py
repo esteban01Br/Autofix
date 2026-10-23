@@ -17,6 +17,7 @@ from app.models.servicio import Servicio
 from app.models.suscripcion import Suscripcion
 from app.models.cotizacion import Cotizacion
 from app.models.detalle_cotizacion import DetalleCotizacion
+from app.models.proveedor import Proveedor
 
 __all__ = [
     "Base",
@@ -40,4 +41,5 @@ __all__ = [
     "Suscripcion",
     "Cotizacion",
     "DetalleCotizacion",
+    "Proveedor",
 ]

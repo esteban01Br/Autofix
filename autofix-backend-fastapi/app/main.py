@@ -19,6 +19,7 @@ from app.routers import (
     facturas,
     mecanicos,
     ordenes,
+    proveedores,
     reportes,
     repuestos,
     servicios,
@@ -50,6 +51,7 @@ OPENAPI_TAGS = [
     {"name": "Repuestos", "description": "Inventario de repuestos."},
     {"name": "Facturas", "description": "FacturaciÃ³n automÃ¡tica por orden de trabajo."},
     {"name": "Cotizaciones", "description": "Cotizaciones y propuestas de precio."},
+    {"name": "Proveedores", "description": "Catálogo de proveedores de repuestos."},
 ]
 
 
@@ -122,6 +124,7 @@ app.include_router(citas.router)
 app.include_router(ordenes.router)
 app.include_router(detalles.router)
 app.include_router(repuestos.router)
+app.include_router(proveedores.router)
 app.include_router(servicios.router)
 app.include_router(facturas.router)
 app.include_router(cotizaciones.router)

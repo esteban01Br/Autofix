@@ -388,6 +388,23 @@ def _migrar_cotizaciones(conn, insp) -> None:
         )
 
 
+def _migrar_proveedores(conn, insp) -> None:
+    """Agrega el vínculo repuesto→proveedor (Fase 3 — proveedores).
+
+    La tabla ``proveedores`` la crea ``create_all`` (es nueva); aquí solo
+    complementamos la columna ``proveedor_id`` en ``repuestos`` ya existente.
+    """
+    if "repuestos" not in insp.get_table_names():
+        return
+    if "proveedor_id" not in _columnas(insp, "repuestos"):
+        conn.execute(
+            text(
+                "ALTER TABLE repuestos ADD COLUMN proveedor_id INTEGER"
+                " REFERENCES proveedores(id)"
+            )
+        )
+
+
 def _migrar_a_multiempresa(conn, insp) -> None:
     if "empresas" not in insp.get_table_names():
         return  # create_all aún no la crea (no debería pasar).
@@ -417,6 +434,7 @@ def _migrar_a_multiempresa(conn, insp) -> None:
     _migrar_pagos(conn, insp)
     _migrar_slug_y_suscripciones(conn, insp)
     _migrar_cotizaciones(conn, insp)
+    _migrar_proveedores(conn, insp)
 
 
 # ------------------------------------------------------------------

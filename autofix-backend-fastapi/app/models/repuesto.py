@@ -24,11 +24,16 @@ class Repuesto(Base):
     stock: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     stock_minimo: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     precio: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    # Proveedor del que se surte este repuesto (opcional).
+    proveedor_id: Mapped[int | None] = mapped_column(
+        ForeignKey("proveedores.id"), nullable=True, index=True
+    )
     empresa_id: Mapped[int] = mapped_column(
         ForeignKey("empresas.id"), nullable=False, index=True
     )
 
     detalles = relationship("DetalleOrden", back_populates="repuesto")
+    proveedor = relationship("Proveedor", back_populates="repuestos")
 
     def __repr__(self) -> str:
         return f"<Repuesto {self.id}: {self.nombre}>"

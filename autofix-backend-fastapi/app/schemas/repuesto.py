@@ -12,6 +12,7 @@ class RepuestoCreate(BaseModel):
     stock: int = Field(ge=0)
     stock_minimo: int = Field(default=0, ge=0)
     precio: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
+    proveedorId: int | None = None
 
 
 class RepuestoUpdate(BaseModel):
@@ -21,6 +22,7 @@ class RepuestoUpdate(BaseModel):
     stock: int | None = Field(default=None, ge=0)
     stock_minimo: int | None = Field(default=None, ge=0)
     precio: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
+    proveedorId: int | None = None
 
 
 class AjusteStockRequest(BaseModel):
@@ -35,3 +37,5 @@ class RepuestoResponse(BaseModel):
     stock: int
     stockMinimo: int = 0
     precio: Decimal
+    proveedorId: int | None = None
+    proveedorNombre: str | None = None

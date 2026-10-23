@@ -4,6 +4,7 @@ from fastapi import HTTPException
 
 from app.crud import repuesto as crud_repuesto
 from app.crud import base as crud_base
+from app.models.proveedor import Proveedor
 from app.models.repuesto import Repuesto
 from app.schemas.repuesto import RepuestoCreate, RepuestoResponse, RepuestoUpdate
 from app.services.base import filtro_empresa, resolver_orden, verificar_empresa
@@ -18,7 +19,20 @@ def to_response(repuesto: Repuesto) -> RepuestoResponse:
         stock=repuesto.stock,
         stockMinimo=repuesto.stock_minimo,
         precio=repuesto.precio,
+        proveedorId=repuesto.proveedor_id,
+        proveedorNombre=repuesto.proveedor.nombre if repuesto.proveedor else None,
     )
+
+
+def _resolver_proveedor(db, empresa_id: int | None, proveedor_id: int | None) -> int | None:
+    """Valida que el proveedor pertenezca a la empresa y devuelve su id."""
+    if proveedor_id is None:
+        return None
+    proveedor = crud_base.obtener_o_404(
+        db, Proveedor, proveedor_id, "Proveedor no encontrado."
+    )
+    verificar_empresa(proveedor, empresa_id, "Proveedor no encontrado.")
+    return proveedor.id
 
 
 def _normalizar_codigo(codigo: str | None) -> str | None:
@@ -47,6 +61,7 @@ def crear_repuesto(db, empresa_id: int, payload: RepuestoCreate) -> RepuestoResp
         stock=payload.stock,
         stock_minimo=payload.stock_minimo,
         precio=payload.precio,
+        proveedor_id=_resolver_proveedor(db, empresa_id, payload.proveedorId),
         empresa_id=empresa_id,
     )
     crud_base.crear(db, repuesto)
@@ -127,6 +142,11 @@ def actualizar_repuesto(
                     detail="Ya existe un repuesto con ese código de barras en tu empresa.",
                 )
         repuesto.codigo_barras = codigo
+
+    if "proveedorId" in datos:
+        repuesto.proveedor_id = _resolver_proveedor(
+            db, empresa_id, datos["proveedorId"]
+        )
 
     for campo in ("descripcion", "stock", "stock_minimo", "precio"):
         if campo in datos:

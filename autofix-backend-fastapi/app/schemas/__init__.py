@@ -45,6 +45,11 @@ from app.schemas.cotizacion import (
     CotizacionUpdate,
     DetalleCotizacionResponse,
 )
+from app.schemas.proveedor import (
+    ProveedorCreate,
+    ProveedorResponse,
+    ProveedorUpdate,
+)
 
 __all__ = [
     "LoginRequest",
@@ -87,4 +92,7 @@ __all__ = [
     "CotizacionEstadoRequest",
     "CotizacionResponse",
     "DetalleCotizacionResponse",
+    "ProveedorCreate",
+    "ProveedorUpdate",
+    "ProveedorResponse",
 ]
