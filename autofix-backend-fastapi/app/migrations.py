@@ -80,6 +80,26 @@ def _migrar_usuarios(conn, insp, empresa_id: int) -> None:
     """
     if "usuarios" not in insp.get_table_names():
         return
+
+    # Siempre asegurar la columna debe_cambiar_contrasena (añadida tras la
+    # migración inicial multiempresa; puede faltar en bases parcialmente migradas).
+    if "debe_cambiar_contrasena" not in _columnas(insp, "usuarios"):
+        if _es_sqlite():
+            conn.execute(
+                text(
+                    "ALTER TABLE usuarios ADD COLUMN debe_cambiar_contrasena"
+                    " INTEGER NOT NULL DEFAULT 0"
+                )
+            )
+        else:
+            conn.execute(
+                text(
+                    "ALTER TABLE usuarios ADD COLUMN debe_cambiar_contrasena"
+                    " BOOLEAN NOT NULL DEFAULT FALSE"
+                )
+            )
+        insp = inspect(engine)
+
     if "empresa_id" in _columnas(insp, "usuarios"):
         return
 
