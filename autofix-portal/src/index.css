@@ -328,6 +328,44 @@ body {
     background-size: 100% 100%, 100% 100%, 80px 80px, 80px 80px;
   }
 
+  /* --- Fondo vivo: orbes de luz animados (ember + electric current) --- */
+  .fondo-vivo {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .fondo-vivo::before {
+    content: '';
+    position: absolute;
+    inset: -25%;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(253, 137, 37, 0.22), transparent 55%),
+      radial-gradient(circle at 70% 70%, rgba(7, 122, 199, 0.18), transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(107, 33, 239, 0.12), transparent 60%);
+    filter: blur(60px);
+    animation: fondo-vivo-drift 22s ease-in-out infinite;
+    will-change: transform;
+  }
+  .fondo-vivo > * {
+    position: relative;
+    z-index: 1;
+  }
+  @keyframes fondo-vivo-drift {
+    0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+    33%  { transform: translate(4%, -3%) scale(1.06) rotate(2deg); }
+    66%  { transform: translate(-3%, 4%) scale(1.03) rotate(-2deg); }
+    100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  }
+
+  [data-theme="light"] .fondo-vivo::before {
+    background:
+      radial-gradient(circle at 30% 30%, rgba(253, 137, 37, 0.12), transparent 55%),
+      radial-gradient(circle at 70% 70%, rgba(7, 122, 199, 0.10), transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(107, 33, 239, 0.06), transparent 60%);
+  }
+
   /* Wordmark / titular principal: Skywash sobre el lienzo */
   .titulo-hero {
     font-family: var(--font-display);

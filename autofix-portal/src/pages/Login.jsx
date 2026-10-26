@@ -7,7 +7,7 @@ import FormLogin from '../components/FormLogin';
 /** Login genérico del portal (plataforma, SUPERADMIN y accesos guardados). */
 export default function Login() {
   return (
-    <div className="min-h-screen flex flex-col bg-workshop">
+    <div className="min-h-screen flex flex-col bg-workshop fondo-vivo">
       <Nav compacto />
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
