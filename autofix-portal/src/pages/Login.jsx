@@ -7,22 +7,18 @@ import FormLogin from '../components/FormLogin';
 /** Login genérico del portal (plataforma, SUPERADMIN y accesos guardados). */
 export default function Login() {
   return (
-    <div className="min-h-screen flex flex-col bg-workshop fondo-vivo">
+    <div className="min-h-screen flex flex-col bg-workshop">
       <Nav compacto />
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md animate-slide-up">
           <div className="text-center mb-6">
             <div className="relative mx-auto mb-4 w-fit">
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 rounded-full bg-accent opacity-40 blur-2xl"
-              />
               <span className="marca-violeta relative flex h-14 w-14 items-center justify-center rounded-full text-white">
                 <Wrench size={26} strokeWidth={2.4} />
               </span>
             </div>
-            <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">
+            <h1 className="font-display text-3xl font-medium tracking-tight sm:text-4xl uppercase">
               Bienvenido de nuevo
             </h1>
             <p className="mt-2 text-sm text-text-secondary">
@@ -30,17 +26,17 @@ export default function Login() {
             </p>
           </div>
 
-          <div className="card-feature p-6 shadow-2xl shadow-black/40 sm:p-8">
+          <div className="bg-carbony-black p-6 sm:p-8" style={{ borderRadius: 0 }}>
             <FormLogin />
           </div>
 
-          {/* Plan para adquirir la app — CTA ember (n8n) */}
-          <div className="card-glow mt-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+          {/* Plan para adquirir la app — CTA giallo (Lamborghini) */}
+          <div className="mt-6 flex flex-col items-center gap-3 border border-graphite-border p-5 text-center sm:flex-row sm:text-left">
             <div className="flex-1">
-              <p className="text-sm font-medium text-cloud-white">
+              <p className="text-sm font-medium text-carbony-black">
                 ¿Aún no tienes cuenta?
               </p>
-              <p className="text-xs text-fog-text">
+              <p className="text-xs text-steel-mid">
                 Adquiere un plan y pon tu taller en marcha en minutos.
               </p>
             </div>
