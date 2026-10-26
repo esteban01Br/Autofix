@@ -34,3 +34,9 @@ build/
 
 # Backups locales de la BD
 *.db.bak
+
+# Local Netlify folder
+.netlify
+
+# Skills locales que instala el CLI de Netlify (no son del proyecto)
+.agents/
