@@ -7,27 +7,35 @@
    ===================================================================== */
 
 @theme {
-  /* --- Lienzo y superficies --- */
-  --color-base-bg: #05060f;
-  --color-surface: #0b0e1b;
-  --color-surface-hover: #151a2b;
-  --color-surface-glass: rgba(11, 14, 27, 0.72);
-  --color-glass: rgba(186, 214, 247, 0.03);
-  --color-glass-fuerte: rgba(186, 214, 247, 0.06);
-  --color-border: rgba(186, 215, 247, 0.12);
-  --color-hairline: rgba(186, 215, 247, 0.12);
+  /* --- Lienzo y superficies (n8n-inspired: void base con matiz violeta) --- */
+  --color-base-bg: #0e0918;
+  --color-surface: #1a1624;
+  --color-surface-hover: #1b1728;
+  --color-surface-glass: rgba(26, 22, 36, 0.72);
+  --color-glass: rgba(26, 22, 36, 0.06);
+  --color-glass-fuerte: rgba(27, 23, 40, 0.06);
+  --color-border: #3e3a46;
+  --color-hairline: #3e3a46;
 
-  /* --- Acento único (Void Violet) --- */
+  /* --- Acento único (Void Violet) + acentos del sistema n8n --- */
   --color-accent: #663af3;
   --color-accent-hover: #8b6bff;
   --color-accent-glow: rgba(102, 58, 243, 0.24);
+  --color-ember-cta: #fd8925;
+  --color-ember-scorch: #ff492c;
+  --color-electric-current: #077ac7;
+  --color-crimson-glow: #56312d;
 
-  /* --- Texto: hielo → escarcha → niebla → velo --- */
-  --color-text-primary: #d8ecf8;
-  --color-text-secondary: #c7d3ea;
-  --color-muted: #9da7ba;
-  --color-frost: #d1e4fa;
-  --color-blueprint: #b6d9fc;
+  /* --- Gradientes del sistema (ember CTA + electric current) --- */
+  --gradient-ember-cta: linear-gradient(30deg, rgb(253, 137, 37), rgb(255, 12, 0));
+  --gradient-electric-current: linear-gradient(141deg, rgb(7, 122, 199), rgb(107, 33, 239));
+
+  /* --- Texto: ceniza → niebla → plata → blanco --- */
+  --color-text-primary: #d1cece;
+  --color-text-secondary: #9d9797;
+  --color-muted: #9d9797;
+  --color-frost: #e5e7eb;
+  --color-blueprint: #077ac7;
 
   /* --- Estados funcionales --- */
   --color-danger: #e5535f;
@@ -41,7 +49,7 @@
   --color-steel: #8fb3d9;
 
   /* --- Tipografía --- */
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Geomanist", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
@@ -173,17 +181,16 @@ body {
   .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
   .btn-primary {
-    background: linear-gradient(180deg, #7b55ff 0%, var(--color-accent) 100%);
+    /* Ember Gradient CTA: el único elemento cálido-chromático principal (n8n) */
+    background: var(--gradient-ember-cta);
     color: #ffffff;
-    box-shadow:
-      inset 0 1px 1px rgba(216, 236, 248, 0.3),
-      0 10px 28px -12px rgba(102, 58, 243, 0.75);
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 10px 28px -12px rgba(253, 137, 37, 0.75);
   }
   .btn-primary:hover {
-    filter: brightness(1.08);
-    box-shadow:
-      inset 0 1px 1px rgba(216, 236, 248, 0.35),
-      0 14px 34px -12px rgba(102, 58, 243, 0.85);
+    filter: brightness(1.12);
+    box-shadow: 0 14px 34px -12px rgba(255, 12, 0, 0.85);
   }
 
   .btn-ghost {
@@ -220,6 +227,43 @@ body {
     backdrop-filter: blur(12px);
   }
 
+  /* --- Feature Card (n8n): panel empotrado, sin sombra exterior --- */
+  .card-feature {
+    background: #1a1624;
+    border-radius: 16px;
+    padding: 48px 44px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: none;
+  }
+
+  /* --- Glowing Inset Card (n8n): borde blanco interior + brillo ámbar inferior --- */
+  .card-glow {
+    background: transparent;
+    border-radius: 24px;
+    padding: 24px 32px;
+    box-shadow:
+      rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset,
+      rgba(255, 142, 93, 0.3) 0px 1px 0px 0px inset;
+  }
+
+  /* --- Deep Panel (n8n): panel oscuro ancho completo --- */
+  .panel-deep {
+    background: #1b1728;
+    border-radius: 24px;
+    box-shadow: none;
+  }
+
+  /* --- Frosted Ghost Button (n8n): iconos y secundarios sobre paneles --- */
+  .btn-frosted {
+    background: rgba(13, 10, 25, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #d1cece;
+    border-radius: 8px;
+    padding: 14px;
+    box-shadow: rgba(0, 0, 0, 0.26) 0px 0px 8px 0px;
+  }
+  .btn-frosted:hover { background: rgba(26, 22, 36, 0.5); color: #ffffff; }
+
   .badge {
     display: inline-flex;
     align-items: center;
@@ -235,26 +279,23 @@ body {
 
   /* --- Atmósfera: rejilla de plano + resplandor cenital --- */
   .bg-workshop {
-    background-color: #05060f;
+    background-color: #0e0918;
     background-image:
-      radial-gradient(ellipse 55% 45% at 50% -8%, rgba(124, 145, 182, 0.28), transparent 70%),
-      radial-gradient(ellipse 42% 32% at 50% 0%, rgba(102, 58, 243, 0.18), transparent 70%),
-      linear-gradient(rgba(186, 215, 247, 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(186, 215, 247, 0.045) 1px, transparent 1px);
+      radial-gradient(126.99% 234.27% at 10.15% 142.35%, rgba(217, 126, 75, 0.133) 0%, rgba(255, 255, 255, 0) 37%),
+      radial-gradient(ellipse 42% 32% at 50% 0%, rgba(7, 122, 199, 0.12), transparent 70%),
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
     background-size: 100% 100%, 100% 100%, 80px 80px, 80px 80px;
   }
 
   /* Wordmark / titular principal: Skywash sobre el lienzo */
   .titulo-hero {
     font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(3.4rem, 13vw, 9rem);
-    line-height: 0.9;
-    letter-spacing: -0.035em;
-    background: linear-gradient(0deg, #d8ecf8 0%, #98c0ef 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    font-weight: 300;
+    font-size: clamp(3rem, 12vw, 54px);
+    line-height: 0.88;
+    letter-spacing: -1.08px;
+    color: #ffffff;
     text-transform: none;
   }
 

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Wrench } from 'lucide-react';
+import { Wrench, ArrowRight } from 'lucide-react';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 import FormLogin from '../components/FormLogin';
@@ -9,6 +9,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col bg-workshop">
       <Nav compacto />
+
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md animate-slide-up">
           <div className="text-center mb-6">
@@ -29,14 +30,33 @@ export default function Login() {
             </p>
           </div>
 
-          <div className="card p-6 shadow-2xl shadow-black/40 sm:p-8">
+          <div className="card-feature p-6 shadow-2xl shadow-black/40 sm:p-8">
             <FormLogin />
           </div>
 
+          {/* Plan para adquirir la app — CTA ember (n8n) */}
+          <div className="card-glow mt-6 flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-cloud-white">
+                ¿Aún no tienes cuenta?
+              </p>
+              <p className="text-xs text-fog-text">
+                Adquiere un plan y pon tu taller en marcha en minutos.
+              </p>
+            </div>
+            <Link
+              to="/comprar/basico"
+              className="btn btn-primary inline-flex items-center gap-2"
+            >
+              Adquirir plan
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
           <p className="text-center text-sm text-text-secondary mt-6">
-            ¿Aún no tienes cuenta?{' '}
-            <Link to="/comprar/basico" className="text-blueprint font-medium hover:text-frost">
-              Adquiere un plan
+            ¿Ya eres cliente?{' '}
+            <Link to="/acceso" className="text-blueprint font-medium hover:text-frost">
+              Acceso privado
             </Link>
           </p>
         </div>
