@@ -180,7 +180,7 @@ function TarjetaSuscripcion() {
         <span className="font-display text-2xl font-medium text-text-primary">Pro</span>
         <span className="mb-0.5 text-[10px] text-muted">anual</span>
       </div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[rgba(186,214,247,0.08)]">
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-hover">
         <div className="h-full w-[78%] rounded-full bg-gradient-to-r from-accent to-blueprint" />
       </div>
       <p className="mt-2 text-[9px] text-muted">9 de 12 meses restantes</p>
@@ -216,10 +216,10 @@ function TarjetaAcceso() {
         </p>
         <p className="text-[11px] text-muted">Acceso privado del equipo</p>
         <div className="mt-5 space-y-2.5 text-left">
-          <div className="flex items-center gap-2 rounded-md border border-[rgba(186,215,247,0.12)] bg-[rgba(199,211,234,0.06)] px-3 py-2 text-[11px] text-muted">
+          <div className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-[11px] text-muted">
             <Mail size={12} /> mecanico@elrayo.com
           </div>
-          <div className="flex items-center gap-2 rounded-md border border-[rgba(186,215,247,0.12)] bg-[rgba(199,211,234,0.06)] px-3 py-2 text-[11px] tracking-widest text-muted">
+          <div className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-[11px] tracking-widest text-muted">
             <Lock size={12} /> ••••••••
           </div>
           <div className="btn btn-primary w-full">
@@ -263,7 +263,7 @@ function VitrinaHero() {
           <TarjetaSuscripcion />
         </div>
       </div>
-      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#05060f] to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-carbony-black to-transparent" />
     </div>
   );
 }
@@ -273,7 +273,7 @@ function PanelMockup() {
   const filas = [
     { id: '#1042', auto: 'Toyota Corolla', estado: 'En reparación', color: 'text-blueprint bg-info/10' },
     { id: '#1041', auto: 'Mazda 3', estado: 'Listo', color: 'text-success bg-success/10' },
-    { id: '#1040', auto: 'Renault Logan', estado: 'Diagnóstico', color: 'text-frost bg-[rgba(186,214,247,0.08)]' },
+    { id: '#1040', auto: 'Renault Logan', estado: 'Diagnóstico', color: 'text-frost bg-surface-hover' },
   ];
   const barras = [38, 58, 44, 74, 60, 88, 68];
 
@@ -284,11 +284,11 @@ function PanelMockup() {
         aria-hidden="true"
       />
       <div className="vidrio-flotante relative overflow-hidden">
-        <div className="flex items-center gap-1.5 border-b border-border bg-[#05060f]/60 px-4 py-2.5">
+        <div className="flex items-center gap-1.5 border-b border-border bg-[#202020]/60 px-4 py-2.5">
           <span className="h-2.5 w-2.5 rounded-full bg-danger/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-warning/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-success/70" />
-          <span className="ml-3 flex-1 truncate rounded-md bg-[rgba(186,214,247,0.06)] px-2 py-1 font-mono text-[10px] text-muted">
+          <span className="ml-3 flex-1 truncate rounded-md bg-surface px-2 py-1 font-mono text-[10px] text-muted">
             app.autofix.co/dashboard
           </span>
         </div>
@@ -315,7 +315,7 @@ function PanelMockup() {
             ].map((dato) => (
               <div
                 key={dato.etiqueta}
-                className="rounded-xl border border-border bg-[rgba(186,214,247,0.03)] p-2.5"
+                className="rounded-xl border border-border bg-surface p-2.5"
               >
                 <p className="font-mono text-[9px] uppercase tracking-wide text-muted">
                   {dato.etiqueta}
@@ -325,7 +325,7 @@ function PanelMockup() {
             ))}
           </div>
 
-          <div className="rounded-xl border border-border bg-[rgba(186,214,247,0.03)] p-3">
+          <div className="rounded-xl border border-border bg-surface p-3">
             <div className="mb-2.5 flex items-center justify-between text-[9px] text-muted">
               <span>Órdenes de la semana</span>
               <span>Últimos 7 días</span>
@@ -345,7 +345,7 @@ function PanelMockup() {
             {filas.map((fila) => (
               <div
                 key={fila.id}
-                className="flex items-center gap-2 rounded-lg border border-border/70 bg-[#05060f]/30 px-2.5 py-1.5"
+                className="flex items-center gap-2 rounded-lg border border-border/70 bg-[#202020]/30 px-2.5 py-1.5"
               >
                 <span className="font-mono text-[10px] text-muted">{fila.id}</span>
                 <span className="flex-1 truncate text-[11px] text-text-primary">{fila.auto}</span>
@@ -368,7 +368,7 @@ function AccesoMockup() {
         aria-hidden="true"
       />
       <div className="vidrio-flotante relative overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-border bg-[#05060f]/60 px-4 py-2.5">
+        <div className="flex items-center gap-2 border-b border-border bg-[#202020]/60 px-4 py-2.5">
           <Lock size={12} className="text-blueprint" />
           <span className="truncate font-mono text-[10px] text-muted">
             autofix.co/acceso/taller-el-rayo
@@ -387,10 +387,10 @@ function AccesoMockup() {
           </p>
 
           <div className="mt-5 space-y-2.5">
-            <div className="flex items-center gap-2 rounded-md border border-[rgba(186,215,247,0.12)] bg-[rgba(199,211,234,0.06)] px-3 py-2 text-[11px] text-muted">
+            <div className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-[11px] text-muted">
               <Mail size={12} /> mecanico@elrayo.com
             </div>
-            <div className="flex items-center gap-2 rounded-md border border-[rgba(186,215,247,0.12)] bg-[rgba(199,211,234,0.06)] px-3 py-2 text-[11px] tracking-widest text-muted">
+            <div className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-[11px] tracking-widest text-muted">
               <Lock size={12} /> ••••••••
             </div>
             <div className="btn btn-primary w-full">Entrar al taller</div>
@@ -440,7 +440,7 @@ export default function Landing() {
       <Nav />
 
       {/* Hero: wordmark iluminado + abanico de vidrio */}
-      <section ref={heroRef} className="relative overflow-hidden bg-workshop">
+      <section ref={heroRef} className="relative overflow-hidden bg-carbony-black">
         <div
           className="foco-conico pointer-events-none absolute left-1/2 top-[-20rem] h-[44rem] w-[44rem] -translate-x-1/2 opacity-70"
           aria-hidden="true"
@@ -464,7 +464,7 @@ export default function Landing() {
           }}
         >
           <Reveal>
-            <span className="eyebrow inline-flex items-center gap-2 rounded-full border border-[rgba(186,215,247,0.14)] bg-[rgba(186,214,247,0.04)] px-4 py-1.5">
+            <span className="eyebrow inline-flex items-center gap-2 rounded-full border border-accent/40 bg-surface px-4 py-1.5">
               <Sparkles size={12} className="text-blueprint" />
               Plataforma para talleres mecánicos
             </span>
@@ -544,7 +544,7 @@ export default function Landing() {
             {caracteristicas.map(({ icono: Icono, titulo, texto }, indice) => (
               <Reveal key={titulo} delay={indice * 60}>
                 <div className="group text-center">
-                  <span className="tile-icono relative mx-auto h-14 w-14 transition-all duration-300 group-hover:-translate-y-1 group-hover:bg-accent-glow group-hover:text-white group-hover:shadow-[inset_0_0_0_1px_rgba(102,58,243,0.4)]">
+                  <span className="tile-icono relative mx-auto h-14 w-14 transition-all duration-300 group-hover:-translate-y-1 group-hover:bg-accent-glow group-hover:text-white group-hover:shadow-[inset_0_0_0_1px_#ffc000]">
                     <Icono size={22} />
                   </span>
                   <h3 className="mt-4 font-display text-base font-medium text-text-primary">
@@ -563,7 +563,7 @@ export default function Landing() {
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 py-24 lg:grid-cols-[0.9fr_1.1fr]">
           <Reveal>
             <p className="eyebrow flex items-center gap-3">
-              <span className="h-px w-10 bg-[rgba(186,215,247,0.22)]" aria-hidden="true" />
+              <span className="h-px w-10 bg-accent" aria-hidden="true" />
               Tu operación
             </p>
             <h2 className="titulo-seccion mt-5">
@@ -601,7 +601,7 @@ export default function Landing() {
         <div className="grid items-center gap-14 lg:grid-cols-2">
           <Reveal>
             <p className="eyebrow flex items-center gap-3">
-              <span className="h-px w-10 bg-[rgba(186,215,247,0.22)]" aria-hidden="true" />
+              <span className="h-px w-10 bg-accent" aria-hidden="true" />
               Confidencialidad
             </p>
             <h2 className="titulo-seccion mt-5">Tu propia puerta de entrada</h2>
@@ -667,7 +667,7 @@ export default function Landing() {
             />
             {pasos.map((paso, indice) => (
               <Reveal key={paso.n} delay={indice * 120} className="relative">
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-accent/35 bg-[#0b0e1b] font-mono text-sm font-medium text-frost shadow-[0_0_34px_-10px_var(--color-accent-glow)]">
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-accent/35 bg-surface font-mono text-sm font-medium text-frost shadow-[0_0_34px_-10px_var(--color-accent-glow)]">
                   {paso.n}
                 </div>
                 <h3 className="mt-5 font-display text-xl font-medium text-text-primary">
@@ -691,7 +691,7 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="mx-auto mt-8 inline-flex w-fit items-center rounded-full border border-border bg-[rgba(186,214,247,0.04)] p-1">
+          <div className="mx-auto mt-8 inline-flex w-fit items-center rounded-full border border-border bg-surface p-1">
             {[
               { id: 'mensual', label: 'Mensual' },
               { id: 'anual', label: 'Anual', ahorro: '−20%' },
@@ -868,7 +868,7 @@ export default function Landing() {
       {/* Cierre */}
       <section className="mx-auto w-full max-w-6xl px-4 py-24">
         <Reveal>
-          <div className="relative overflow-hidden rounded-2xl border border-accent/25 bg-workshop p-8 text-center sm:p-14">
+          <div className="relative overflow-hidden rounded-none border border-accent/25 bg-workshop p-8 text-center sm:p-14">
             <div
               className="foco-conico pointer-events-none absolute left-1/2 top-[-12rem] h-[26rem] w-[26rem] -translate-x-1/2 opacity-60"
               aria-hidden="true"

@@ -13,7 +13,7 @@ export default function Nav({ compacto = false }) {
           <span className="font-display text-2xl font-medium tracking-tight">
             Auto<span className="texto-degradado">Fix</span>
           </span>
-          <span className="badge hidden border border-[rgba(186,215,247,0.12)] bg-[rgba(186,214,247,0.06)] text-frost sm:inline-flex">
+          <span className="badge hidden border border-border bg-surface text-frost sm:inline-flex">
             SaaS
           </span>
         </Link>
