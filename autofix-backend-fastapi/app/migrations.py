@@ -429,6 +429,27 @@ def _migrar_a_multiempresa(conn, insp) -> None:
     if "empresas" not in insp.get_table_names():
         return  # create_all aún no la crea (no debería pasar).
 
+    # Asegurar columnas añadidas tras la migración inicial (idempotente),
+    # incluso en bases que ya estaban migradas a multiempresa.
+    if "usuarios" in insp.get_table_names() and "debe_cambiar_contrasena" not in _columnas(
+        insp, "usuarios"
+    ):
+        if _es_sqlite():
+            conn.execute(
+                text(
+                    "ALTER TABLE usuarios ADD COLUMN debe_cambiar_contrasena"
+                    " INTEGER NOT NULL DEFAULT 0"
+                )
+            )
+        else:
+            conn.execute(
+                text(
+                    "ALTER TABLE usuarios ADD COLUMN debe_cambiar_contrasena"
+                    " BOOLEAN NOT NULL DEFAULT FALSE"
+                )
+            )
+        insp = inspect(engine)
+
     _migrar_roles_postgres(conn)
 
     # Solo las bases con datos legados necesitan empresa por defecto
