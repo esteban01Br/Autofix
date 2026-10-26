@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -409,6 +409,8 @@ export default function Landing() {
   const [planes, setPlanes] = useState([]);
   const [ciclo, setCiclo] = useState('anual');
   const [preguntaAbierta, setPreguntaAbierta] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const heroRef = useRef(null);
 
   useEffect(() => {
     listarPlanes()
@@ -416,12 +418,29 @@ export default function Landing() {
       .catch(() => setPlanes([]));
   }, []);
 
+  // Efecto tipo Apple: el hero se escala y desvanece suavemente al hacer scroll.
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return undefined;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return undefined;
+    const handler = () => {
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      const p = Math.min(1, Math.max(0, (vh * 0.55 - rect.top) / (rect.height * 0.9)));
+      setScrollProgress(p);
+    };
+    window.addEventListener('scroll', handler, { passive: true });
+    handler();
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col">
       <Nav />
 
       {/* Hero: wordmark iluminado + abanico de vidrio */}
-      <section className="relative overflow-hidden bg-workshop">
+      <section ref={heroRef} className="relative overflow-hidden bg-workshop">
         <div
           className="foco-conico pointer-events-none absolute left-1/2 top-[-20rem] h-[44rem] w-[44rem] -translate-x-1/2 opacity-70"
           aria-hidden="true"
@@ -435,7 +454,15 @@ export default function Landing() {
           aria-hidden="true"
         />
 
-        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 text-center sm:pb-20 sm:pt-24">
+        <div
+          className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 text-center sm:pb-20 sm:pt-24"
+          style={{
+            transform: `scale(${1 - scrollProgress * 0.06}) translateY(${scrollProgress * -18}px)`,
+            opacity: 1 - scrollProgress * 0.35,
+            transition: 'transform 0.08s linear, opacity 0.08s linear',
+            willChange: 'transform, opacity',
+          }}
+        >
           <Reveal>
             <span className="eyebrow inline-flex items-center gap-2 rounded-full border border-[rgba(186,215,247,0.14)] bg-[rgba(186,214,247,0.04)] px-4 py-1.5">
               <Sparkles size={12} className="text-blueprint" />
