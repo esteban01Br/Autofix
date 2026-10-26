@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Wrench } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 export default function Nav({ compacto = false }) {
   return (
@@ -37,6 +38,7 @@ export default function Nav({ compacto = false }) {
         )}
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Link to="/login" className="btn btn-ghost btn-sm">
             Iniciar sesión
           </Link>
