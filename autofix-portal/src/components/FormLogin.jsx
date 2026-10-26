@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react';
+import { ArrowRight, Loader2, Lock, Mail } from 'lucide-react';
 import { login } from '../services/authService';
 import { entrarALaApp, mensajeError } from '../lib/app';
 
@@ -10,7 +10,6 @@ import { entrarALaApp, mensajeError } from '../lib/app';
 export default function FormLogin({ slug }) {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [verContrasena, setVerContrasena] = useState(false);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
 
@@ -62,24 +61,14 @@ export default function FormLogin({ slug }) {
           <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
           <input
             id="contrasena"
-            type={verContrasena ? 'text' : 'password'}
-            className="input pl-9 pr-10"
+            type="password"
+            className="input pl-9"
             placeholder="••••••••"
             value={contrasena}
             onChange={(e) => setContrasena(e.target.value)}
             autoComplete="current-password"
             required
           />
-          <button
-            type="button"
-            onClick={() => setVerContrasena((valor) => !valor)}
-            className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted transition-colors hover:text-text-primary"
-            aria-label={verContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-            aria-pressed={verContrasena}
-            tabIndex={-1}
-          >
-            {verContrasena ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
         </div>
       </div>
 
