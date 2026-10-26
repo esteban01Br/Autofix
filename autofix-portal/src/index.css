@@ -7,51 +7,54 @@
    ===================================================================== */
 
 @theme {
-  /* --- Lienzo y superficies (n8n-inspired: void base con matiz violeta) --- */
-  --color-base-bg: #0e0918;
-  --color-surface: #1a1624;
-  --color-surface-hover: #1b1728;
-  --color-surface-glass: rgba(26, 22, 36, 0.72);
-  --color-glass: rgba(26, 22, 36, 0.06);
-  --color-glass-fuerte: rgba(27, 23, 40, 0.06);
-  --color-border: #3e3a46;
-  --color-hairline: #3e3a46;
+  /* --- Lienzo y superficies (Lamborghini: alternancia oscuro/claro) --- */
+  --color-base-bg: #ffffff;
+  --color-surface: #f5f5f5;
+  --color-surface-hover: #ebebeb;
+  --color-surface-glass: rgba(255, 255, 255, 0.85);
+  --color-glass: rgba(0, 0, 0, 0.04);
+  --color-glass-fuerte: rgba(0, 0, 0, 0.06);
+  --color-border: #969696;
+  --color-hairline: #969696;
 
-  /* --- Acento (electric current: azul → violeta, sin morado viejo) --- */
-  --color-accent: #077ac7;
-  --color-accent-hover: #6b21ef;
-  --color-accent-glow: rgba(7, 122, 199, 0.24);
-  --color-ember-cta: #fd8925;
-  --color-ember-scorch: #ff492c;
-  --color-electric-current: #077ac7;
-  --color-crimson-glow: #56312d;
+  /* --- Acento unico: Giallo Vivo (un solo hit por pantalla) --- */
+  --color-accent: #ffc000;
+  --color-accent-hover: #917300;
+  --color-accent-glow: rgba(255, 192, 0, 0.24);
+  --color-giallo-vivo: #ffc000;
+  --color-giallo-ombra: #917300;
+  --color-carbony-black: #202020;
+  --color-carbon-deep: #181818;
+  --color-pure-black: #000000;
+  --color-pearl-white: #ffffff;
+  --color-marble-gray: #f5f5f5;
+  --color-graphite-border: #494949;
+  --color-steel-mid: #7d7d7d;
+  --color-ash-border: #969696;
+  --color-anvil: #313131;
 
-  /* --- Gradientes del sistema (ember CTA + electric current) --- */
-  --gradient-ember-cta: linear-gradient(30deg, rgb(253, 137, 37), rgb(255, 12, 0));
-  --gradient-electric-current: linear-gradient(141deg, rgb(7, 122, 199), rgb(107, 33, 239));
-
-  /* --- Texto: ceniza → niebla → plata → blanco --- */
-  --color-text-primary: #d1cece;
-  --color-text-secondary: #9d9797;
-  --color-muted: #9d9797;
-  --color-frost: #e5e7eb;
-  --color-blueprint: #077ac7;
+  /* --- Texto: carbon -> grafito -> acero -> ceniza --- */
+  --color-text-primary: #202020;
+  --color-text-secondary: #494949;
+  --color-muted: #7d7d7d;
+  --color-frost: #202020;
+  --color-blueprint: #202020;
 
   /* --- Estados funcionales --- */
   --color-danger: #e5535f;
   --color-danger-glow: rgba(229, 83, 95, 0.14);
   --color-success: #35d39a;
   --color-success-glow: rgba(53, 211, 154, 0.14);
-  --color-info: #6ea8ff;
-  --color-info-glow: rgba(110, 168, 255, 0.14);
+  --color-info: #077ac7;
+  --color-info-glow: rgba(7, 122, 199, 0.14);
   --color-warning: #e4a15a;
   --color-warning-glow: rgba(228, 161, 90, 0.14);
-  --color-steel: #8fb3d9;
+  --color-steel: #7d7d7d;
 
-  /* --- Tipografía --- */
-  --font-display: "Geomanist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* --- Tipografia: LamboType (Barlow Condensed como sustituto) --- */
+  --font-display: 'Barlow Condensed', 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   /* --- Movimiento --- */
   --animate-fade-in: fade-in 0.3s ease-out;
@@ -64,45 +67,6 @@
   --animate-pulso: pulso-anillo 2.6s ease-out infinite;
 }
 
-/* --- Tema claro (toggle) --- */
-[data-theme="light"] {
-  --color-base-bg: #f5f6fa;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f1f0f5;
-  --color-surface-glass: rgba(255, 255, 255, 0.85);
-  --color-glass: rgba(0, 0, 0, 0.04);
-  --color-glass-fuerte: rgba(0, 0, 0, 0.06);
-  --color-border: #e5e7eb;
-  --color-hairline: #e5e7eb;
-  --color-text-primary: #0e0918;
-  --color-text-secondary: #48556a;
-  --color-muted: #6b7280;
-  --color-frost: #0e0918;
-  --color-blueprint: #077ac7;
-  --color-accent: #077ac7;
-  --color-accent-hover: #6b21ef;
-  --color-accent-glow: rgba(7, 122, 199, 0.12);
-  --color-ember-cta: #fd8925;
-  --color-electric-current: #077ac7;
-  --color-ember-scorch: #ff492c;
-  --color-crimson-glow: #56312d;
-}
-
-[data-theme="light"] .bg-workshop {
-  background-color: #f5f6fa;
-  background-image: radial-gradient(ellipse 42% 32% at 50% 0%, rgba(7, 122, 199, 0.06), transparent 70%);
-}
-
-[data-theme="light"] .card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 24px 32px -22px rgba(0, 0, 0, 0.12);
-  backdrop-filter: none;
-}
-
-[data-theme="light"] body {
-  color-scheme: light;
-}
 
 @keyframes fade-in {
   from { opacity: 0; }
@@ -221,16 +185,20 @@ body {
   .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
   .btn-primary {
-    /* Ember Gradient CTA: el único elemento cálido-chromático principal (n8n) */
-    background: var(--gradient-ember-cta);
+    /* Giallo Action Button: el unico elemento cromatematico (Lamborghini) */
+    background: #ffc000;
     color: #ffffff;
     border: none;
-    border-radius: 8px;
-    box-shadow: 0 10px 28px -12px rgba(253, 137, 37, 0.75);
+    border-radius: 0px;
+    padding: 16px 24px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.0230em;
+    box-shadow: none;
   }
   .btn-primary:hover {
-    filter: brightness(1.12);
-    box-shadow: 0 14px 34px -12px rgba(255, 12, 0, 0.85);
+    background: #917300;
   }
 
   .btn-ghost {
@@ -257,52 +225,11 @@ body {
 
   /* --- Tarjetas: vidrio esmerilado con realce interior --- */
   .card {
-    background: rgba(186, 214, 247, 0.03);
-    border: 1px solid rgba(186, 215, 247, 0.1);
-    border-radius: 16px;
-    box-shadow:
-      inset 0 1px 1px rgba(199, 211, 234, 0.1),
-      inset 0 24px 48px rgba(199, 211, 234, 0.035),
-      0 24px 32px -22px rgba(6, 6, 14, 0.85);
-    backdrop-filter: blur(12px);
-  }
-
-  /* --- Feature Card (n8n): panel empotrado, sin sombra exterior --- */
-  .card-feature {
-    background: #1a1624;
-    border-radius: 16px;
-    padding: 48px 44px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #ffffff;
+    border: 1px solid #969696;
+    border-radius: 0px;
     box-shadow: none;
   }
-
-  /* --- Glowing Inset Card (n8n): borde blanco interior + brillo ámbar inferior --- */
-  .card-glow {
-    background: transparent;
-    border-radius: 24px;
-    padding: 24px 32px;
-    box-shadow:
-      rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset,
-      rgba(255, 142, 93, 0.3) 0px 1px 0px 0px inset;
-  }
-
-  /* --- Deep Panel (n8n): panel oscuro ancho completo --- */
-  .panel-deep {
-    background: #1b1728;
-    border-radius: 24px;
-    box-shadow: none;
-  }
-
-  /* --- Frosted Ghost Button (n8n): iconos y secundarios sobre paneles --- */
-  .btn-frosted {
-    background: rgba(13, 10, 25, 0.28);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #d1cece;
-    border-radius: 8px;
-    padding: 14px;
-    box-shadow: rgba(0, 0, 0, 0.26) 0px 0px 8px 0px;
-  }
-  .btn-frosted:hover { background: rgba(26, 22, 36, 0.5); color: #ffffff; }
 
   .badge {
     display: inline-flex;
@@ -319,13 +246,7 @@ body {
 
   /* --- Atmósfera: rejilla de plano + resplandor cenital --- */
   .bg-workshop {
-    background-color: #0e0918;
-    background-image:
-      radial-gradient(126.99% 234.27% at 10.15% 142.35%, rgba(217, 126, 75, 0.133) 0%, rgba(255, 255, 255, 0) 37%),
-      radial-gradient(ellipse 42% 32% at 50% 0%, rgba(7, 122, 199, 0.12), transparent 70%),
-      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 80px 80px, 80px 80px;
+    background-color: #ffffff;
   }
 
   /* --- Fondo vivo: orbes de luz animados (ember + electric current) --- */
@@ -369,12 +290,12 @@ body {
   /* Wordmark / titular principal: Skywash sobre el lienzo */
   .titulo-hero {
     font-family: var(--font-display);
-    font-weight: 300;
-    font-size: clamp(3rem, 12vw, 54px);
-    line-height: 0.88;
-    letter-spacing: -1.08px;
-    color: #ffffff;
-    text-transform: none;
+    font-weight: 400;
+    font-size: clamp(3rem, 12vw, 120px);
+    line-height: 0.92;
+    letter-spacing: 0.0230em;
+    color: #202020;
+    text-transform: uppercase;
   }
 
   .titulo-seccion {
@@ -414,10 +335,7 @@ body {
   }
 
   .texto-degradado {
-    background: linear-gradient(0deg, #d8ecf8 0%, #98c0ef 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: #202020;
   }
 
   /* Alias del degradado de titulares (compatibilidad) */
@@ -429,10 +347,9 @@ body {
   }
 
   .marca-violeta {
-    background: linear-gradient(135deg, #077ac7 0%, #6b21ef 48%, #1a0e3a 100%);
-    box-shadow:
-      inset 0 1px 1px rgba(216, 236, 248, 0.35),
-      0 10px 26px -12px rgba(7, 122, 199, 0.8);
+    background: #202020;
+    color: #ffffff;
+    box-shadow: none;
   }
 
   .tile-icono {
