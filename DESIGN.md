@@ -1,64 +1,59 @@
-# Lamborghini.com — Style Reference
-> Showroom black with one yellow car under spotlights
+# Graphite — Style Reference
+> Luminous terminal lattice. Build dark, bordered product surfaces around precise white typography and sparse bursts of spectral light.
 
-**Theme:** mixed
+**Theme:** dark
 
 Source measurements are normalized; roles and recommendations are interpreted. Font summary lists are independent, not paired by position. HTML examples are reconstructions, not source components.
 
-Lamborghini's design language is automotive theater: a cinematic dark stage where Giallo yellow punctuates an otherwise black-and-white world. The interface alternates between full-bleed dark hero canvases (where video and product photography dominate) and quiet light-gray content surfaces (where editorial storytelling takes over). Typography is the loudest element — an industrial custom sans-serif (LamboType) spoken only in UPPERCASE, scaled aggressively to 80–120px for hero statements. Components are minimal and structural: no rounded cards, no soft shadows, no decorative gradients — just hard-edged surfaces, hairline rules, and one vivid yellow action button. The overall feeling is gallery-grade restraint interrupted by a single confident color hit, the way a matte black showroom is broken by one yellow car under a spotlight.
+Graphite — luminous terminal lattice. The interface is a near-black developer workspace where bright off-white type, hairline graphite borders, and softly glowing product visuals carry the hierarchy. Large 500-weight headlines are tightly tracked and compact in line height, while dense product panels use restrained 14–16px utility text. Saturated color is reserved for animated-looking technical graphics, partner surfaces, and orange text links; conversion controls remain deliberately monochrome.
 
 ## Tokens — Colors
 
 | Name | Value | Token | Role |
 |------|-------|-------|------|
-| Giallo Vivo | `#ffc000` | `--color-giallo-vivo` | Yellow supporting accent for decorative details and low-frequency emphasis. Do not promote it to the primary CTA color |
-| Giallo Ombra | `#917300` | `--color-giallo-ombra` | Hover or secondary yellow state, list markers with brand accent — darker mustard variant of the primary |
-| Carbony Black | `#202020` | `--color-carbony-black` | Primary text, dark hero canvases, navigation bar — the workhorse near-black used at 1400+ occurrences |
-| Pure Black | `#000000` | `--color-pure-black` | Body copy, footer ink, icon strokes on light surfaces — maximum contrast text and absolute dark |
-| Carbon Deep | `#181818` | `--color-carbon-deep` | Headline color on light surfaces, dark surface variant, link ink — slightly warmer alternative to pure black |
-| Pearl White | `#ffffff` | `--color-pearl-white` | Page canvas, light card surface, button text on dark, hero text overlay — dominant light surface |
-| Marble Gray | `#f5f5f5` | `--color-marble-gray` | Alternate section background, body container fill, badge surface — the off-white that breaks up the white-white rhythm |
-| Graphite Border | `#494949` | `--color-graphite-border` | Section dividers, link ink on light backgrounds, mid-weight borders |
-| Steel Mid | `#7d7d7d` | `--color-steel-mid` | Button border outlines, secondary link text, muted UI chrome |
-| Ash Border | `#969696` | `--color-ash-border` | Light borders, disabled states, tertiary dividers on white surfaces |
-| Anvil | `#313131` | `--color-anvil` | Body copy variant, dark border accent — sits between Carbony Black and deeper neutrals |
+| Obsidian Canvas | `#0a0a0a` | `--color-obsidian-canvas` | Page backgrounds, footer backgrounds, dark card interiors |
+| True Black | `#000000` | `--color-true-black` | Deep media backdrops, product-preview fades, black overlays |
+| Charcoal Surface | `#171717` | `--color-charcoal-surface` | Announcement strips, compact icon controls, elevated dark surfaces |
+| Graphite Edge | `#262626` | `--color-graphite-edge` | Secondary filled controls, card borders, navigation shell borders, dividers |
+| Steel Border | `#464646` | `--color-steel-border` | Emphasized borders around selected controls and media frames |
+| Cloud White | `#fafafa` | `--color-cloud-white` | Primary headings, high-emphasis text, icons, strokes, and dark-surface foregrounds |
+| Paper White | `#e5e5e5` | `--color-paper-white` | Filled conversion buttons and pale partner-card surfaces |
+| Fog | `#a1a1a1` | `--color-fog` | Navigation labels, secondary body text, subdued interface icons |
+| Ash | `#737373` | `--color-ash` | Tertiary labels, inactive icon strokes, focus-ring details |
+| Signal Orange | `#ff8833` | `--color-signal-orange` | Inline text links and small directional-arrow accents — the sole warm reading cue within the monochrome interface |
+| Solar Spectrum | `linear-gradient(90deg, #ffb931 15%, #ffffff 30%, #ffffff 40%, #2e73fc 50%)` | `--color-solar-spectrum` | Decorative technical linework and animated graphic borders — yellow-to-white-to-blue light turns abstract geometry into an active code signal |
 
 ## Tokens — Typography
 
-### LamboType — Exclusive brand typeface used at all hierarchy levels. Renders always in UPPERCASE for editorial weight, with a consistent 0.0230em letter-spacing across all sizes — the spacing is wide enough to feel engineered, not cramped. Display sizes reach 120px with tight 0.92–1.00 line-height so headlines stack into monolithic typographic blocks. The single weight (400) at radically different sizes (10px labels → 120px display) is the signature: the system achieves voice through scale contrast, never weight contrast. · `--font-lambotype`
-- **Substitute:** Barlow Condensed (closest open equivalent for the tall industrial feel); Rajdhani as a fallback; Bebas Neue for display-only contexts
-- **Weights:** 400
-- **Sizes:** 10px, 12px, 16px, 18px, 27px, 32px, 40px, 54px, 80px, 120px
-- **Line height:** 0.92, 1.00, 1.13, 1.15, 1.19, 1.37, 1.38, 1.50, 1.56, 1.63, 1.83, 2.00
-- **Letter spacing:** 0.0230em across all sizes — applied uniformly to labels (12px), body (16px), and display (120px) alike, giving every text node an engineered, spaced-out rhythm
-- **Role:** Exclusive brand typeface used at all hierarchy levels. Renders always in UPPERCASE for editorial weight, with a consistent 0.0230em letter-spacing across all sizes — the spacing is wide enough to feel engineered, not cramped. Display sizes reach 120px with tight 0.92–1.00 line-height so headlines stack into monolithic typographic blocks. The single weight (400) at radically different sizes (10px labels → 120px display) is the signature: the system achieves voice through scale contrast, never weight contrast.
-
-### Open Sans — Rare fallback or supplementary body text at 16px, normal letter-spacing — only used in 3 occurrences, effectively vestigial; do not introduce for new pages · `--font-open-sans`
-- **Substitute:** system-ui
-- **Weights:** 400
-- **Sizes:** 16px
-- **Line height:** 1.50
-- **Role:** Rare fallback or supplementary body text at 16px, normal letter-spacing — only used in 3 occurrences, effectively vestigial; do not introduce for new pages
+### matterFont — Single-family UI and marketing typography. Use 14px/500 for navigation and controls, 16px/400 for links and product copy, 24px/600 for feature-card headings, 36px/500 for section headings, and 60px/500 for the hero. The 60px display treatment uses -1.5px tracking and a 60px line height, making the headline read as a compact block rather than a loose marketing statement. · `--font-matterfont`
+- **Substitute:** Inter
+- **Weights:** 400, 500, 600, 700
+- **Sizes:** 10px, 12px, 14px, 16px, 18px, 20px, 24px, 36px, 60px
+- **Line height:** 1.00, 1.11, 1.17, 1.25, 1.33, 1.40, 1.43, 1.50, 1.56, 2.00
+- **Letter spacing:** -1.5px at 60px; -0.9px at 18px where the compact link treatment is used; normal elsewhere
+- **OpenType features:** `"clig" 0, "liga" 0`
+- **Role:** Single-family UI and marketing typography. Use 14px/500 for navigation and controls, 16px/400 for links and product copy, 24px/600 for feature-card headings, 36px/500 for section headings, and 60px/500 for the hero. The 60px display treatment uses -1.5px tracking and a 60px line height, making the headline read as a compact block rather than a loose marketing statement.
 
 ### Type Scale
 
 | Role | Family | Weight | Size | Line Height | Letter Spacing | Token |
 |------|--------|--------|------|-------------|----------------|-------|
-| caption | — | — | 10px | 1.5 | 0.23px | `--text-caption` |
-| body | — | — | 16px | 1.5 | 0.37px | `--text-body` |
-| subheading | — | — | 18px | 1.5 | 0.41px | `--text-subheading` |
-| heading-sm | — | — | 27px | 1.37 | 0.62px | `--text-heading-sm` |
-| heading | — | — | 32px | 1.38 | 0.74px | `--text-heading` |
-| heading-lg | — | — | 40px | 1.19 | 0.92px | `--text-heading-lg` |
-| display | — | — | 54px | 1.13 | 1.24px | `--text-display` |
-| display-lg | — | — | 80px | 1 | 1.84px | `--text-display-lg` |
-| hero | — | — | 120px | 0.92 | 2.76px | `--text-hero` |
+| micro-nav | matterFont | 700 | 10px | 2 | 0px | `--text-micro-nav` |
+| caption | matterFont | 400 | 12px | 1.33 | 0px | `--text-caption` |
+| nav-control | matterFont | 500 | 14px | 1.43 | 0px | `--text-nav-control` |
+| body | matterFont | 400 | 16px | 1.25 | 0px | `--text-body` |
+| body-relaxed | matterFont | 400 | 16px | 1.5 | 0px | `--text-body-relaxed` |
+| body-large | matterFont | 400 | 18px | 1.25 | 0px | `--text-body-large` |
+| subheading | matterFont | 500 | 20px | 1.4 | 0px | `--text-subheading` |
+| feature-heading | matterFont | 600 | 24px | 1.17 | 0px | `--text-feature-heading` |
+| section-heading | matterFont | 500 | 36px | 1.11 | 0px | `--text-section-heading` |
+| display | matterFont | 500 | 60px | 1 | -1.5px | `--text-display` |
 
 ## Tokens — Spacing & Shapes
 
 **Base unit:** 8px
 
-**Density:** comfortable
+**Density:** compact
 
 ### Spacing Scale
 
@@ -68,160 +63,178 @@ Lamborghini's design language is automotive theater: a cinematic dark stage wher
 | 16 | 16px | `--spacing-16` |
 | 24 | 24px | `--spacing-24` |
 | 32 | 32px | `--spacing-32` |
-| 40 | 40px | `--spacing-40` |
 | 48 | 48px | `--spacing-48` |
 | 56 | 56px | `--spacing-56` |
 | 64 | 64px | `--spacing-64` |
-| 80 | 80px | `--spacing-80` |
-| 160 | 160px | `--spacing-160` |
+| 72 | 72px | `--spacing-72` |
+| 128 | 128px | `--spacing-128` |
+| 224 | 224px | `--spacing-224` |
 
 ### Border Radius
 
 | Element | Value |
 |---------|-------|
-| cards | 0px |
-| badges | 0px |
-| images | 0px |
-| buttons | 0px |
+| cards | 10px |
+| pills | 9999px |
+| badges | 20px |
+| images | 10px |
+| inputs | 10px |
+| buttons | 8px |
+| mediaFrames | 10px |
+
+### Shadows
+
+| Name | Value | Token |
+|------|-------|-------|
+| sm | `rgba(0, 0, 0, 0.25) 0px 4px 4px 0px` | `--shadow-sm` |
+| subtle | `rgba(101, 129, 128, 0.15) 0px 0px 2px 2px inset, rgba(32,...` | `--shadow-subtle` |
+| subtle-2 | `rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0p...` | `--shadow-subtle-2` |
+| md | `rgba(0, 0, 0, 0.3) 0px 8px 10px 0px` | `--shadow-md` |
+| subtle-3 | `rgb(255, 255, 255) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0...` | `--shadow-subtle-3` |
+| sm-2 | `rgb(0, 0, 0) 0px 0px 8px 8px` | `--shadow-sm-2` |
+| sm-3 | `rgba(0, 0, 0, 0.5) 0px 0px 8px 8px` | `--shadow-sm-3` |
+| sm-4 | `oklab(0.268999 -0.00000260025 0.00000627339) 0px 2px 4px ...` | `--shadow-sm-4` |
+| md-2 | `lab(15.204 0 -0.00000596046) 0px 0px 12px 0px inset` | `--shadow-md-2` |
 
 ### Layout
 
-- **Page max-width:** 1440px
-- **Section gap:** 80px
-- **Card padding:** 24px
-- **Element gap:** 24px
+- **Page max-width:** 1152px
+- **Section gap:** 224px
+- **Card padding:** 16px
+- **Element gap:** 8px
 
 ## Components
 
-### Hero Stage
-**Role:** Full-bleed cinematic opener with video or photographic background
+### Top Announcement Bar
+**Role:** Full-width product announcement above primary navigation
 
-Full-viewport dark canvas (#202020 or #000000) with overlaid white LamboType headline at 80–120px, uppercase, line-height ~0.92, letter-spacing 0.0230em. Eyebrow label at 12–16px sits above headline in same uppercase treatment. Yellow CTA button anchored bottom-left, pause/video control anchored bottom-right. Content sits in a left-aligned column, max 50% of viewport width.
+Use a #171717 strip with 1px #262626 borders, compact centered 14px/600 Cloud White text, and a low-emphasis Fog trailing link. Keep the bar visually shallow with 8px internal vertical spacing.
 
-### Giallo Action Button
-**Role:** Primary call-to-action
+### Floating Primary Navigation
+**Role:** Contained top navigation shell
 
-Solid #ffc000 background, no border, 0px radius, padding 16px 24px. LamboType 12–16px uppercase white text (#ffffff) with arrow icon (→) in 16px to the right of the label. Letter-spacing 0.0230em. No shadow. Sits as a hard rectangular block of yellow against dark or white surfaces — the only color in the interface, so it must dominate.
+Place the logo, six 14px/500 Fog navigation links, account controls, and sign-up control inside an Obsidian Canvas shell with a 1px #262626 border, 10px radius, 16px horizontal padding, and 8px control gaps.
 
-### Ghost Link Button
-**Role:** Secondary action or text-link CTA
+### Pale Conversion Button
+**Role:** High-emphasis public conversion control
 
-No fill, no border. LamboType 12–16px uppercase text in #202020 or #ffffff depending on surface, with right-arrow icon. Letter-spacing 0.0230em. Used for less critical actions (model listings, editorial links). The arrow is the only visual anchor.
+Use Paper White #e5e5e5 with #171717 14px/500 text, an 8px radius, 8px 16px padding, a 1px rgba(255,255,255,0.1) edge, and the inset shadow rgb(255,255,255) 0px 1px 0px 0px, rgba(0,0,0,0.1) 0px -2px 6px 0px.
 
-### Outlined Nav Button
-**Role:** Tertiary button with border
+### Charcoal Secondary Button
+**Role:** Lower-emphasis public conversion control
 
-Transparent fill, 1px border in #7d7d7d or #969696, 0px radius, 12–16px LamboType uppercase text. Used sparingly in navigation or filter contexts where a middle-weight button is needed between Giallo solid and Ghost link.
+Use #262626 fill with Cloud White 14px/500 text, a 1px #464646 border, 8px radius, 8px 16px padding, and box-shadow rgba(0,0,0,0.1) 0px 1px 3px 0px, rgba(0,0,0,0.1) 0px 1px 2px -1px.
 
-### Top Navigation Bar
-**Role:** Primary site navigation
+### Transparent Navigation Control
+**Role:** Menu trigger or compact utility control
 
-Fixed top bar at full width, #202020 background, ~64px height. Left: hamburger menu icon + 'MENU' label in white LamboType 12px. Center: bull logo in white. Right: camera icon + search icon. No visible border-bottom — the dark surface meets the hero directly.
+Keep the background transparent with Fog 14px/500 text, a 1px rgba(255,255,255,0.1) border, 8px radius, and 8px 16px padding.
 
-### Section Heading Block
-**Role:** Editorial section title with linked descriptor
+### Dark Pill Icon Button
+**Role:** Carousel navigation and compact product controls
 
-Two-column row: left side holds section name in LamboType 40–54px uppercase #202020 (#000000 on #f5f5f5), right side holds 'descubrir [topic]' link in LamboType 12px uppercase #202020 with right-arrow. Vertically centered, separated by generous whitespace. This is the signature section opener pattern.
+Use #171717 with Cloud White iconography, a #262626 edge, 9999px radius, and a 32px square hit area. Apply rgba(0,0,0,0.25) 0px 4px 4px 0px shadow.
 
-### Product Image Tile
-**Role:** Full-bleed product photograph
+### Product Demo Frame
+**Role:** Large contained product showcase
 
-0px radius, no border, no shadow — photographs run edge-to-edge within their grid cell. Caption sits below in LamboType 12–16px uppercase #202020 with a date stamp at 10–12px above the title. No rounded corners, no overlay UI.
+Frame the dark product capture in Obsidian Canvas with a 1px #262626 border, 10px radius, overflow hidden, and inset shadow rgba(101,129,128,0.15) 0px 0px 2px 2px inset, rgba(32,47,46,0.15) 0px 0px 4px 4px inset. Use a dark image fade so Cloud White overlay labels remain legible.
 
-### Three-Column Story Grid
-**Role:** Editorial story or news grid
+### Demo Feature Tab
+**Role:** Bottom-aligned selector within a product preview
 
-Three equal-width columns with 24px gap. Each cell: date label (10–12px LamboType uppercase) above headline (16–27px LamboType uppercase), then a full-bleed image below at 0px radius. No card chrome — the image and text float directly on the white canvas with whitespace as the only separator.
+Use a True Black tab with a 1px #262626 border, 4px radius, 12px horizontal padding, 8px gaps between icons and labels, and 12–14px Fog text. Arrange tabs in one tight horizontal row.
 
-### Carousel Navigation Pips
-**Role:** Hero slide indicator and pause control
+### Customer Story Card
+**Role:** Carousel card for customer proof
 
-Bottom-right of hero: two horizontal short lines (active + inactive) at ~40px width, 1–2px height, #ffffff, with a hexagonal pause button outlined in #ffffff. LamboType is not used here — these are pure iconographic elements. Spacing between pips: 24px.
+Build a 10px-radius card with a #262626 1px border, Obsidian Canvas lower content area, and an isolated logo panel above. Use a 12px/400 outlined label chip and 16px body copy; allow the top panel to use a customer-specific light or saturated background without recoloring the core UI.
 
-### Full-Bleed Editorial Image
-**Role:** Large product or lifestyle photograph
+### Feature Mosaic Card
+**Role:** Dark explanatory feature module
 
-100% width, 0px radius, no caption overlay. Photograph extends edge to edge of viewport. Used for car close-ups (leather stitching, badges) and lifestyle shots (circuit, landscape). The image does the talking — no frame, no shadow, no rounded corner.
+Use an Obsidian Canvas panel with 1px #262626 border, 10px radius, 16px padding around copy, and embedded product imagery clipped to the same radius. Pair a 24px/600 Cloud White heading with Fog 16px copy and a Signal Orange 16px/400 text link.
 
-### Event Banner
-**Role:** Promotional or event announcement band
+### Inline Orange Link
+**Role:** Directional content link
 
-Lighter photographic background with overlay text block at left. Headline at 54–80px LamboType uppercase white, supporting body at 16–18px uppercase white, then a Giallo CTA button below. Right side: implicit photographic content. Padding: 40px top/bottom.
+Set Signal Orange #ff8833 at 16px/400 with 20px line height and pair it with a small right arrow. Do not place it in a filled container.
 
-### Date Stamped Card
-**Role:** News or article entry
+### Luminous Polygon Graphic
+**Role:** Hero atmosphere and section-transition artwork
 
-White surface, 0px radius, no border. Date in LamboType 10–12px uppercase #7d7d7d or #969696. Headline in LamboType 16–18px uppercase #202020, 0.0230em letter-spacing. Followed by a 4:3 or 16:9 image at 0px radius. Padding: 24px.
+Use several offset, rotated rounded-square outlines with 10–20px corner rounding, mostly Cloud White strokes, soft black glow, and sparse Solar Spectrum gradient accents. Keep the center hollow and allow blurred duplicate outlines to create depth without turning the graphic into a filled illustration.
 
 ## Do's and Don'ts
 
 ### Do
-- Render every heading in UPPERCASE LamboType at 0.0230em letter-spacing — no exceptions, this is the typographic voice
-- Use #ffc000 Giallo Vivo for exactly one element per screen, almost always the primary action button
-- Alternate between full-bleed #202020 dark surfaces and #ffffff/#f5f5f5 light surfaces section by section to create cinematic pacing
-- Scale display type aggressively: 80–120px for hero statements, 40–54px for section openers, 16–18px for body
-- Keep all radius values at 0px — hard edges are non-negotiable, from buttons to images to cards
-- Use 8px-base spacing multiples (8, 16, 24, 32, 40, 48, 64, 80px) — never break the grid with arbitrary values
-- Separate components with surface color contrast and whitespace, never with shadows or borders
+- Use Obsidian Canvas #0a0a0a as the dominant page background and separate modules with 1px Graphite Edge #262626 borders.
+- Set public navigation and standard buttons in matterFont 14px/500 with a 20px line height.
+- Use the 60px/500, 60px line-height display style with -1.5px tracking only for major hero statements.
+- Use 8px as the default gap between related controls, icons, and compact UI elements.
+- Use 10px radii for cards, product media frames, and navigation shells; use 8px radii for rectangular buttons.
+- Reserve Paper White #e5e5e5 filled controls for high-emphasis conversion moments and use Charcoal Surface #262626 for secondary controls.
+- Use Signal Orange #ff8833 only for inline links and directional text accents.
 
 ### Don't
-- Do not use rounded corners on any element — buttons, images, cards, and badges all sit at 0px radius
-- Do not introduce additional colors beyond #ffc000 and its #917300 variant — the 0% colorfulness is the brand
-- Do not add drop shadows, soft glows, or elevation effects — separation comes from surface color only
-- Do not use more than one weight of LamboType — it ships at 400 only; hierarchy comes from size and uppercase treatment
-- Do not place the Giallo yellow on more than one element per screen — it loses urgency as a signal
-- Do not use lowercase or sentence case for any display or heading text — UPPERCASE is mandatory at 16px and above
-- Do not apply letter-spacing values other than 0.0230em — the uniform tracking is what makes the type system feel engineered
+- Do not use bright blue, yellow, orange, or red as a universal filled button color.
+- Do not place broad white content sections against the Obsidian Canvas background.
+- Do not use radii larger than 10px on product frames or customer cards; reserve 9999px for circular and pill controls.
+- Do not replace #262626 module borders with borderless floating cards.
+- Do not set display headlines in weights above 600 or add loose line spacing to the 60px headline style.
+- Do not use saturated fills for body copy, navigation labels, or dense product-interface text.
+- Do not use soft pastel shadows; use black drop shadows or the muted teal-gray inset frame treatment.
 
 ## Surfaces
 
 | Level | Name | Value | Purpose |
 |-------|------|-------|---------|
-| 0 | Canvas White | `#ffffff` | Default page background for editorial and content sections |
-| 1 | Marble | `#f5f5f5` | Alternate section background, subtle band separator from white canvas |
-| 2 | Carbony | `#202020` | Dark stage for full-bleed heroes, video backgrounds, and product showcase sections |
-| 3 | Carbon Deep | `#181818` | Navigation bar, footer, and slightly darker surface for layering above Carbony |
-| 4 | Pure Black | `#000000` | Terminal contrast surface, body ink, deepest text |
+| 0 | True Black | `#000000` | Media fades, deepest visual recesses, and black overlays |
+| 1 | Obsidian Canvas | `#0a0a0a` | Main page canvas, footer, and card interiors |
+| 2 | Charcoal Surface | `#171717` | Announcement strips, compact control surfaces, and elevated utility elements |
+| 3 | Graphite Edge | `#262626` | Secondary control fills, borders, and structural separators |
 
 ## Elevation
 
-Lamborghini deliberately avoids drop shadows. All visual separation comes from surface color contrast (white → #f5f5f5 → #202020 → #000000) and hairline 1px borders. Components sit flat against the canvas like automotive body panels — no floating cards, no soft glows. This is a hard-edged, industrial aesthetic where shadow would feel decorative and weak.
+- **Floating Primary Navigation:** `rgba(0, 0, 0, 0.25) 0px 4px 4px 0px`
+- **Charcoal Secondary Button:** `rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px`
+- **Product Demo Frame:** `rgba(101, 129, 128, 0.15) 0px 0px 2px 2px inset, rgba(32, 47, 46, 0.15) 0px 0px 4px 4px inset`
+- **Customer Story Card:** `rgba(0, 0, 0, 0.3) 0px 8px 10px 0px`
 
 ## Imagery
 
-Photography is the primary visual language and dominates the interface. Treatment is full-bleed and edge-to-edge with 0px radius — images are never cropped to rounded frames. The hero uses cinematic video and atmospheric photography (tunnels, headlights, road motion) on dark canvases. Product photography is tight, macro-grade detail: leather stitching, embroidered bull logos, body panel curves. Car lineup photography uses track and landscape backgrounds (Imola circuit, open road). Lifestyle and editorial imagery is high-contrast, low-key, often shot at dawn/dusk or in studio lighting. No illustration, no abstract graphics, no icons-as-decoration. Icons are minimal and white-on-dark line icons. The image-to-text ratio is high in heroes, balanced in editorial sections.
+Imagery is product-first and abstract rather than photographic. Large dark code-review screenshots are contained inside thin #262626 frames, heavily blurred or faded at their edges, and overlaid with sparse Cloud White labels; the product UI itself is the visual proof. The hero uses a hollow stack of glowing, rotated rounded-square outlines with blurred white duplicates and occasional yellow-to-blue spectral treatment. Customer cards use flat logo panels with sharp internal horizontal divisions, including white and vivid partner-colored bands. Icons are small, mono, and mostly Cloud White or Fog, with fine outlined strokes.
 
 ## Layout
 
-The page model alternates between full-bleed dark stages and max-width (1440px) contained light sections. The hero is full-viewport with a centered or left-aligned text block sitting over a video/photographic background. Subsequent sections use a centered max-width container with left-aligned text in two-column rows (heading left, link right). Feature and story sections deploy 3-column image grids with 24px gap. Navigation is a fixed dark top bar (64px) with centered logo. Footer is full-width dark. Vertical rhythm uses 80px section gaps with 24px internal element spacing. The overall flow is: dark cinematic hero → light editorial band → dark product showcase → light story grid → dark footer. Sections rarely use visible dividers — surface color contrast alone defines the boundaries.
+The page is a centered, max-width 1152px composition on an uninterrupted #0a0a0a canvas. A narrow announcement bar sits above a contained floating navigation shell; the first screen uses an asymmetric hero with a left-aligned display statement and conversion controls opposite a luminous abstract polygon. Product demonstration media follows as a wide framed module, then customer proof appears as a three-column card carousel. The lower page changes into a compact bordered mosaic: one wide text-and-product panel followed by paired feature cards and further stacked modules, with thin gaps and repeated 10px media corners rather than alternating color bands. The navigation remains visually present as a dark bordered top bar while sections flow beneath it.
 
 ## Agent Prompt Guide
 
 Quick Color Reference:
-- text: #202020 (primary on light), #ffffff (primary on dark)
-- background: #ffffff (light canvas), #202020 (dark stage)
-- border: #969696 (light hairlines), #494949 (darker dividers)
-- accent: #ffc000 (Giallo Vivo — single hit per screen)
-- primary action: no distinct CTA color
+- Obsidian Canvas: #0a0a0a — Page backgrounds, footer backgrounds, dark card interiors
+- True Black: #000000 — Deep media backdrops, product-preview fades, black overlays
+- Charcoal Surface: #171717 — Announcement strips, compact icon controls, elevated dark surfaces
+- Graphite Edge: #262626 — Secondary filled controls, card borders, navigation shell borders, dividers
+- Steel Border: #464646 — Emphasized borders around selected controls and media frames
+- Cloud White: #fafafa — Primary headings, high-emphasis text, icons, strokes, and dark-surface foregrounds
+- Paper White: #e5e5e5 — Filled conversion buttons and pale partner-card surfaces
+- Fog: #a1a1a1 — Navigation labels, secondary body text, subdued interface icons
+- Ash: #737373 — Tertiary labels, inactive icon strokes, focus-ring details
+- Signal Orange: #ff8833 — Inline text links and small directional-arrow accents — the sole warm reading cue within the monochrome interface
+- Solar Spectrum: linear-gradient(90deg, #ffb931 15%, #ffffff 30%, #ffffff 40%, #2e73fc 50%) — Decorative technical linework and animated graphic borders — yellow-to-white-to-blue light turns abstract geometry into an active code signal
 
-Example Component Prompts:
-
-No distinct primary action color was observed; use the extracted neutral button treatments instead of inventing a filled CTA color.
-
-2. Create a section heading block: two-column row on #ffffff background. Left: section name at 54px LamboType weight 400, uppercase, #202020, letter-spacing 0.0230em. Right: discovery link at 12px LamboType weight 400, uppercase, #202020 with right-arrow icon. 80px padding top and bottom. No borders, no shadows.
-
-3. Create a three-column story grid: three equal columns with 24px gap on #ffffff. Each cell: date label at 10px LamboType weight 400, uppercase, #7d7d7d, then headline at 16px LamboType weight 400, uppercase, #202020, then a full-bleed photograph below at 0px radius. 64px section gap above the grid.
-
-
-5. Create a product image tile: full-bleed photograph at 0px radius, no border, no shadow. Below the image: caption in 12px LamboType weight 400, uppercase, #202020, letter-spacing 0.0230em. 24px padding around the tile content. Sits on #ffffff or #f5f5f5 surface.
+Create a left-aligned hero on Obsidian Canvas #0a0a0a with a matterFont 60px/500 headline, 60px line height, -1.5px tracking in Cloud White #fafafa; place a hollow glowing polygon graphic on the right and pair Paper White #e5e5e5 and Graphite Edge #262626 14px/500 buttons below.
+Create a 10px-radius Product Demo Frame in Obsidian Canvas #0a0a0a with a 1px Graphite Edge #262626 border, dark blurred code-review media, a Cloud White overlay label, and compact True Black #000000 feature tabs along the bottom.
+Create three Customer Story Cards in a row with #262626 1px borders, 10px radii, light or partner-color logo panels, Obsidian Canvas #0a0a0a descriptions, 12px labels, and 16px matterFont body copy.
+Create a bordered feature mosaic with an Obsidian Canvas #0a0a0a surface, 10px radius, Cloud White #fafafa 24px/600 title, Fog #a1a1a1 16px copy, embedded dark product UI, and a Signal Orange #ff8833 16px/400 inline link.
 
 ## Similar Brands
 
-- **Ferrari.com** — Same automotive-theater approach: dark cinematic hero with full-bleed video, monospace-tinged uppercase display type, single Rosso Corsa red accent against black-and-white palette, and 0px-radius hard edges throughout
-- **Porsche.com** — Shares the alternating dark hero / light editorial section rhythm, uppercase condensed-style display headlines at 80–120px scale, and a monochromatic palette punctuated by a single brand color (red for Porsche) on CTAs only
-- **Ducati.com** — Both lean into full-bleed dark product photography, uppercase custom sans-serif headlines with uniform letter-spacing, and a minimal component vocabulary — 0px radius buttons, hairline borders, no shadows
-- **Aston Martin** — Luxury automotive restraint: dark cinematic surfaces, uppercase editorial display type, a single accent color (British Racing Green or Aston Martin Green) used only on action elements, generous 80px section spacing
-- **McLaren Automotive** — Industrial engineering aesthetic: dark full-bleed hero stages, uppercase condensed display sans-serif, single vibrant accent (Papaya Orange) as the lone chromatic element, 0px-radius hard-edged component system
+- **Linear** — Dark product showcases, sharply constrained typography, fine dark borders, and bright monochrome conversion controls.
+- **Vercel** — Near-black canvas with white type, restrained surfaces, and product interface media used as the central visual evidence.
+- **Raycast** — Compact dark control treatments, high-contrast interface framing, and occasional luminous abstract graphics.
+- **Warp** — Developer-tool visual language built from dark terminal-like surfaces, framed product captures, and vivid technical accent moments.
 
 ## Quick Start
 
@@ -230,53 +243,59 @@ No distinct primary action color was observed; use the extracted neutral button 
 ```css
 :root {
   /* Colors */
-  --color-giallo-vivo: #ffc000;
-  --color-giallo-ombra: #917300;
-  --color-carbony-black: #202020;
-  --color-pure-black: #000000;
-  --color-carbon-deep: #181818;
-  --color-pearl-white: #ffffff;
-  --color-marble-gray: #f5f5f5;
-  --color-graphite-border: #494949;
-  --color-steel-mid: #7d7d7d;
-  --color-ash-border: #969696;
-  --color-anvil: #313131;
+  --color-obsidian-canvas: #0a0a0a;
+  --color-true-black: #000000;
+  --color-charcoal-surface: #171717;
+  --color-graphite-edge: #262626;
+  --color-steel-border: #464646;
+  --color-cloud-white: #fafafa;
+  --color-paper-white: #e5e5e5;
+  --color-fog: #a1a1a1;
+  --color-ash: #737373;
+  --color-signal-orange: #ff8833;
+  --color-solar-spectrum: #ffb931;
+  --gradient-solar-spectrum: linear-gradient(90deg, #ffb931 15%, #ffffff 30%, #ffffff 40%, #2e73fc 50%);
 
   /* Typography — Font Families */
-  --font-lambotype: 'LamboType', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-open-sans: 'Open Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-matterfont: 'matterFont', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* Typography — Scale */
-  --text-caption: 10px;
-  --leading-caption: 1.5;
-  --tracking-caption: 0.23px;
+  --text-micro-nav: 10px;
+  --leading-micro-nav: 2;
+  --tracking-micro-nav: 0px;
+  --text-caption: 12px;
+  --leading-caption: 1.33;
+  --tracking-caption: 0px;
+  --text-nav-control: 14px;
+  --leading-nav-control: 1.43;
+  --tracking-nav-control: 0px;
   --text-body: 16px;
-  --leading-body: 1.5;
-  --tracking-body: 0.37px;
-  --text-subheading: 18px;
-  --leading-subheading: 1.5;
-  --tracking-subheading: 0.41px;
-  --text-heading-sm: 27px;
-  --leading-heading-sm: 1.37;
-  --tracking-heading-sm: 0.62px;
-  --text-heading: 32px;
-  --leading-heading: 1.38;
-  --tracking-heading: 0.74px;
-  --text-heading-lg: 40px;
-  --leading-heading-lg: 1.19;
-  --tracking-heading-lg: 0.92px;
-  --text-display: 54px;
-  --leading-display: 1.13;
-  --tracking-display: 1.24px;
-  --text-display-lg: 80px;
-  --leading-display-lg: 1;
-  --tracking-display-lg: 1.84px;
-  --text-hero: 120px;
-  --leading-hero: 0.92;
-  --tracking-hero: 2.76px;
+  --leading-body: 1.25;
+  --tracking-body: 0px;
+  --text-body-relaxed: 16px;
+  --leading-body-relaxed: 1.5;
+  --tracking-body-relaxed: 0px;
+  --text-body-large: 18px;
+  --leading-body-large: 1.25;
+  --tracking-body-large: 0px;
+  --text-subheading: 20px;
+  --leading-subheading: 1.4;
+  --tracking-subheading: 0px;
+  --text-feature-heading: 24px;
+  --leading-feature-heading: 1.17;
+  --tracking-feature-heading: 0px;
+  --text-section-heading: 36px;
+  --leading-section-heading: 1.11;
+  --tracking-section-heading: 0px;
+  --text-display: 60px;
+  --leading-display: 1;
+  --tracking-display: -1.5px;
 
   /* Typography — Weights */
   --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   /* Spacing */
   --spacing-unit: 8px;
@@ -284,31 +303,54 @@ No distinct primary action color was observed; use the extracted neutral button 
   --spacing-16: 16px;
   --spacing-24: 24px;
   --spacing-32: 32px;
-  --spacing-40: 40px;
   --spacing-48: 48px;
   --spacing-56: 56px;
   --spacing-64: 64px;
-  --spacing-80: 80px;
-  --spacing-160: 160px;
+  --spacing-72: 72px;
+  --spacing-128: 128px;
+  --spacing-224: 224px;
 
   /* Layout */
-  --page-max-width: 1440px;
-  --section-gap: 80px;
-  --card-padding: 24px;
-  --element-gap: 24px;
+  --page-max-width: 1152px;
+  --section-gap: 224px;
+  --card-padding: 16px;
+  --element-gap: 8px;
+
+  /* Border Radius */
+  --radius-md: 4px;
+  --radius-lg: 10px;
+  --radius-2xl: 16px;
+  --radius-2xl-2: 20px;
+  --radius-3xl: 24px;
+  --radius-3xl-2: 27px;
+  --radius-full: 300px;
+  --radius-full-2: 9999px;
 
   /* Named Radii */
-  --radius-cards: 0px;
-  --radius-badges: 0px;
-  --radius-images: 0px;
-  --radius-buttons: 0px;
+  --radius-cards: 10px;
+  --radius-pills: 9999px;
+  --radius-badges: 20px;
+  --radius-images: 10px;
+  --radius-inputs: 10px;
+  --radius-buttons: 8px;
+  --radius-mediaframes: 10px;
+
+  /* Shadows */
+  --shadow-sm: rgba(0, 0, 0, 0.25) 0px 4px 4px 0px;
+  --shadow-subtle: rgba(101, 129, 128, 0.15) 0px 0px 2px 2px inset, rgba(32, 47, 46, 0.15) 0px 0px 4px 4px inset;
+  --shadow-subtle-2: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+  --shadow-md: rgba(0, 0, 0, 0.3) 0px 8px 10px 0px;
+  --shadow-subtle-3: rgb(255, 255, 255) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.1) 0px -2px 6px 0px inset;
+  --shadow-sm-2: rgb(0, 0, 0) 0px 0px 8px 8px;
+  --shadow-sm-3: rgba(0, 0, 0, 0.5) 0px 0px 8px 8px;
+  --shadow-sm-4: oklab(0.268999 -0.00000260025 0.00000627339) 0px 2px 4px 0px inset;
+  --shadow-md-2: lab(15.204 0 -0.00000596046) 0px 0px 12px 0px inset;
 
   /* Surfaces */
-  --surface-canvas-white: #ffffff;
-  --surface-marble: #f5f5f5;
-  --surface-carbony: #202020;
-  --surface-carbon-deep: #181818;
-  --surface-pure-black: #000000;
+  --surface-true-black: #000000;
+  --surface-obsidian-canvas: #0a0a0a;
+  --surface-charcoal-surface: #171717;
+  --surface-graphite-edge: #262626;
 }
 ```
 
@@ -317,61 +359,84 @@ No distinct primary action color was observed; use the extracted neutral button 
 ```css
 @theme {
   /* Colors */
-  --color-giallo-vivo: #ffc000;
-  --color-giallo-ombra: #917300;
-  --color-carbony-black: #202020;
-  --color-pure-black: #000000;
-  --color-carbon-deep: #181818;
-  --color-pearl-white: #ffffff;
-  --color-marble-gray: #f5f5f5;
-  --color-graphite-border: #494949;
-  --color-steel-mid: #7d7d7d;
-  --color-ash-border: #969696;
-  --color-anvil: #313131;
+  --color-obsidian-canvas: #0a0a0a;
+  --color-true-black: #000000;
+  --color-charcoal-surface: #171717;
+  --color-graphite-edge: #262626;
+  --color-steel-border: #464646;
+  --color-cloud-white: #fafafa;
+  --color-paper-white: #e5e5e5;
+  --color-fog: #a1a1a1;
+  --color-ash: #737373;
+  --color-signal-orange: #ff8833;
+  --color-solar-spectrum: #ffb931;
 
   /* Typography */
-  --font-lambotype: 'LamboType', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-open-sans: 'Open Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-matterfont: 'matterFont', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* Typography — Scale */
-  --text-caption: 10px;
-  --leading-caption: 1.5;
-  --tracking-caption: 0.23px;
+  --text-micro-nav: 10px;
+  --leading-micro-nav: 2;
+  --tracking-micro-nav: 0px;
+  --text-caption: 12px;
+  --leading-caption: 1.33;
+  --tracking-caption: 0px;
+  --text-nav-control: 14px;
+  --leading-nav-control: 1.43;
+  --tracking-nav-control: 0px;
   --text-body: 16px;
-  --leading-body: 1.5;
-  --tracking-body: 0.37px;
-  --text-subheading: 18px;
-  --leading-subheading: 1.5;
-  --tracking-subheading: 0.41px;
-  --text-heading-sm: 27px;
-  --leading-heading-sm: 1.37;
-  --tracking-heading-sm: 0.62px;
-  --text-heading: 32px;
-  --leading-heading: 1.38;
-  --tracking-heading: 0.74px;
-  --text-heading-lg: 40px;
-  --leading-heading-lg: 1.19;
-  --tracking-heading-lg: 0.92px;
-  --text-display: 54px;
-  --leading-display: 1.13;
-  --tracking-display: 1.24px;
-  --text-display-lg: 80px;
-  --leading-display-lg: 1;
-  --tracking-display-lg: 1.84px;
-  --text-hero: 120px;
-  --leading-hero: 0.92;
-  --tracking-hero: 2.76px;
+  --leading-body: 1.25;
+  --tracking-body: 0px;
+  --text-body-relaxed: 16px;
+  --leading-body-relaxed: 1.5;
+  --tracking-body-relaxed: 0px;
+  --text-body-large: 18px;
+  --leading-body-large: 1.25;
+  --tracking-body-large: 0px;
+  --text-subheading: 20px;
+  --leading-subheading: 1.4;
+  --tracking-subheading: 0px;
+  --text-feature-heading: 24px;
+  --leading-feature-heading: 1.17;
+  --tracking-feature-heading: 0px;
+  --text-section-heading: 36px;
+  --leading-section-heading: 1.11;
+  --tracking-section-heading: 0px;
+  --text-display: 60px;
+  --leading-display: 1;
+  --tracking-display: -1.5px;
 
   /* Spacing */
   --spacing-8: 8px;
   --spacing-16: 16px;
   --spacing-24: 24px;
   --spacing-32: 32px;
-  --spacing-40: 40px;
   --spacing-48: 48px;
   --spacing-56: 56px;
   --spacing-64: 64px;
-  --spacing-80: 80px;
-  --spacing-160: 160px;
+  --spacing-72: 72px;
+  --spacing-128: 128px;
+  --spacing-224: 224px;
+
+  /* Border Radius */
+  --radius-md: 4px;
+  --radius-lg: 10px;
+  --radius-2xl: 16px;
+  --radius-2xl-2: 20px;
+  --radius-3xl: 24px;
+  --radius-3xl-2: 27px;
+  --radius-full: 300px;
+  --radius-full-2: 9999px;
+
+  /* Shadows */
+  --shadow-sm: rgba(0, 0, 0, 0.25) 0px 4px 4px 0px;
+  --shadow-subtle: rgba(101, 129, 128, 0.15) 0px 0px 2px 2px inset, rgba(32, 47, 46, 0.15) 0px 0px 4px 4px inset;
+  --shadow-subtle-2: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+  --shadow-md: rgba(0, 0, 0, 0.3) 0px 8px 10px 0px;
+  --shadow-subtle-3: rgb(255, 255, 255) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.1) 0px -2px 6px 0px inset;
+  --shadow-sm-2: rgb(0, 0, 0) 0px 0px 8px 8px;
+  --shadow-sm-3: rgba(0, 0, 0, 0.5) 0px 0px 8px 8px;
+  --shadow-sm-4: oklab(0.268999 -0.00000260025 0.00000627339) 0px 2px 4px 0px inset;
+  --shadow-md-2: lab(15.204 0 -0.00000596046) 0px 0px 12px 0px inset;
 }
 ```
