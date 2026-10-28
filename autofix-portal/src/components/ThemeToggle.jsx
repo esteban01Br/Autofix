@@ -14,6 +14,7 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', tema);
+    document.documentElement.style.colorScheme = tema === 'light' ? 'light' : 'dark';
     localStorage.setItem(STORAGE_KEY, tema);
   }, [tema]);
 
@@ -21,7 +22,7 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={() => setTema((t) => (t === 'dark' ? 'light' : 'dark'))}
-      className="btn-frosted inline-flex h-9 w-9 items-center justify-center p-0"
+      className="btn-frosted inline-flex h-9 w-9 items-center justify-center p-0 rounded-lg"
       aria-label={tema === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
       title={tema === 'dark' ? 'Modo claro' : 'Modo oscuro'}
     >

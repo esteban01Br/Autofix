@@ -92,11 +92,11 @@ export default function Acceso() {
                 <img
                   src={empresa.logo_url}
                   alt={empresa.nombre}
-                  className="relative h-16 w-16 rounded-2xl border border-white/10 object-cover shadow-xl"
+                  className="relative h-16 w-16 rounded-2xl border border-border object-cover shadow-xl"
                 />
               ) : (
                 <span
-                  className="relative flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-medium text-white shadow-xl ring-1 ring-white/15"
+                  className="relative flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-medium text-white shadow-xl ring-1 ring-accent/40"
                   style={{ background: empresa.color_primario }}
                   aria-hidden="true"
                 >
