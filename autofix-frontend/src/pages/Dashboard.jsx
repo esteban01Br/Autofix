@@ -2,12 +2,22 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
+  BarChart3,
+  Building2,
   Calendar,
   Car,
   ChevronRight,
+  ClipboardList,
+  FileText,
+  LayoutDashboard,
   Package,
   Receipt,
+  ShieldCheck,
   Sparkles,
+  Store,
+  Truck,
+  UserCog,
+  Users,
   Wrench,
 } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
@@ -24,12 +34,12 @@ import {
 } from '../services/dashboardService';
 
 const SEGMENTOS_ESTADO = [
-  { estado: 'RECIBIDO', color: '#6ea8ff' },
-  { estado: 'DIAGNOSTICO', color: '#a78bfa' },
-  { estado: 'EN_REPARACION', color: '#663af3' },
-  { estado: 'ESPERANDO_REPUESTOS', color: '#e46d4c' },
-  { estado: 'LISTO', color: '#35d39a' },
-  { estado: 'ENTREGADO', color: '#6b7385' },
+  { estado: 'RECIBIDO', color: '#a1a1a1' },
+  { estado: 'DIAGNOSTICO', color: '#737373' },
+  { estado: 'EN_REPARACION', color: '#fafafa' },
+  { estado: 'ESPERANDO_REPUESTOS', color: '#ff8833' },
+  { estado: 'LISTO', color: '#e5e5e5' },
+  { estado: 'ENTREGADO', color: '#464646' },
 ];
 
 const ACCIONES = [
@@ -56,6 +66,46 @@ const ACCIONES = [
     to: '/repuestos',
     icon: Package,
     roles: ['ADMIN', 'GERENTE', 'BODEGUERO'],
+  },
+];
+
+const MODULOS = [
+  {
+    titulo: 'General',
+    items: [
+      { to: '/dashboard', label: 'Panel', icon: LayoutDashboard, roles: ['SUPERADMIN', 'ADMIN', 'GERENTE', 'ASESOR', 'MECANICO', 'BODEGUERO', 'CAJERO', 'CLIENTE'], desc: 'Vista general del taller' },
+      { to: '/empresas', label: 'Empresas', icon: Building2, roles: ['SUPERADMIN'], desc: 'Gestión multi-empresa' },
+      { to: '/mi-empresa', label: 'Mi empresa', icon: Store, roles: ['ADMIN', 'GERENTE'], desc: 'Configuración de taller' },
+    ],
+  },
+  {
+    titulo: 'Operación',
+    items: [
+      { to: '/clientes', label: 'Clientes', icon: UserCog, roles: ['ADMIN', 'GERENTE', 'ASESOR', 'MECANICO'], desc: 'Base de clientes' },
+      { to: '/vehiculos', label: 'Vehículos', icon: Car, roles: ['ADMIN', 'GERENTE', 'ASESOR', 'MECANICO', 'CLIENTE'], desc: 'Registro de vehículos' },
+      { to: '/citas', label: 'Citas', icon: Calendar, roles: ['ADMIN', 'GERENTE', 'ASESOR', 'MECANICO', 'CLIENTE'], desc: 'Agenda del taller' },
+      { to: '/ordenes', label: 'Órdenes', icon: Wrench, roles: ['ADMIN', 'GERENTE', 'ASESOR', 'MECANICO'], desc: 'Órdenes de trabajo' },
+      { to: '/mis-ordenes', label: 'Mis Órdenes', icon: Wrench, roles: ['MECANICO'], desc: 'Órdenes asignadas' },
+      { to: '/repuestos', label: 'Repuestos', icon: Package, roles: ['ADMIN', 'GERENTE', 'BODEGUERO', 'MECANICO'], desc: 'Inventario de repuestos' },
+      { to: '/proveedores', label: 'Proveedores', icon: Truck, roles: ['ADMIN', 'GERENTE', 'BODEGUERO'], desc: 'Proveedores' },
+      { to: '/servicios', label: 'Servicios', icon: ClipboardList, roles: ['ADMIN', 'GERENTE', 'ASESOR'], desc: 'Catálogo de servicios' },
+      { to: '/cotizaciones', label: 'Cotizaciones', icon: FileText, roles: ['ADMIN', 'GERENTE'], desc: 'Presupuestos' },
+    ],
+  },
+  {
+    titulo: 'Equipo',
+    items: [
+      { to: '/usuarios', label: 'Usuarios', icon: Users, roles: ['ADMIN', 'GERENTE'], desc: 'Gestión de usuarios' },
+      { to: '/mecanicos', label: 'Mecánicos', icon: Wrench, roles: ['ADMIN', 'GERENTE'], desc: 'Equipo mecánico' },
+      { to: '/productividad', label: 'Productividad', icon: BarChart3, roles: ['ADMIN', 'GERENTE'], desc: 'Indicadores' },
+    ],
+  },
+  {
+    titulo: 'Administración',
+    items: [
+      { to: '/facturas', label: 'Facturas', icon: Receipt, roles: ['ADMIN', 'GERENTE', 'CAJERO'], desc: 'Facturación y cobros' },
+      { to: '/auditoria', label: 'Auditoría', icon: ShieldCheck, roles: ['ADMIN', 'GERENTE'], desc: 'Trazabilidad' },
+    ],
   },
 ];
 
@@ -87,7 +137,7 @@ function DonaEstados({ segmentos, total }) {
             cy="50"
             r="42"
             fill="none"
-            stroke="var(--color-surface-hover)"
+            stroke="var(--color-graphite-edge)"
             strokeWidth="11"
           />
           {segmentos.map(({ estado, color, cantidad }) => {
@@ -112,8 +162,8 @@ function DonaEstados({ segmentos, total }) {
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-display text-2xl font-bold text-text-primary">{total}</span>
-          <span className="text-[10px] uppercase tracking-[0.14em] text-text-secondary">
+          <span className="font-display text-2xl font-medium text-[var(--color-cloud-white)]">{total}</span>
+          <span className="text-[10px] uppercase tracking-[0.14em] text-[var(--color-fog)]">
             Órdenes
           </span>
         </div>
@@ -126,11 +176,11 @@ function DonaEstados({ segmentos, total }) {
               className="h-2 w-2 shrink-0 rounded-full"
               style={{ background: color }}
             />
-            <span className="flex-1 truncate text-text-secondary">
+            <span className="flex-1 truncate text-[var(--color-fog)]">
               {etiquetaEstado(estado)}
             </span>
-            <span className="font-mono font-semibold text-text-primary">{cantidad}</span>
-            <span className="w-9 text-right text-text-secondary">
+            <span className="font-mono font-semibold text-[var(--color-cloud-white)]">{cantidad}</span>
+            <span className="w-9 text-right text-[var(--color-fog)]">
               {Math.round((cantidad / total) * 100)}%
             </span>
           </li>
@@ -144,15 +194,15 @@ function TituloPanel({ titulo, subtitulo, to, navigate }) {
   return (
     <div className="mb-4 flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <h3 className="font-display text-lg font-semibold tracking-wide text-text-primary">
+        <h3 className="font-display text-lg font-medium tracking-tight text-[var(--color-cloud-white)]">
           {titulo}
         </h3>
-        {subtitulo && <p className="mt-0.5 text-xs text-text-secondary">{subtitulo}</p>}
+        {subtitulo && <p className="mt-0.5 text-xs text-[var(--color-fog)]">{subtitulo}</p>}
       </div>
       {to && (
         <button
           onClick={() => navigate(to)}
-          className="group inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-text-secondary transition-colors hover:text-accent"
+          className="group inline-flex shrink-0 items-center gap-1 text-xs font-medium text-[var(--color-fog)] transition-colors hover:text-[var(--color-signal-orange)]"
         >
           Ver todo
           <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
@@ -309,7 +359,7 @@ export default function Dashboard() {
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[0, 1, 2, 3].map((indice) => (
-            <div key={indice} className="card p-5">
+            <div key={indice} className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-5">
               <Skeleton className="h-3 w-24" />
               <Skeleton className="mt-3 h-8 w-16" />
               <Skeleton className="mt-3 h-3 w-full" />
@@ -318,7 +368,7 @@ export default function Dashboard() {
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
           {[0, 1, 2].map((indice) => (
-            <div key={indice} className="card p-5">
+            <div key={indice} className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-5">
               <Skeleton className="h-4 w-40" />
               <Skeleton className="mt-4 h-36 w-full" />
             </div>
@@ -330,7 +380,7 @@ export default function Dashboard() {
 
   if (estado.error) {
     return (
-      <div className="card flex items-center gap-3 border-danger/30 bg-danger/5 p-8 text-danger">
+      <div className="flex items-center gap-3 rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-8 text-[var(--color-signal-orange)]">
         <AlertTriangle size={18} />
         {estado.error}
       </div>
@@ -361,14 +411,14 @@ export default function Dashboard() {
       {/* Encabezado */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">
+          <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--color-signal-orange)]">
             <Sparkles size={12} /> Panel de control
           </p>
-          <h1 className="mt-1 font-display text-3xl font-medium tracking-tight text-text-primary">
+          <h1 className="mt-1 font-display text-3xl font-medium tracking-tight text-[var(--color-cloud-white)]">
             {saludo},{' '}
-            <span className="texto-degradado">{nombreCorto || 'equipo'}</span>
+            <span className="text-[var(--color-cloud-white)]">{nombreCorto || 'equipo'}</span>
           </h1>
-          <p className="mt-1 text-sm text-text-secondary first-letter:uppercase">
+          <p className="mt-1 text-sm text-[var(--color-fog)] first-letter:uppercase">
             {fechaLarga} · {ordenesAbiertas.length} órdenes abiertas ·{' '}
             {citasProximas.length} citas próximas
           </p>
@@ -379,9 +429,9 @@ export default function Dashboard() {
             <button
               key={to}
               onClick={() => navigate(to)}
-              className="btn btn-ghost btn-sm group hover:border-accent/40 hover:text-accent"
+              className="inline-flex items-center gap-2 rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-4 py-1.5 text-sm font-medium text-[var(--color-cloud-white)] transition-colors hover:border-[var(--color-steel-border)] hover:bg-[#1f1f1f]"
             >
-              <Icon size={15} className="transition-transform group-hover:scale-110" />
+              <Icon size={15} className="transition-transform" />
               {label}
             </button>
           ))}
@@ -390,42 +440,50 @@ export default function Dashboard() {
 
       {/* Indicadores */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard
-          titulo="Vehículos"
-          valor={datos.vehiculos.length}
-          icon={Car}
-          acento
-          detalle="Registrados en el taller"
-          onClick={() => navigate('/vehiculos')}
-        />
-        <MetricCard
-          titulo="Órdenes abiertas"
-          valor={ordenesAbiertas.length}
-          icon={Wrench}
-          detalle={`${datos.ordenes.length} en el historial`}
-          serie={serieOrdenes}
-          onClick={() => navigate('/ordenes')}
-        />
-        <MetricCard
-          titulo="Citas próximas"
-          valor={citasProximas.length}
-          icon={Calendar}
-          acento
-          detalle="Pendientes o confirmadas"
-          onClick={() => navigate('/citas')}
-        />
-        <MetricCard
-          titulo="Stock crítico"
-          valor={alertasStock.length}
-          icon={Package}
-          detalle="Repuestos por reponer"
-          onClick={() => navigate('/repuestos')}
-        />
+        <div className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] transition-colors hover:border-[var(--color-steel-border)]">
+          <MetricCard
+            titulo="Vehículos"
+            valor={datos.vehiculos.length}
+            icon={Car}
+            acento={false}
+            detalle="Registrados en el taller"
+            onClick={() => navigate('/vehiculos')}
+          />
+        </div>
+        <div className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] transition-colors hover:border-[var(--color-steel-border)]">
+          <MetricCard
+            titulo="Órdenes abiertas"
+            valor={ordenesAbiertas.length}
+            icon={Wrench}
+            detalle={`${datos.ordenes.length} en el historial`}
+            serie={serieOrdenes}
+            onClick={() => navigate('/ordenes')}
+          />
+        </div>
+        <div className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] transition-colors hover:border-[var(--color-steel-border)]">
+          <MetricCard
+            titulo="Citas próximas"
+            valor={citasProximas.length}
+            icon={Calendar}
+            acento={false}
+            detalle="Pendientes o confirmadas"
+            onClick={() => navigate('/citas')}
+          />
+        </div>
+        <div className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] transition-colors hover:border-[var(--color-steel-border)]">
+          <MetricCard
+            titulo="Stock crítico"
+            valor={alertasStock.length}
+            icon={Package}
+            detalle="Repuestos por reponer"
+            onClick={() => navigate('/repuestos')}
+          />
+        </div>
       </div>
 
       {/* Segunda fila */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="card card-hover p-5">
+        <div className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-5">
           <TituloPanel
             titulo="Flujo de órdenes"
             subtitulo="Distribución por estado"
@@ -445,7 +503,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="card card-hover p-5">
+        <div className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-5">
           <TituloPanel
             titulo="Próximas citas"
             subtitulo="Agenda del taller"
@@ -467,21 +525,21 @@ export default function Dashboard() {
                 return (
                   <li
                     key={cita.id}
-                    className="group flex items-center gap-3 rounded-lg border border-border bg-base-bg/40 px-3 py-2.5 transition-colors hover:border-accent/30 hover:bg-surface-hover"
+                    className="group flex items-center gap-3 rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-3 py-2.5 transition-colors hover:border-[var(--color-steel-border)]"
                   >
-                    <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-lg bg-surface-hover">
-                      <span className="font-display text-sm font-bold leading-none text-text-primary">
+                    <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)]">
+                      <span className="font-display text-sm font-medium leading-none text-[var(--color-cloud-white)]">
                         {fecha.getDate()}
                       </span>
-                      <span className="text-[9px] uppercase tracking-wide text-text-secondary">
+                      <span className="text-[9px] uppercase tracking-wide text-[var(--color-fog)]">
                         {fecha.toLocaleDateString('es-CO', { month: 'short' }).replace('.', '')}
                       </span>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-text-primary">
+                      <p className="truncate text-sm font-medium text-[var(--color-cloud-white)]">
                         {cita.clienteNombre ?? 'Cliente'}
                       </p>
-                      <p className="truncate text-xs text-text-secondary">
+                      <p className="truncate text-xs text-[var(--color-fog)]">
                         {cita.vehiculoPlaca ?? 'Sin vehículo'} · {cita.hora?.slice(0, 5)}
                       </p>
                     </div>
@@ -493,7 +551,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="card card-hover p-5">
+        <div className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-5">
           <TituloPanel
             titulo="Alertas de inventario"
             subtitulo="Repuestos en el mínimo"
@@ -502,11 +560,11 @@ export default function Dashboard() {
           />
           {alertasStock.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-center">
-              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-success-glow text-success">
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] text-[var(--color-fog)]">
                 <Package size={22} />
               </div>
-              <p className="text-sm font-medium text-text-primary">Inventario al día</p>
-              <p className="mt-1 text-xs text-text-secondary">
+              <p className="text-sm font-medium text-[var(--color-cloud-white)]">Inventario al día</p>
+              <p className="mt-1 text-xs text-[var(--color-fog)]">
                 Ningún repuesto está por debajo del mínimo.
               </p>
             </div>
@@ -516,25 +574,25 @@ export default function Dashboard() {
                 {alertasStock.slice(0, 4).map((repuesto) => (
                   <li
                     key={repuesto.id}
-                    className="flex items-center gap-3 rounded-lg border border-border bg-base-bg/40 px-3 py-2.5"
+                    className="flex items-center gap-3 rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-3 py-2.5"
                   >
                     <AlertTriangle
                       size={15}
                       className={`shrink-0 ${
-                        repuesto.stock === 0 ? 'text-danger' : 'text-warning'
+                        repuesto.stock === 0 ? 'text-[var(--color-signal-orange)]' : 'text-[var(--color-fog)]'
                       }`}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm text-text-primary">{repuesto.nombre}</p>
-                      <p className="text-xs text-text-secondary">
+                      <p className="truncate text-sm text-[var(--color-cloud-white)]">{repuesto.nombre}</p>
+                      <p className="text-xs text-[var(--color-fog)]">
                         Stock actual: {repuesto.stock}
                       </p>
                     </div>
                     <span
-                      className={`badge ${
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide ${
                         repuesto.stock === 0
-                          ? 'bg-danger-glow text-danger'
-                          : 'bg-warning-glow text-warning'
+                          ? 'border border-[var(--color-graphite-edge)] text-[var(--color-signal-orange)]'
+                          : 'border border-[var(--color-graphite-edge)] text-[var(--color-fog)]'
                       }`}
                     >
                       {repuesto.stock === 0 ? 'Agotado' : 'Bajo'}
@@ -543,7 +601,7 @@ export default function Dashboard() {
                 ))}
               </ul>
               {alertasStock.length > 4 && (
-                <p className="mt-3 text-center text-xs text-text-secondary">
+                <p className="mt-3 text-center text-xs text-[var(--color-fog)]">
                   y {alertasStock.length - 4} repuestos más por reponer
                 </p>
               )}
@@ -554,7 +612,7 @@ export default function Dashboard() {
 
       {/* Tercera fila */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="card p-5 lg:col-span-2">
+        <div className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-5 lg:col-span-2">
           <TituloPanel
             titulo="Órdenes recientes"
             subtitulo="Últimos ingresos al taller"
@@ -574,7 +632,7 @@ export default function Dashboard() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-sm">
                 <thead>
-                  <tr className="border-b border-border text-left text-text-secondary">
+                  <tr className="border-b border-[var(--color-graphite-edge)] text-left text-[var(--color-fog)]">
                     <th className="pb-2 font-medium">ID</th>
                     <th className="pb-2 font-medium">Estado</th>
                     <th className="pb-2 font-medium">Vehículo</th>
@@ -582,23 +640,23 @@ export default function Dashboard() {
                     <th className="pb-2 text-right font-medium">Acción</th>
                   </tr>
                 </thead>
-                <tbody className="text-text-primary">
+                <tbody className="text-[var(--color-cloud-white)]">
                   {datos.ordenes
                     .slice(-5)
                     .reverse()
                     .map((orden) => (
                       <tr
                         key={orden.id}
-                        className="border-b border-border last:border-0 hover:bg-surface-hover"
+                        className="border-b border-[var(--color-graphite-edge)] last:border-0 hover:bg-[#151515]"
                       >
-                        <td className="py-2.5 font-mono text-text-secondary">#{orden.id}</td>
+                        <td className="py-2.5 font-mono text-[var(--color-fog)]">#{orden.id}</td>
                         <td className="py-2.5">
                           <Badge valor={orden.estado} />
                         </td>
-                        <td className="py-2.5 font-mono text-accent">
+                        <td className="py-2.5 font-mono text-[var(--color-cloud-white)]">
                           {orden.vehiculoPlaca ?? '—'}
                         </td>
-                        <td className="py-2.5 text-text-secondary">
+                        <td className="py-2.5 text-[var(--color-fog)]">
                           {orden.fechaIngreso
                             ? new Date(orden.fechaIngreso).toLocaleDateString('es-CO')
                             : '—'}
@@ -606,7 +664,7 @@ export default function Dashboard() {
                         <td className="py-2.5 text-right">
                           <button
                             onClick={() => navigate('/ordenes')}
-                            className="inline-flex items-center gap-1 text-sm text-steel transition-colors hover:text-accent"
+                            className="inline-flex items-center gap-1 text-sm text-[var(--color-fog)] transition-colors hover:text-[var(--color-signal-orange)]"
                           >
                             Detalle
                             <ChevronRight size={14} />
@@ -622,42 +680,42 @@ export default function Dashboard() {
 
         <div className="space-y-4">
           {facturacion && (
-            <div className="card overflow-hidden">
-              <div className="border-b border-border bg-gradient-to-br from-accent-glow to-transparent p-5">
-                <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+            <div className="overflow-hidden rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)]">
+              <div className="border-b border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] p-5">
+                <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--color-fog)]">
                   <Receipt size={12} /> Facturación del mes
                 </p>
-                <p className="mt-1.5 font-display text-3xl font-bold text-text-primary">
+                <p className="mt-1.5 font-display text-3xl font-medium text-[var(--color-cloud-white)]">
                   {moneda.format(facturacion.totalMes)}
                 </p>
-                <p className="mt-0.5 text-xs text-text-secondary">
+                <p className="mt-0.5 text-xs text-[var(--color-fog)]">
                   {facturacion.cantidadMes} facturas emitidas · {facturacion.pendientes} por cobrar
                 </p>
               </div>
               <div className="space-y-3 p-5">
                 <div>
                   <div className="mb-1 flex items-center justify-between text-xs">
-                    <span className="text-text-secondary">Recaudado</span>
-                    <span className="font-semibold text-text-primary">
+                    <span className="text-[var(--color-fog)]">Recaudado</span>
+                    <span className="font-semibold text-[var(--color-cloud-white)]">
                       {facturacion.porcentaje}%
                     </span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-surface-hover">
+                  <div className="h-2 overflow-hidden rounded-full bg-[var(--color-graphite-edge)]">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-success/70 to-success transition-all duration-700"
+                      className="h-full rounded-full bg-[var(--color-cloud-white)] transition-all duration-700"
                       style={{ width: `${facturacion.porcentaje}%` }}
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-between rounded-lg bg-surface-hover/60 px-3 py-2">
-                  <span className="text-xs text-text-secondary">Cartera pendiente</span>
-                  <span className="font-mono text-sm font-semibold text-warning">
+                <div className="flex items-center justify-between rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-3 py-2">
+                  <span className="text-xs text-[var(--color-fog)]">Cartera pendiente</span>
+                  <span className="font-mono text-sm font-semibold text-[var(--color-cloud-white)]">
                     {moneda.format(facturacion.cartera)}
                   </span>
                 </div>
                 <button
                   onClick={() => navigate('/facturas')}
-                  className="btn btn-ghost btn-sm w-full"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-4 py-1.5 text-sm font-medium text-[var(--color-cloud-white)] transition-colors hover:border-[var(--color-steel-border)] hover:bg-[#1f1f1f]"
                 >
                   Ver facturación
                   <ChevronRight size={14} />
@@ -666,27 +724,27 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="card p-5">
-            <h3 className="mb-3 font-display text-lg font-semibold tracking-wide text-text-primary">
+          <div className="rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-5">
+            <h3 className="mb-3 font-display text-lg font-medium tracking-tight text-[var(--color-cloud-white)]">
               Resumen rápido
             </h3>
-            <ul className="divide-y divide-border">
+            <ul className="divide-y divide-[var(--color-graphite-edge)]">
               {resumenRapido.map((fila) => (
                 <li key={fila.label}>
                   <button
                     onClick={() => navigate(fila.to)}
                     className="group flex w-full items-center justify-between gap-3 py-2.5 text-left"
                   >
-                    <span className="text-sm text-text-secondary transition-colors group-hover:text-text-primary">
+                    <span className="text-sm text-[var(--color-fog)] transition-colors group-hover:text-[var(--color-cloud-white)]">
                       {fila.label}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="font-display text-lg font-bold text-text-primary">
+                      <span className="font-display text-lg font-medium text-[var(--color-cloud-white)]">
                         {fila.valor}
                       </span>
                       <ChevronRight
                         size={14}
-                        className="text-text-secondary transition-transform group-hover:translate-x-0.5 group-hover:text-accent"
+                        className="text-[var(--color-fog)] transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-signal-orange)]"
                       />
                     </span>
                   </button>
@@ -694,6 +752,51 @@ export default function Dashboard() {
               ))}
             </ul>
           </div>
+        </div>
+      </div>
+
+      {/* Módulos del sistema */}
+      <div className="space-y-4">
+        <div>
+          <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--color-signal-orange)]">
+            <LayoutDashboard size={12} /> Módulos del sistema
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-medium tracking-tight text-[var(--color-cloud-white)]">
+            Todos los servicios
+          </h2>
+          <p className="mt-1 text-sm text-[var(--color-fog)]">
+            Acceso rápido a todos los módulos disponibles para tu rol
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {MODULOS.map((seccion) => {
+            const itemsVisibles = seccion.items.filter((item) => item.roles.includes(usuario?.rol));
+            if (itemsVisibles.length === 0) return null;
+            return (
+              <div key={seccion.titulo}>
+                <h3 className="mb-3 text-sm font-medium text-[var(--color-fog)]">{seccion.titulo}</h3>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {itemsVisibles.map(({ to, label, icon: Icon, desc }) => (
+                    <button
+                      key={to}
+                      onClick={() => navigate(to)}
+                      className="group flex items-start gap-3 rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-4 text-left transition-all hover:border-[var(--color-steel-border)] hover:bg-[#151515]"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] text-[var(--color-cloud-white)] transition-colors group-hover:border-[var(--color-steel-border)]">
+                        <Icon size={18} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-[var(--color-cloud-white)]">{label}</p>
+                        {desc && <p className="mt-0.5 text-xs text-[var(--color-fog)]">{desc}</p>}
+                      </div>
+                      <ChevronRight size={16} className="mt-0.5 shrink-0 text-[var(--color-ash)] transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-signal-orange)]" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
