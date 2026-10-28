@@ -10,6 +10,7 @@ const temaInicial = temaGuardado === 'light' || temaGuardado === 'dark'
   ? temaGuardado
   : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
 document.documentElement.setAttribute('data-theme', temaInicial);
+document.documentElement.style.colorScheme = temaInicial === 'light' ? 'light' : 'dark';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

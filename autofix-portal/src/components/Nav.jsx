@@ -4,13 +4,13 @@ import ThemeToggle from './ThemeToggle';
 
 export default function Nav({ compacto = false }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface-glass backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
+    <header className="sticky top-0 z-50 border-b border-border bg-surface-glass backdrop-blur-xl">
+      <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-4 px-6">
         <Link to="/" className="group flex items-center gap-2.5">
-          <span className="marca-violeta flex h-9 w-9 items-center justify-center rounded-full text-white transition-transform group-hover:scale-105 group-hover:-rotate-3">
+          <span className="marca-violeta flex h-10 w-10 items-center justify-center rounded-full text-white transition-transform group-hover:scale-105 group-hover:-rotate-3">
             <Wrench size={17} strokeWidth={2.4} />
           </span>
-          <span className="font-display text-2xl font-medium tracking-tight">
+          <span className="font-display text-[1.6rem] font-medium tracking-tight leading-none">
             Auto<span className="texto-degradado">Fix</span>
           </span>
           <span className="badge hidden border border-border bg-surface text-frost sm:inline-flex">
@@ -39,11 +39,11 @@ export default function Nav({ compacto = false }) {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link to="/login" className="btn btn-ghost btn-sm">
+          <Link to="/login" className="btn btn-ghost h-9 px-3.5 text-sm">
             Iniciar sesión
           </Link>
           {!compacto && (
-            <Link to="/comprar/basico" className="btn btn-primary btn-sm hidden sm:inline-flex">
+            <Link to="/comprar/basico" className="btn btn-primary h-9 px-4 text-sm hidden sm:inline-flex">
               Comenzar
             </Link>
           )}
