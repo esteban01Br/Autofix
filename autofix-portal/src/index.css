@@ -141,9 +141,63 @@
   --animate-pulso: pulso-anillo 2.6s ease-out infinite;
 }
 
-/* --- Graphite siempre oscuro --- */
-:root {
+/* Modo oscuro (por defecto) */
+[data-theme="dark"],
+:root:not([data-theme="light"]) {
   color-scheme: dark;
+  --color-obsidian-canvas: #0a0a0a;
+  --color-true-black: #000000;
+  --color-charcoal-surface: #171717;
+  --color-graphite-edge: #262626;
+  --color-steel-border: #464646;
+  --color-cloud-white: #fafafa;
+  --color-paper-white: #e5e5e5;
+  --color-fog: #a1a1a1;
+  --color-ash: #737373;
+  --color-base-bg: #0a0a0a;
+  --color-surface: #171717;
+  --color-surface-hover: #1f1f1f;
+  --color-surface-glass: rgba(10, 10, 10, 0.88);
+  --color-card: #0a0a0a;
+  --color-border: #262626;
+  --color-hairline: #262626;
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #a1a1a1;
+  --color-muted: #737373;
+  --color-frost: #fafafa;
+  --color-blueprint: #ff8833;
+  --color-accent: #ff8833;
+  --color-accent-hover: #ff9a4d;
+  --color-accent-glow: rgba(255, 136, 51, 0.18);
+}
+
+/* Modo claro */
+[data-theme="light"] {
+  color-scheme: light;
+  --color-obsidian-canvas: #ffffff;
+  --color-true-black: #f8f8f8;
+  --color-charcoal-surface: #f5f5f5;
+  --color-graphite-edge: #e5e5e5;
+  --color-steel-border: #d4d4d4;
+  --color-cloud-white: #171717;
+  --color-paper-white: #171717;
+  --color-fog: #525252;
+  --color-ash: #737373;
+  --color-base-bg: #ffffff;
+  --color-surface: #f9f9f9;
+  --color-surface-hover: #f0f0f0;
+  --color-surface-glass: rgba(255, 255, 255, 0.9);
+  --color-card: #ffffff;
+  --color-border: #e5e5e5;
+  --color-hairline: #e5e5e5;
+  --color-text-primary: #171717;
+  --color-text-secondary: #525252;
+  --color-muted: #737373;
+  --color-frost: #171717;
+  --color-blueprint: #ff8833;
+  --color-accent: #ff8833;
+  --color-accent-hover: #ea580c;
+  --color-accent-glow: rgba(255, 136, 51, 0.14);
 }
 
 html { scroll-behavior: smooth; }
@@ -162,7 +216,7 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--color-graphite-edge); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-steel-border); }
 
-::selection { background: var(--color-signal-orange); color: var(--color-obsidian-canvas); }
+::selection { background: var(--color-signal-orange); color: #ffffff; }
 
 /* =====================================================================
    Componentes
@@ -172,22 +226,22 @@ body {
   /* --- Campos --- */
   .input {
     width: 100%;
-    background: var(--color-charcoal-surface);
+    background: var(--color-surface);
     border: 1px solid var(--color-graphite-edge);
     border-radius: 10px;
     padding: 0.625rem 0.75rem;
     font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.43;
-    color: var(--color-cloud-white);
+    color: var(--color-text-primary);
     transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
   }
-  .input::placeholder { color: var(--color-ash); }
+  .input::placeholder { color: var(--color-muted); }
   .input:focus {
     outline: none;
-    border-color: var(--color-steel-border);
-    background: #1f1f1f;
-    box-shadow: none;
+    border-color: var(--color-accent);
+    background: var(--color-surface-hover);
+    box-shadow: 0 0 0 2px var(--color-accent-glow);
   }
   .input:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -196,7 +250,7 @@ body {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     font-weight: 500;
-    color: var(--color-ash);
+    color: var(--color-muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.375rem;
@@ -220,25 +274,25 @@ body {
   .btn:active:not(:disabled) { transform: scale(0.98); }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
-  /* Botón de conversión alto énfasis (Paper White) */
+  /* Botón de conversión alto énfasis */
   .btn-primary {
-    background: var(--color-paper-white);
-    color: #171717;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-accent);
+    color: #ffffff;
+    border: 1px solid transparent;
     border-radius: 8px;
-    box-shadow: rgb(255, 255, 255) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.1) 0px -2px 6px 0px inset;
+    box-shadow: none;
   }
-  .btn-primary:hover { filter: brightness(0.98); }
+  .btn-primary:hover { background: var(--color-accent-hover); }
 
-  /* Botón secundario (Charcoal) */
+  /* Botón secundario */
   .btn-ghost {
-    background: var(--color-graphite-edge);
-    color: var(--color-cloud-white);
-    border: 1px solid var(--color-steel-border);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+    box-shadow: none;
   }
-  .btn-ghost:hover { background: #2d2d2d; }
+  .btn-ghost:hover { background: var(--color-surface-hover); border-color: var(--color-steel-border); }
 
   .btn-danger {
     background: rgba(255, 95, 95, 0.12);
@@ -267,22 +321,22 @@ body {
     font-size: 12px;
     font-weight: 400;
     line-height: 1.33;
-    border: 1px solid var(--color-graphite-edge);
-    color: var(--color-fog);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
     background: transparent;
   }
 
   /* --- Lienzo --- */
   .bg-workshop { background-color: var(--color-base-bg); }
 
-  /* --- Titulares Graphite --- */
+  /* --- Titulares --- */
   .titulo-hero {
     font-family: var(--font-display);
     font-weight: 500;
     font-size: clamp(2.5rem, 9vw, 60px);
     line-height: 1;
     letter-spacing: -1.5px;
-    color: var(--color-cloud-white);
+    color: var(--color-text-primary);
     text-transform: none;
   }
 
@@ -292,7 +346,7 @@ body {
     font-size: clamp(1.8rem, 5vw, 36px);
     line-height: 1.11;
     letter-spacing: 0px;
-    color: var(--color-cloud-white);
+    color: var(--color-text-primary);
     text-transform: none;
   }
 
@@ -301,20 +355,21 @@ body {
     font-size: 0.6875rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-ash);
+    color: var(--color-muted);
   }
 
-  .linea-etiqueta { height: 1px; flex: 1; background: var(--color-graphite-edge); }
+  .linea-etiqueta { height: 1px; flex: 1; background: var(--color-border); }
 
-  /* Enlace naranja (único tono cálido) */
-  .texto-degradado { color: var(--color-signal-orange); }
-  .texto-degradado-hero { color: var(--color-signal-orange); }
+  /* Enlace naranja */
+  .texto-degradado { color: var(--color-accent); }
+  .texto-degradado-hero { color: var(--color-accent); }
 
   /* Logo / marca */
   .marca-violeta {
-    background: var(--color-graphite-edge);
-    color: var(--color-cloud-white);
-    box-shadow: var(--shadow-sm);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+    box-shadow: none;
   }
 
   .tile-icono {
@@ -322,60 +377,56 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background: var(--color-charcoal-surface);
-    border: 1px solid var(--color-graphite-edge);
-    color: var(--color-cloud-white);
-    box-shadow: var(--shadow-sm);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    box-shadow: none;
   }
 
   .vidrio-flotante {
-    background: var(--color-obsidian-canvas);
-    border: 1px solid var(--color-graphite-edge);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
     border-radius: 10px;
     box-shadow: none;
   }
 
-  /* --- Navegación / barras --- */
   .nav-shell {
-    background: var(--color-obsidian-canvas);
-    border: 1px solid var(--color-graphite-edge);
+    background: var(--color-surface-glass);
+    border: 1px solid var(--color-border);
     border-radius: 10px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: none;
   }
 
   .announcement-bar {
-    background: var(--color-charcoal-surface);
-    border-bottom: 1px solid var(--color-graphite-edge);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
   }
 
-  /* --- Panel demo --- */
   .demo-frame {
-    background: var(--color-obsidian-canvas);
-    border: 1px solid var(--color-graphite-edge);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: var(--shadow-subtle);
+    box-shadow: none;
   }
 
   .demo-tab {
-    background: var(--color-true-black);
-    border: 1px solid var(--color-graphite-edge);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    color: var(--color-fog);
+    color: var(--color-text-secondary);
   }
 
-  /* --- Tarjetas de historia cliente --- */
   .story-card {
-    background: var(--color-obsidian-canvas);
-    border: 1px solid var(--color-graphite-edge);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
     border-radius: 10px;
-    box-shadow: var(--shadow-md);
+    box-shadow: none;
   }
 
-  /* --- Mosaico de features --- */
   .feature-mosaic {
-    background: var(--color-obsidian-canvas);
-    border: 1px solid var(--color-graphite-edge);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
     border-radius: 10px;
   }
 
@@ -388,15 +439,15 @@ body {
 
   .glow-accent { box-shadow: 0 0 70px -18px var(--color-accent-glow); }
 
-  .linea-tiempo { background: var(--color-graphite-edge); }
+  .linea-tiempo { background: var(--color-border); }
 
   .pulso-exito { animation: pulso-exito 2.4s ease-out infinite; }
 }
 
 @layer utilities {
-  .text-accent { color: var(--color-signal-orange); }
-  .hover\:text-accent:hover { color: var(--color-signal-orange); }
-  .group:hover .group-hover\:text-accent { color: var(--color-signal-orange); }
+  .text-accent { color: var(--color-accent); }
+  .hover\:text-accent:hover { color: var(--color-accent); }
+  .group:hover .group-hover\:text-accent { color: var(--color-accent); }
 }
 
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
