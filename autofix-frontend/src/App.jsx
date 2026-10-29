@@ -26,13 +26,12 @@ const Proveedores = lazy(() => import('./pages/Proveedores'));
 const NoEncontrada = lazy(() => import('./pages/NoEncontrada'));
 
 // El portal de ventas (app separada) concentra el login, el registro de
-// empresas y la compra de suscripciones. En producción se define
-// VITE_PORTAL_URL en Netlify; sin él (deploy viejo) queda el login propio.
+// empresas y la compra de suscripciones. En producción se usa la URL del portal.
 const PORTAL_URL = import.meta.env.VITE_PORTAL_URL
   ? import.meta.env.VITE_PORTAL_URL.replace(/\/+$/, '')
   : import.meta.env.DEV
     ? 'http://localhost:5174'
-    : null;
+    : 'https://autofix-portal.pages.dev';
 
 /**
  * Redirección al portal. Debe hacerse con `window.location.replace`:

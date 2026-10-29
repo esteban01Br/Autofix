@@ -1,8 +1,5 @@
 /** URL de la app operativa (donde vive el panel del taller). */
-export const APP_URL = (import.meta.env.VITE_APP_URL || 'http://localhost:5173').replace(
-  /\/+$/,
-  '',
-);
+export const APP_URL = 'https://autofix-app.pages.dev';
 
 /**
  * Entrega la sesión a la app: la redirige con /?token=… y la app
