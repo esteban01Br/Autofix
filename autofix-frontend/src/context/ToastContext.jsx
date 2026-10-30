@@ -65,7 +65,7 @@ export function ToastProvider({ children }) {
               </button>
               <span
                 aria-hidden="true"
-                className="absolute bottom-0 left-0 h-0.5 w-full origin-left bg-white/15"
+                className="absolute bottom-0 left-0 h-0.5 w-full origin-left bg-text-primary/20"
                 style={{
                   animation: `toast-progress ${toast.duracion}ms linear forwards`,
                 }}
