@@ -48,7 +48,7 @@ export function ToastProvider({ children }) {
           return (
             <div
               key={toast.id}
-              className={`pointer-events-auto relative flex min-w-[260px] max-w-[420px] items-center gap-3 overflow-hidden rounded-2xl border bg-[#0b0e1b]/95 px-4 py-3 shadow-xl shadow-black/40 backdrop-blur-md animate-slide-up ${estilo.container}`}
+              className={`pointer-events-auto relative flex min-w-[260px] max-w-[420px] items-center gap-3 overflow-hidden rounded-2xl border bg-surface/95 px-4 py-3 shadow-xl shadow-black/20 backdrop-blur-md animate-slide-up ${estilo.container}`}
             >
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${estilo.circulo}`}

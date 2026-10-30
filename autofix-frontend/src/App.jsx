@@ -66,6 +66,8 @@ const titulos = {
   '/auditoria': 'Auditoría',
   '/productividad': 'Productividad',
   '/servicios': 'Servicios',
+  '/cotizaciones': 'Cotizaciones',
+  '/proveedores': 'Proveedores',
 };
 
 function ConTitulo() {

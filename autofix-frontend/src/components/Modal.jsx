@@ -21,13 +21,13 @@ export default function Modal({ abierto, onCerrar, titulo, children, tamanio = '
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-[#02030a]/80 p-0 backdrop-blur-md animate-fade-in sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-md animate-fade-in sm:items-center sm:p-4"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onCerrar();
       }}
     >
       <div
-        className={`flex max-h-[92vh] w-full flex-col rounded-t-2xl border border-[rgba(186,215,247,0.12)] bg-[#05060f]/97 shadow-[inset_0_1px_1px_rgba(216,236,248,0.2),inset_0_24px_48px_rgba(168,216,245,0.06),0_16px_32px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:rounded-2xl ${tamanio} animate-slide-up sm:animate-scale-in`}
+        className={`flex max-h-[92vh] w-full flex-col rounded-t-2xl border border-border bg-surface shadow-2xl shadow-black/30 backdrop-blur-2xl sm:rounded-2xl ${tamanio} animate-slide-up sm:animate-scale-in`}
         role="dialog"
         aria-modal="true"
       >

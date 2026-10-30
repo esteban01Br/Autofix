@@ -1,88 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  Users,
-  UserCog,
-  Car,
-  Calendar,
-  Wrench,
-  Package,
-  Receipt,
-  Wrench as Activity,
-  LogOut,
-  X,
-  Building2,
-  Store,
-  ShieldCheck,
-  BarChart3,
-  ClipboardList,
-  FileText,
-  Truck,
-} from 'lucide-react';
+import { LogOut, X, Wrench } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { modulosVisibles } from '../lib/modulos';
 import Badge from './Badge';
 
-const OPERACION = ['ADMIN', 'GERENTE', 'ASESOR', 'MECANICO'];
-const EQUIPO = ['ADMIN', 'GERENTE'];
-
-/**
- * Módulos agrupados por área. El sidebar solo muestra las secciones con
- * al menos un módulo visible para el rol de la sesión.
- */
-const secciones = [
-  {
-    titulo: 'General',
-    items: [
-      {
-        to: '/dashboard',
-        label: 'Panel',
-        icon: LayoutDashboard,
-        roles: ['SUPERADMIN', 'ADMIN', 'GERENTE', 'ASESOR', 'MECANICO', 'BODEGUERO', 'CAJERO', 'CLIENTE'],
-      },
-      { to: '/empresas', label: 'Empresas', icon: Building2, roles: ['SUPERADMIN'] },
-      { to: '/mi-empresa', label: 'Mi empresa', icon: Store, roles: ['ADMIN', 'GERENTE'] },
-    ],
-  },
-  {
-    titulo: 'Operación',
-    items: [
-      { to: '/clientes', label: 'Clientes', icon: UserCog, roles: OPERACION },
-      { to: '/vehiculos', label: 'Vehículos', icon: Car, roles: [...OPERACION, 'CLIENTE'] },
-      { to: '/citas', label: 'Citas', icon: Calendar, roles: [...OPERACION, 'CLIENTE'] },
-      { to: '/ordenes', label: 'Órdenes', icon: Wrench, roles: OPERACION },
-      { to: '/mis-ordenes', label: 'Mis órdenes', icon: Activity, roles: ['MECANICO'] },
-      {
-        to: '/repuestos',
-        label: 'Repuestos',
-        icon: Package,
-        roles: ['ADMIN', 'GERENTE', 'BODEGUERO', 'MECANICO'],
-      },
-      {
-        to: '/proveedores',
-        label: 'Proveedores',
-        icon: Truck,
-        roles: ['ADMIN', 'GERENTE', 'BODEGUERO'],
-      },
-      { to: '/servicios', label: 'Servicios', icon: ClipboardList, roles: ['ADMIN', 'GERENTE', 'ASESOR'] },
-      { to: '/cotizaciones', label: 'Cotizaciones', icon: FileText, roles: ['ADMIN', 'GERENTE'] },
-    ],
-  },
-  {
-    titulo: 'Equipo',
-    items: [
-      { to: '/usuarios', label: 'Usuarios', icon: Users, roles: EQUIPO },
-      { to: '/mecanicos', label: 'Mecánicos', icon: Activity, roles: EQUIPO },
-      { to: '/productividad', label: 'Productividad', icon: BarChart3, roles: EQUIPO },
-    ],
-  },
-  {
-    titulo: 'Administración',
-    items: [
-      { to: '/facturas', label: 'Facturas', icon: Receipt, roles: ['ADMIN', 'GERENTE', 'CAJERO'] },
-      { to: '/auditoria', label: 'Auditoría', icon: ShieldCheck, roles: EQUIPO },
-    ],
-  },
-];
+const capitalizar = (texto) =>
+  texto ? texto.charAt(0).toUpperCase() + texto.slice(1) : '';
 
 export default function Sidebar({ abierto, cerrar }) {
   const { usuario, logout } = useAuth();
@@ -93,14 +16,16 @@ export default function Sidebar({ abierto, cerrar }) {
     navigate('/login');
   };
 
-  const nombreUsuario = usuario?.sub?.split('@')[0] ?? 'Usuario';
-  const iniciales = nombreUsuario.slice(0, 2).toUpperCase();
-  const visibles = secciones
-    .map((seccion) => ({
-      ...seccion,
-      items: seccion.items.filter((item) => item.roles.includes(usuario?.rol)),
-    }))
-    .filter((seccion) => seccion.items.length > 0);
+  const nombreUsuario = usuario?.nombre
+    ? `${usuario.nombre} ${usuario.apellido ?? ''}`.trim()
+    : capitalizar(usuario?.sub?.split('@')[0] ?? 'Usuario');
+  const iniciales = nombreUsuario
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((parte) => parte.charAt(0))
+    .join('')
+    .toUpperCase();
+  const visibles = modulosVisibles(usuario?.rol);
 
   return (
     <>
@@ -119,7 +44,7 @@ export default function Sidebar({ abierto, cerrar }) {
         {/* Marca */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="marca-violeta flex h-10 w-10 items-center justify-center rounded-full text-white">
+            <div className="marca-violeta flex h-10 w-10 items-center justify-center rounded-full text-cloud-white">
               <Wrench size={18} strokeWidth={2.2} />
             </div>
             <div>
@@ -133,7 +58,7 @@ export default function Sidebar({ abierto, cerrar }) {
           </div>
           <button
             onClick={cerrar}
-            className="rounded-full p-1.5 text-muted transition-colors hover:bg-glass-fuerte hover:text-text-primary lg:hidden"
+            className="rounded-full p-1.5 text-muted transition-colors hover:bg-surface-hover hover:text-text-primary lg:hidden"
             aria-label="Cerrar menú"
           >
             <X size={17} />
@@ -154,10 +79,10 @@ export default function Sidebar({ abierto, cerrar }) {
                     to={to}
                     onClick={cerrar}
                     className={({ isActive }) =>
-                      `group relative flex items-center gap-3 rounded-full py-2.5 pl-3.5 pr-3 text-sm font-medium transition-all duration-200 ${
+                      `group relative flex items-center gap-3 overflow-hidden rounded-full py-2.5 pl-3.5 pr-3 text-sm font-medium transition-all duration-200 ${
                         isActive
-                          ? 'bg-accent-glow text-white shadow-[inset_0_1px_1px_rgba(216,236,248,0.08)]'
-                          : 'text-text-secondary hover:translate-x-0.5 hover:bg-glass-fuerte hover:text-white'
+                          ? 'bg-accent-glow text-text-primary'
+                          : 'text-text-secondary hover:translate-x-0.5 hover:bg-surface-hover hover:text-text-primary'
                       }`
                     }
                   >
@@ -172,14 +97,14 @@ export default function Sidebar({ abierto, cerrar }) {
                         <Icon
                           size={17}
                           className={`shrink-0 transition-transform duration-200 ${
-                            isActive ? 'text-blueprint' : 'group-hover:scale-110'
+                            isActive ? 'scale-110 text-accent' : 'group-hover:scale-110'
                           }`}
                         />
                         <span className="flex-1">{label}</span>
                         <span
                           aria-hidden="true"
-                          className={`h-1.5 w-1.5 rounded-full bg-accent-hover transition-opacity ${
-                            isActive ? 'opacity-100' : 'opacity-0'
+                          className={`h-1.5 w-1.5 rounded-full bg-accent transition-all duration-200 ${
+                            isActive ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
                           }`}
                         />
                       </>
@@ -193,13 +118,15 @@ export default function Sidebar({ abierto, cerrar }) {
 
         {/* Sesión */}
         <div className="border-t border-border px-3 py-3">
-          <div className="mb-2 flex items-center gap-2.5 rounded-2xl bg-white/[0.04] px-2.5 py-2 ring-1 ring-[rgba(186,215,247,0.08)]">
-            <div className="tile-icono h-8 w-8 shrink-0 text-[10px] font-semibold">
-              {iniciales}
+          <div className="mb-2 flex items-center gap-2.5 rounded-2xl border border-border bg-surface px-2.5 py-2">
+            <div className="tile-icono h-9 w-9 shrink-0 text-[11px] font-semibold">
+              {iniciales || 'AF'}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-medium text-text-primary">{nombreUsuario}</p>
-              <div className="mt-0.5">
+              <p className="truncate text-xs font-medium leading-tight text-text-primary" title={nombreUsuario}>
+                {nombreUsuario}
+              </p>
+              <div className="mt-1 flex">
                 <Badge valor={usuario?.rol} dot={false} />
               </div>
             </div>

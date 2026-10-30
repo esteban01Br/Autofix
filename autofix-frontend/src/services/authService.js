@@ -11,6 +11,12 @@ export const cambiarContrasena = async (data) => {
   return response.data;
 };
 
+/** Perfil del usuario autenticado (nombre, apellido, rol, etc.). */
+export const obtenerPerfil = async () => {
+  const response = await api.get('/api/auth/me');
+  return response.data;
+};
+
 export const decodificarToken = (token) => {
   const payload = token.split('.')[1];
   const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');

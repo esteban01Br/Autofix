@@ -77,8 +77,96 @@
   --animate-pulso: pulso-anillo 2.6s ease-out infinite;
 }
 
-:root { color-scheme: dark; }
+:root {
+  color-scheme: dark;
+
+  /* Colores de los gráficos (dona de estados) */
+  --grafico-recibido: #a1a1a1;
+  --grafico-diagnostico: #737373;
+  --grafico-reparacion: #fafafa;
+  --grafico-espera: #ff8833;
+  --grafico-listo: #e5e5e5;
+  --grafico-entregado: #464646;
+}
 html { color-scheme: dark; }
+
+/* =====================================================================
+   Tema claro — invierte la paleta Graphite manteniendo el mismo lenguaje.
+   El atributo data-tema lo gestiona ThemeContext (localStorage).
+   ===================================================================== */
+html[data-tema="claro"] {
+  color-scheme: light;
+
+  --color-obsidian-canvas: #ffffff;
+  --color-true-black: #ffffff;
+  --color-charcoal-surface: #f4f4f5;
+  --color-graphite-edge: #e4e4e7;
+  --color-steel-border: #d4d4d8;
+
+  --color-paper-white: #18181b;
+  --color-cloud-white: #18181b;
+  --color-fog: #52525b;
+  --color-ash: #71717a;
+
+  --color-base-bg: #f4f4f5;
+  --color-surface: #ffffff;
+  --color-surface-hover: #ededf0;
+  --color-surface-glass: rgba(250, 250, 250, 0.88);
+  --color-card: #ffffff;
+  --color-border: #e4e4e7;
+  --color-hairline: #e4e4e7;
+
+  --color-text-primary: #18181b;
+  --color-text-secondary: #52525b;
+  --color-muted: #71717a;
+  --color-frost: #09090b;
+  --color-blueprint: #ff8833;
+
+  --color-accent-glow: rgba(255, 136, 51, 0.16);
+  --color-danger: #dc2626;
+  --color-danger-glow: rgba(220, 38, 38, 0.1);
+  --color-success: #15803d;
+  --color-success-glow: rgba(22, 163, 74, 0.12);
+  --color-info: #1d4ed8;
+  --color-info-glow: rgba(37, 99, 235, 0.1);
+  --color-warning: #b45309;
+  --color-warning-glow: rgba(202, 138, 4, 0.14);
+  --color-steel: #71717a;
+
+  --shadow-sm: rgba(0, 0, 0, 0.08) 0px 4px 4px 0px;
+
+  --grafico-recibido: #a1a1aa;
+  --grafico-diagnostico: #71717a;
+  --grafico-reparacion: #18181b;
+  --grafico-espera: #ff8833;
+  --grafico-listo: #3f3f46;
+  --grafico-entregado: #d4d4d8;
+}
+
+html[data-tema="claro"] .bg-workshop,
+html[data-tema="claro"] .fondo-panel {
+  background-image:
+    radial-gradient(900px 480px at 50% -12%, rgba(255, 136, 51, 0.1), transparent 65%),
+    radial-gradient(900px 420px at 100% 110%, rgba(47, 129, 247, 0.05), transparent 60%),
+    linear-gradient(rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 72px 72px, 72px 72px;
+}
+
+html[data-tema="claro"] .skeleton {
+  background: rgba(0, 0, 0, 0.03);
+}
+html[data-tema="claro"] .skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.05), transparent);
+}
+html[data-tema="claro"] ::-webkit-scrollbar-thumb { background: #d4d4d8; }
+html[data-tema="claro"] ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+html[data-tema="claro"] ::selection {
+  background: var(--color-signal-orange);
+  color: #ffffff;
+}
+
+html, body { transition: background-color 0.25s ease, color 0.25s ease; }
 
 body {
   background-color: var(--color-base-bg);
@@ -123,7 +211,7 @@ body {
   .input:focus {
     outline: none;
     border-color: var(--color-steel-border);
-    background: #1f1f1f;
+    background: var(--color-surface-hover);
     box-shadow: none;
   }
   .input:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -158,7 +246,7 @@ body {
 
   .btn-primary {
     background: var(--color-paper-white);
-    color: #171717;
+    color: var(--color-obsidian-canvas);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: rgb(255, 255, 255) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.1) 0px -2px 6px 0px inset;
   }
@@ -170,7 +258,7 @@ body {
     border: 1px solid var(--color-steel-border);
     box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
   }
-  .btn-ghost:hover { background: #2d2d2d; }
+  .btn-ghost:hover { background: var(--color-surface-hover); }
 
   .btn-danger {
     background: rgba(255, 95, 95, 0.12);
