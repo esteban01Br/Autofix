@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, empresa_filtro, get_current_user
+from app.routers.deps import admin, empleado, empresa_filtro
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.detalle_orden import (
@@ -12,6 +12,7 @@ from app.schemas.detalle_orden import (
     DetalleOrdenUpdate,
 )
 from app.services import detalle_orden_service
+from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(prefix="/api/detalles", tags=["Detalles de Orden"])
 
@@ -29,7 +30,17 @@ def crear_detalle(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> DetalleOrdenResponse:
-    return detalle_orden_service.crear_detalle(db, empresa_filtro(usuario), orden_id, payload)
+    creado = detalle_orden_service.crear_detalle(db, empresa_filtro(usuario), orden_id, payload)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="AGREGAR_DETALLE_ORDEN",
+        entidad="DetalleOrden",
+        entidad_id=creado.id,
+        detalle=f"Repuesto agregado a la orden: {creado.repuestoId}",
+    )
+    return creado
 
 
 @router.get(
@@ -40,7 +51,7 @@ def crear_detalle(
 def listar_detalles(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
     orden_id: int | None = Query(None, description="Filtra por orden de trabajo"),
     orden: str | None = Query(
         None, description="Campo de orden: id, cantidad, precio_unitario"
@@ -70,7 +81,7 @@ def listar_detalles(
 def listar_detalles_por_orden(
     orden_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> list[DetalleOrdenResponse]:
     return detalle_orden_service.listar_por_orden(db, empresa_filtro(usuario), orden_id)
 
@@ -83,7 +94,7 @@ def listar_detalles_por_orden(
 def obtener_detalle(
     detalle_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> DetalleOrdenResponse:
     return detalle_orden_service.obtener_detalle(db, empresa_filtro(usuario), detalle_id)
 
@@ -113,4 +124,13 @@ def eliminar_detalle(
     usuario: Usuario = Depends(admin),
 ) -> Response:
     detalle_orden_service.eliminar_detalle(db, empresa_filtro(usuario), detalle_id)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="QUITAR_DETALLE_ORDEN",
+        entidad="DetalleOrden",
+        entidad_id=detalle_id,
+        detalle=f"Detalle de orden eliminado (id: {detalle_id}), stock del repuesto devuelto",
+    )
     return Response(status_code=status.HTTP_204_NO_CONTENT)

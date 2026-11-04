@@ -47,7 +47,7 @@ le entregó.
 
 - **`ADMIN`**: acceso total (incluye usuarios, mecánicos y facturación).
 - **`MECANICO`**: clientes, vehículos, citas, órdenes, repuestos y facturas.
-- **`CLIENTE`**: panel, vehículos, citas y facturas.
+- **`CLIENTE`**: solo su perfil y su sesión. No tiene acceso a los datos internos del taller (clientes, vehículos, citas, órdenes, repuestos ni facturas).
 
 ---
 
@@ -61,7 +61,7 @@ le entregó.
 - 📷 **Escáner integrado:** registra repuestos con la cámara del celular, sin digitar códigos.
 - 🖥️ **Un solo comando:** backend y frontend se levantan juntos con `.\start-dev.ps1`.
 - 📱 **Diseño moderno y responsive:** funciona en computador, tablet y celular.
-- ☁️ **Lista para la nube:** despliegue gratuito con Netlify (frontend), Render (backend) y PostgreSQL (ver sección de despliegue).
+- ☁️ **Lista para la nube:** despliegue gratuito con Cloudflare Pages (frontend), Render (backend) y PostgreSQL (ver sección de despliegue).
 
 ---
 
@@ -99,28 +99,27 @@ El script **prepara todo automáticamente** si es la primera vez:
 | **Backend (FastAPI)** | <http://localhost:8081> |
 | **Documentación de la API (Swagger)** | <http://localhost:8081/docs> |
 
-### Credenciales de acceso por defecto
+### Credenciales de acceso
 
-| Campo | Valor |
-| --- | --- |
-| Correo | `admin@autofix.com` |
-| Contraseña | `Admin123!` |
+Las credenciales del administrador inicial se definen en el archivo `.env` del
+backend (`AUTOFIX_ADMIN_EMAIL` y `AUTOFIX_ADMIN_PASSWORD`). No hay credenciales
+por defecto en el código.
 
 Para detener ambos servicios, presiona **`Ctrl+C`** en la terminal.
 
 ---
 
-## Despliegue en producción (Netlify + Render + PostgreSQL)
+## Despliegue en producción (Cloudflare Pages + Render + PostgreSQL)
 
 La app se despliega en 3 piezas (el repo ya incluye los archivos de configuración):
 
 | Pieza | Servicio | Archivo de config |
 | --- | --- | --- |
-| Frontend (React) | **Netlify** | `netlify.toml` (raíz) |
+| Frontend (React) | **Cloudflare Pages** | `_headers` y `_redirects` en `public/` |
 | Backend (FastAPI) | **Render** | `render.yaml` (raíz) |
 | Base de datos | **PostgreSQL en Render** | la crea el Blueprint |
 
-> ⚠️ Netlify **no puede correr el backend** (solo sitios estáticos); por eso el backend va en Render.
+> ⚠️ Cloudflare Pages **solo sirve el frontend estático**; el backend va en Render.
 
 ### 1) Backend + base de datos (Render)
 
@@ -128,7 +127,7 @@ La app se despliega en 3 piezas (el repo ya incluye los archivos de configuraci�
 2. En [Render](https://render.com): **New → Blueprint** y conecta el repo.
 3. Render detecta `render.yaml` y crea el servicio `autofix-api` y la base de datos `autofix-db` (PostgreSQL) ya conectada.
 4. Te pedirá las variables marcadas como `sync: false`:
-   - `CORS_ORIGINS`: la URL de tu Netlify (ej. `https://tu-app.netlify.app`)
+   - `CORS_ORIGINS`: la URL de tu Cloudflare Pages (ej. `https://tu-app.cloudflare.app`)
    - `AUTOFIX_ADMIN_EMAIL` / `AUTOFIX_ADMIN_PASSWORD`: credenciales del administrador inicial.
 5. Al terminar tendrás una URL tipo `https://autofix-api.onrender.com`.
 
@@ -136,17 +135,17 @@ El `SECRET_KEY` lo genera Render automáticamente y en producción **la app se n
 
 > 🔄 Las tablas y columnas nuevas de la base de datos se crean solas al arrancar el servidor (`Base.metadata.create_all` + micro-migraciones en `app/migrations.py`): no necesitas ejecutar nada manual al desplegar cambios de modelo.
 
-### 2) Frontend (Netlify)
+### 2) Frontend (Cloudflare Pages)
 
-1. En [Netlify](https://netlify.com): **Add new site → Import an existing project** y conecta el repo.
-2. Netlify lee `netlify.toml` y configura solo el build (`npm run build` sobre `autofix-frontend`).
+1. En [Cloudflare Pages](https://cloudflare.com): **Add new site → Import an existing project** y conecta el repo.
+2. Cloudflare Pages lee `cloudflare.toml` y configura solo el build (`npm run build` sobre `autofix-frontend`).
 3. En **Site settings → Environment variables** agrega:
    - `VITE_API_URL` = `https://autofix-api.onrender.com` (la URL del paso 1)
 4. Despliega. El archivo `_redirects` ya cubre las rutas de React Router.
 
 > Nota: en el plan gratuito de Render el backend "duerme" tras ~15 min sin uso; la primera petición tarda ~1 min en despertarlo.
 >
-> 📷 El escáner de códigos de barras pide **permiso de cámara** en el navegador la primera vez (funciona por HTTPS en Netlify y por `localhost` en desarrollo).
+> 📷 El escáner de códigos de barras pide **permiso de cámara** en el navegador la primera vez (funciona por HTTPS en Cloudflare Pages y por `localhost` en desarrollo).
 
 ---
 
@@ -174,7 +173,7 @@ El `SECRET_KEY` lo genera Render automáticamente y en producción **la app se n
 Autofix/
 ├── start-dev.ps1                # Levanta backend + frontend (un solo comando)
 ├── render.yaml                  # Despliegue del backend + PostgreSQL en Render (Blueprint)
-├── netlify.toml                 # Despliegue del frontend en Netlify
+├── cloudflare.toml                 # Despliegue del frontend en Cloudflare Pages
 ├── autofix-backend-fastapi/     # API REST (FastAPI)
 │   ├── app/                     # routers, models, schemas, crud, services...
 │   │   ├── migrations.py        # Micro-migraciones automáticas de la BD

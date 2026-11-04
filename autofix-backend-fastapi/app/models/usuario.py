@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -30,6 +30,11 @@ class Usuario(Base):
     debe_cambiar_contrasena: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False
     )
+    # Bloqueo temporal por intentos fallidos (anti fuerza bruta por cuenta).
+    intentos_fallidos: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0
+    )
+    bloqueado_hasta: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     # Empresa a la que pertenece (NULL solo para SUPERADMIN de plataforma)
     empresa_id: Mapped[int | None] = mapped_column(
         ForeignKey("empresas.id"), nullable=True, index=True

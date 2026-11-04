@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.enums import EstadoCotizacion
 from app.models.usuario import Usuario
-from app.routers.deps import empresa_filtro, gestion, get_current_user
+from app.routers.deps import empleado, empresa_filtro, gestion
 from app.schemas.cotizacion import (
     CotizacionCreate,
     CotizacionEstadoRequest,
@@ -59,7 +59,7 @@ def crear_cotizacion(
 def listar_cotizaciones(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
     estado: EstadoCotizacion | None = Query(None),
     vehiculo_id: int | None = Query(None),
     cliente_id: int | None = Query(None),
@@ -99,7 +99,7 @@ def listar_cotizaciones(
 def obtener_cotizacion(
     cotizacion_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> CotizacionResponse:
     return cotizacion_service.obtener_cotizacion(
         db, empresa_filtro(usuario), cotizacion_id

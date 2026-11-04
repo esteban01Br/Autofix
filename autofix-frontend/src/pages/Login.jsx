@@ -8,7 +8,6 @@ import {
   EyeOff,
   ArrowRight,
   Car,
-  Package,
   Calendar,
   Receipt,
   AlertCircle,
@@ -16,7 +15,6 @@ import {
   Users,
   Clock,
   CheckCircle2,
-  KeyRound,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
@@ -64,16 +62,10 @@ export default function Login() {
         setError(detalle);
         return;
       }
-      setError(`${detalle} Inténtalo con: admin@autofix.com / Admin123!`);
+      setError('Correo o contraseña incorrectos.');
     } else {
-      setError('Correo o contraseña incorrectos. Inténtalo con: admin@autofix.com / Admin123!');
+      setError('Correo o contraseña incorrectos.');
     }
-  };
-
-  const rellenarCredenciales = () => {
-    setCorreo('admin@autofix.com');
-    setContrasena('Admin123!');
-    setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -217,7 +209,7 @@ export default function Login() {
                     id="correo"
                     type="email"
                     className="input pl-9"
-                    placeholder="admin@autofix.com"
+                    placeholder="tucorreo@ejemplo.com"
                     value={correo}
                     onChange={(e) => { setCorreo(e.target.value); if (error) setError(''); }}
                     autoComplete="email"
@@ -227,18 +219,7 @@ export default function Login() {
               </div>
 
               <div>
-                <div className="flex items-center justify-between">
-                  <label className="label" htmlFor="contrasena">Contraseña</label>
-                  <button
-                    type="button"
-                    className="text-xs text-steel hover:text-accent transition-colors"
-                    onClick={() =>
-                      setError('Recuerda que tu contraseña por defecto es: Admin123!')
-                    }
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </button>
-                </div>
+                <label className="label" htmlFor="contrasena">Contraseña</label>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none" />
                   <input
@@ -282,14 +263,6 @@ export default function Login() {
                 <span className="text-sm text-text-secondary">Recordarme en este equipo</span>
               </label>
 
-              <button
-                type="button"
-                onClick={rellenarCredenciales}
-                className="btn btn-ghost w-full py-2"
-              >
-                <KeyRound size={16} /> Rellenar credenciales de prueba
-              </button>
-
               <button type="submit" className="btn btn-primary w-full py-2.5" disabled={cargando}>
                 {cargando ? (
                   <>
@@ -302,17 +275,6 @@ export default function Login() {
                 )}
               </button>
             </form>
-          </div>
-
-          <div className="mt-4 card p-4 flex items-start gap-3 animate-fade-in shadow-xl shadow-black/20">
-            <div className="w-8 h-8 rounded-full bg-success/15 flex items-center justify-center text-success shrink-0 mt-0.5">
-              <Package size={15} />
-            </div>
-            <div className="text-xs text-text-secondary">
-              <p className="font-semibold text-text-primary mb-1">Credenciales de acceso por defecto</p>
-              <p className="font-mono">Correo: <span className="text-accent">admin@autofix.com</span></p>
-              <p className="font-mono">Contraseña: <span className="text-accent">Admin123!</span></p>
-            </div>
           </div>
 
           <p className="mt-4 text-center text-sm text-text-secondary">

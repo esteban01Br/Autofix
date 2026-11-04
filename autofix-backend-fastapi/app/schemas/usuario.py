@@ -2,28 +2,39 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, Field, model_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 from app.models.enums import Rol
+from app.schemas.common import validar_contrasena
 
 
 class UsuarioCreate(BaseModel):
     nombre: str = Field(min_length=1, max_length=100)
     apellido: str = Field(min_length=1, max_length=100)
     correo: EmailStr = Field(max_length=150)
-    contrasena: str = Field(min_length=8, max_length=128)
+    contrasena: str = Field(max_length=128)
     telefono: str | None = Field(default=None, max_length=20)
     rol: Rol
+
+    @field_validator("contrasena")
+    @classmethod
+    def contrasena_valida(cls, valor: str) -> str:
+        return validar_contrasena(valor)
 
 
 class UsuarioUpdate(BaseModel):
     nombre: str | None = Field(default=None, min_length=1, max_length=100)
     apellido: str | None = Field(default=None, min_length=1, max_length=100)
     correo: EmailStr | None = Field(default=None, max_length=150)
-    contrasena: str | None = Field(default=None, min_length=8, max_length=128)
+    contrasena: str | None = Field(default=None, max_length=128)
     telefono: str | None = Field(default=None, max_length=20)
     rol: Rol | None = None
     activo: bool | None = None
+
+    @field_validator("contrasena")
+    @classmethod
+    def contrasena_valida(cls, valor: str | None) -> str | None:
+        return validar_contrasena(valor)
 
     @model_validator(mode="after")
     def al_menos_un_campo(self) -> "UsuarioUpdate":
@@ -55,4 +66,9 @@ class UsuarioResponse(BaseModel):
 
 class CambioContrasenaRequest(BaseModel):
     contrasena_actual: str = Field(min_length=1, max_length=128)
-    contrasena_nueva: str = Field(min_length=8, max_length=128)
+    contrasena_nueva: str = Field(max_length=128)
+
+    @field_validator("contrasena_nueva")
+    @classmethod
+    def contrasena_valida(cls, valor: str) -> str:
+        return validar_contrasena(valor)

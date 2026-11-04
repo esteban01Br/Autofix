@@ -4,6 +4,8 @@ import uuid
 
 from app.security import decode_token
 
+SLUG_PRUEBAS = "autofix-pruebas"
+
 
 def correo_unico(prefix: str) -> str:
     return f"{prefix}-{uuid.uuid4().hex[:8]}@correo.com"
@@ -95,6 +97,7 @@ def test_registro_devuelve_token(client):
             "apellido": "Usuario",
             "correo": email,
             "contrasena": "Password123!",
+            "slug": SLUG_PRUEBAS,
         },
     )
     assert resp.status_code == 201
@@ -116,6 +119,7 @@ def test_no_se_puede_autoregistrar_rol_admin(client):
             "correo": email,
             "contrasena": "Password123!",
             "rol": "ADMIN",
+            "slug": SLUG_PRUEBAS,
         },
     )
     assert resp.status_code == 201
@@ -134,6 +138,7 @@ def test_login_exitoso(client):
             "correo": email,
             "contrasena": "Password123!",
             "rol": "CLIENTE",
+            "slug": SLUG_PRUEBAS,
         },
     )
     resp = client.post(
@@ -153,6 +158,7 @@ def test_login_credenciales_incorrectas(client):
             "correo": email,
             "contrasena": "Password123!",
             "rol": "CLIENTE",
+            "slug": SLUG_PRUEBAS,
         },
     )
     resp = client.post(
@@ -170,6 +176,7 @@ def test_registro_correo_duplicado(client):
         "correo": email,
         "contrasena": "Password123!",
         "rol": "CLIENTE",
+        "slug": SLUG_PRUEBAS,
     }
     assert client.post("/api/auth/register", json=payload).status_code == 201
     assert client.post("/api/auth/register", json=payload).status_code == 409
@@ -184,6 +191,7 @@ def test_validacion_email_invalido(client):
             "correo": "no-es-un-email",
             "contrasena": "Password123!",
             "rol": "CLIENTE",
+            "slug": SLUG_PRUEBAS,
         },
     )
     assert resp.status_code == 422
@@ -241,14 +249,54 @@ def admin_token_o(client):
     return resp.json()["token"]
 
 
-def test_lectura_permitida_para_rol_user(client):
+RUTAS_SOLO_EMPLEADOS = [
+    "clientes",
+    "vehiculos",
+    "citas",
+    "facturas",
+    "ordenes",
+    "repuestos",
+    "mecanicos",
+    "proveedores",
+    "servicios",
+    "cotizaciones",
+]
+
+
+def test_cliente_no_puede_leer_datos_internos_de_la_empresa(client):
+    """Un CLIENTE autoregistrado solo tiene acceso a su propia sesión."""
     email = correo_unico("lector")
-    crear_usuario(client, admin_token_o(client), email, rol="CLIENTE")
-    token = client.post(
-        "/api/auth/login", json={"correo": email, "contrasena": "Password123!"}
-    ).json()["token"]
-    resp = client.get("/api/repuestos", headers=auth(token))
-    assert resp.status_code == 200
+    resp = client.post(
+        "/api/auth/register",
+        json={
+            "nombre": "Ana",
+            "apellido": "Prueba",
+            "correo": email,
+            "contrasena": "Password123!",
+            "slug": SLUG_PRUEBAS,
+        },
+    )
+    assert resp.status_code == 201, resp.text
+    h = auth(resp.json()["token"])
+
+    for ruta in RUTAS_SOLO_EMPLEADOS:
+        respuesta = client.get(f"/api/{ruta}", headers=h)
+        assert respuesta.status_code == 403, f"/api/{ruta} dejó pasar a un CLIENTE"
+
+
+def test_registro_con_slug_inexistente_devuelve_404(client):
+    resp = client.post(
+        "/api/auth/register",
+        json={
+            "nombre": "Sin",
+            "apellido": "Empresa",
+            "correo": correo_unico("sinempresa"),
+            "contrasena": "Password123!",
+            "slug": "empresa-que-no-existe",
+        },
+    )
+    assert resp.status_code == 404
+    assert resp.json()["detail"] == "Empresa no encontrada."
 
 
 # =========================================================
@@ -785,7 +833,7 @@ def _registrar_empresa(client, nombre, correo_admin):
             "nombre": "Dueño",
             "apellido": nombre,
             "correo": correo_admin,
-            "contrasena": "Clave123!",
+            "contrasena": "Clave12345!",
         },
     )
     assert resp.status_code == 201, resp.text
@@ -893,7 +941,7 @@ def test_registro_con_plan_crea_slug_y_suscripcion(client):
             "nombre": "Dueño",
             "apellido": "Prueba",
             "correo": correo,
-            "contrasena": "Clave123!",
+            "contrasena": "Clave12345!",
         },
     )
     assert resp.status_code == 201, resp.text
@@ -927,12 +975,12 @@ def test_registro_con_plan_crea_slug_y_suscripcion(client):
     # Login vinculado al slug: su slug funciona; el de otra empresa → 404
     ok = client.post(
         "/api/auth/login",
-        json={"correo": correo, "contrasena": "Clave123!", "slug": slug},
+        json={"correo": correo, "contrasena": "Clave12345!", "slug": slug},
     )
     assert ok.status_code == 200
     malo = client.post(
         "/api/auth/login",
-        json={"correo": correo, "contrasena": "Clave123!", "slug": "otro-slug"},
+        json={"correo": correo, "contrasena": "Clave12345!", "slug": "otro-slug"},
     )
     assert malo.status_code == 404
 
@@ -949,7 +997,7 @@ def test_suscripcion_vencida_bloquea_login_y_superadmin_la_gestiona(
             "nombre": "Dueño",
             "apellido": "Prueba",
             "correo": correo,
-            "contrasena": "Clave123!",
+            "contrasena": "Clave12345!",
         },
     )
     assert resp.status_code == 201, resp.text
@@ -957,9 +1005,12 @@ def test_suscripcion_vencida_bloquea_login_y_superadmin_la_gestiona(
 
     # Login inicial: la suscripción recién creada está vigente.
     login = client.post(
-        "/api/auth/login", json={"correo": correo, "contrasena": "Clave123!"}
+        "/api/auth/login", json={"correo": correo, "contrasena": "Clave12345!"}
     )
     assert login.status_code == 200
+    # Token emitido ANTES del vencimiento: debe dejar de servir para los
+    # datos internos en cuanto la suscripción vence.
+    token_previo = login.json()["token"]
 
     # SUPERADMIN la marca como vencida (soporte).
     vencida = client.post(
@@ -972,12 +1023,31 @@ def test_suscripcion_vencida_bloquea_login_y_superadmin_la_gestiona(
 
     # El login queda bloqueado con el código que entiende el portal.
     bloqueo = client.post(
-        "/api/auth/login", json={"correo": correo, "contrasena": "Clave123!"}
+        "/api/auth/login", json={"correo": correo, "contrasena": "Clave12345!"}
     )
     assert bloqueo.status_code == 403
     assert bloqueo.json()["detail"]["codigo"] == "SUSCRIPCION_VENCIDA"
 
-    # El superadmin renueva y el login vuelve a funcionar.
+    # Un token emitido antes del vencimiento tampoco puede leer datos internos.
+    datos = client.get("/api/repuestos", headers=auth(token_previo))
+    assert datos.status_code == 403
+    assert datos.json()["detail"]["codigo"] == "SUSCRIPCION_VENCIDA"
+
+    # Las rutas necesarias para renovar siguen disponibles con ese token.
+    assert client.get("/api/auth/me", headers=auth(token_previo)).status_code == 200
+    actual = client.get(
+        "/api/suscripciones/actual", headers=auth(token_previo)
+    )
+    assert actual.status_code == 200
+    assert actual.json()["vigente"] is False
+
+    # La propia empresa puede renovar aunque esté vencida (ADMIN/GERENTE).
+    propia = client.post("/api/suscripciones/renovar", headers=auth(token_previo))
+    assert propia.status_code == 200, propia.text
+    assert propia.json()["vigente"] is True
+    assert client.get("/api/repuestos", headers=auth(token_previo)).status_code == 200
+
+    # El superadmin también puede renovar/gestionar y el login vuelve a funcionar.
     renovada = client.post(
         f"/api/suscripciones/empresas/{eid}",
         json={"plan": "PRO", "dias": 365},
@@ -987,7 +1057,7 @@ def test_suscripcion_vencida_bloquea_login_y_superadmin_la_gestiona(
     assert renovada.json()["vigente"] is True
     assert renovada.json()["plan"] == "PRO"
     login2 = client.post(
-        "/api/auth/login", json={"correo": correo, "contrasena": "Clave123!"}
+        "/api/auth/login", json={"correo": correo, "contrasena": "Clave12345!"}
     )
     assert login2.status_code == 200
 
@@ -1004,7 +1074,7 @@ def test_aislamiento_clientes_y_usuarios(client):
             "nombre": "Cliente",
             "apellido": "DeA",
             "correo": f"cliente-{uuid.uuid4().hex[:6]}@correo.com",
-            "contrasena": "Clave123!",
+            "contrasena": "Clave12345!",
             "rol": "CLIENTE",
         },
         headers=ha,
@@ -1025,7 +1095,7 @@ def test_aislamiento_clientes_y_usuarios(client):
             "nombre": "Intruso",
             "apellido": "X",
             "correo": f"intruso-{uuid.uuid4().hex[:6]}@correo.com",
-            "contrasena": "Clave123!",
+            "contrasena": "Clave12345!",
             "rol": "SUPERADMIN",
         },
         headers=ha,
@@ -1065,7 +1135,7 @@ def test_panel_superadmin_muestra_suscripcion(client, superadmin_token):
             "nombre": "Dueño",
             "apellido": "Panel",
             "correo": correo,
-            "contrasena": "Clave123!",
+            "contrasena": "Clave12345!",
         },
     )
     assert resp.status_code == 201, resp.text

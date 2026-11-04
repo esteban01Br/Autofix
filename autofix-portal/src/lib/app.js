@@ -2,12 +2,15 @@
 export const APP_URL = 'https://autofix-app.pages.dev';
 
 /**
- * Entrega la sesión a la app: la redirige con /?token=… y la app
+ * Entrega la sesión a la app: la redirige con /#token=… y la app
  * guarda el token en su propio almacenamiento (handoff entre orígenes).
+ *
+ * El token viaja en el fragmento (#), que el navegador no envía al
+ * servidor: no queda en los logs de Cloudflare Pages ni en el Referer.
  */
 export const entrarALaApp = (token, ruta) => {
   const destino = ruta || '/dashboard';
-  window.location.href = `${APP_URL}/?token=${encodeURIComponent(token)}&ir=${encodeURIComponent(destino)}`;
+  window.location.href = `${APP_URL}/#token=${encodeURIComponent(token)}&ir=${encodeURIComponent(destino)}`;
 };
 
 /** Extrae un mensaje legible de un error de la API. */

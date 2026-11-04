@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, empresa_filtro, facturacion, get_current_user
+from app.routers.deps import admin, empleado, empresa_filtro, facturacion
 from app.database import get_db
 from app.models.empresa import Empresa
 from app.models.usuario import Usuario
@@ -52,7 +52,7 @@ def crear_factura(
 def listar_facturas(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
     desde: date | None = Query(None, description="Fecha desde (YYYY-MM-DD)"),
     hasta: date | None = Query(None, description="Fecha hasta (YYYY-MM-DD)"),
     orden_trabajo_id: int | None = Query(None),
@@ -88,7 +88,7 @@ def listar_facturas(
 def obtener_factura(
     factura_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> FacturaResponse:
     return factura_service.obtener_factura(db, empresa_filtro(usuario), factura_id)
 
@@ -143,7 +143,7 @@ def eliminar_factura(
 def listar_pagos(
     factura_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> list[PagoResponse]:
     return pago_service.listar_pagos(db, empresa_filtro(usuario), factura_id)
 
