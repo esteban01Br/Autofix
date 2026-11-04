@@ -168,6 +168,14 @@ export const MODULOS = [
         desc: 'Indicadores',
         claves: ['productividad', 'indicadores', 'reportes', 'estadísticas'],
       },
+      {
+        to: '/resumen',
+        label: 'Resumen productividad',
+        icon: LayoutDashboard,
+        roles: ['ADMIN'],
+        desc: 'Resumen por periodo',
+        claves: ['resumen', 'productividad', 'periodo', 'reportes'],
+      },
     ],
   },
   {
