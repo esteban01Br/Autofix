@@ -21,7 +21,7 @@ Portal público del SaaS AutoFix: landing, planes, compra de suscripciones
 | Variable        | Descripción                                   | Ejemplo                                    |
 | --------------- | --------------------------------------------- | ------------------------------------------ |
 | `VITE_API_URL`  | URL de la API (opcional en dev: usa proxy)    | `https://autofix-api-tm6d.onrender.com`    |
-| `VITE_APP_URL`  | URL de la app operativa (para entrar al panel) | `https://subtle-figolla-fb4cd0.netlify.app` |
+| `VITE_APP_URL`  | URL de la app operativa (para entrar al panel) | `https://subtle-figolla-fb4cd0.cloudflare.app` |
 
 En desarrollo no hace falta ninguna: el proxy de Vite reenvía `/api` al
 backend local (puertos 8081/8000) y la app se asume en `localhost:5173`.
@@ -35,18 +35,15 @@ npm run dev    # http://localhost:5174
 
 (El launcher `.\start-dev.ps1` de la raíz ya arranca backend, app y portal.)
 
-## Despliegue en Netlify
+## Despliegue en Cloudflare Pages
 
-1. Crear un **sitio nuevo** en Netlify conectado al mismo repositorio.
-2. Configuración del sitio:
-   - **Base directory**: `autofix-portal`
-   - **Build command**: `npm run build`
-   - **Publish directory**: `dist`
-   (ya vienen en `netlify.toml` si se usa esa base directory).
-3. En *Site settings → Environment variables*:
-   - `VITE_API_URL` = URL de la API en Render
-   - `VITE_APP_URL` = URL del sitio Netlify de la app (`autofix-frontend`)
-4. En **Render** (la API), agregar el origen del portal a `CORS_ORIGINS`,
-   p. ej.: `https://TU-PORTAL.netlify.app` (lista separada por comas).
-5. En el sitio Netlify de la **app** (`autofix-frontend`), definir
-   `VITE_PORTAL_URL` = URL de este portal (para que `/login` redirija aquí).
+1. Crear un **sitio nuevo** en Cloudflare conectado al mismo repositorio.
+2. Base directory: `autofix-portal`
+3. Build command: `npm run build`
+4. Publish directory: `dist`
+
+En **Site settings → Environment variables**:
+- `VITE_API_URL` = URL de la API en Render
+- `VITE_APP_URL` = URL del sitio Cloudflare Pages
+
+La cámara requiere HTTPS (Cloudflare) o `localhost`; el navegador pedirá permiso la primera vez.

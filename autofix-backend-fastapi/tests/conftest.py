@@ -13,6 +13,11 @@ os.environ["SECRET_KEY"] = "clave-de-prueba-para-autofix-tests-2026"
 os.environ["DEBUG"] = "true"
 # Los tests hacen muchos logins seguidos; sin límite de peticiones.
 os.environ["RATE_LIMIT_ENABLED"] = "false"
+# Credenciales de prueba para el seed (nunca se usan en producción).
+os.environ["AUTOFIX_ADMIN_EMAIL"] = "admin.seed@prueba.com"
+os.environ["AUTOFIX_ADMIN_PASSWORD"] = "ClaveSeguraTaller2026"
+os.environ["AUTOFIX_SUPERADMIN_EMAIL"] = "super.seed@prueba.com"
+os.environ["AUTOFIX_SUPERADMIN_PASSWORD"] = "ClaveSeguraPlataforma2026"
 
 import pytest
 from fastapi.testclient import TestClient
@@ -36,7 +41,11 @@ def empresa_defecto(client):
     try:
         empresa = db.query(Empresa).order_by(Empresa.id).first()
         if empresa is None:
-            empresa = Empresa(nombre="AutoFix Pruebas", nit="900.000.001-1")
+            empresa = Empresa(
+                nombre="AutoFix Pruebas",
+                nit="900.000.001-1",
+                slug="autofix-pruebas",
+            )
             db.add(empresa)
             db.commit()
             db.refresh(empresa)

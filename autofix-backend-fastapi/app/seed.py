@@ -4,8 +4,8 @@
 - Usuario administrador de esa empresa.
 - Usuario SUPERADMIN de la plataforma (ve todas las empresas).
 
-Las credenciales se leen de variables de entorno (con fallback solo para
-desarrollo local). Uso:
+Las credenciales se leen de variables de entorno obligatorias (definidas en
+el archivo .env). Uso:
     python -m app.seed
 """
 
@@ -13,6 +13,7 @@ import os
 
 from sqlalchemy import select
 
+from app.config import settings
 from app.crud import usuario as crud_usuario
 from app.database import Base, SessionLocal, engine
 from app.migrations import aplicar_migraciones
@@ -21,11 +22,65 @@ from app.models.enums import Rol
 from app.models.usuario import Usuario
 from app.security import hash_password
 
-CORREO_ADMIN: str = os.getenv("AUTOFIX_ADMIN_EMAIL", "admin@autofix.com")
-CONTRASENA_ADMIN: str = os.getenv("AUTOFIX_ADMIN_PASSWORD", "Admin123!")
+VARIABLES_CREDENCIALES = (
+    "AUTOFIX_ADMIN_EMAIL",
+    "AUTOFIX_ADMIN_PASSWORD",
+    "AUTOFIX_SUPERADMIN_EMAIL",
+    "AUTOFIX_SUPERADMIN_PASSWORD",
+)
 
-CORREO_SUPERADMIN: str = os.getenv("AUTOFIX_SUPERADMIN_EMAIL", "superadmin@autofix.com")
-CONTRASENA_SUPERADMIN: str = os.getenv("AUTOFIX_SUPERADMIN_PASSWORD", "Super123!")
+
+def _exigir_credenciales_en_produccion() -> None:
+    """En producción falla rápido si faltan las credenciales del seed.
+
+    Nunca se usan claves por defecto: las cuatro variables son obligatorias.
+    """
+    if not settings.ES_PRODUCCION:
+        return
+
+    faltan = [
+        nombre
+        for nombre in VARIABLES_CREDENCIALES
+        if not os.getenv(nombre, "").strip()
+    ]
+    if faltan:
+        raise RuntimeError(
+            "SEGURIDAD: en producción debes definir " + ", ".join(faltan)
+        )
+
+
+def _variable_obligatoria(nombre: str) -> str:
+    valor = os.getenv(nombre, "").strip()
+    if not valor:
+        raise RuntimeError(
+            f"Falta la variable de entorno {nombre}. "
+            "Defínela en el archivo .env antes de ejecutar el seed."
+        )
+    return valor
+
+
+def _leer_credenciales() -> tuple[str, str, str, str]:
+    """Lee y valida las credenciales iniciales desde el entorno."""
+    correo_admin = _variable_obligatoria("AUTOFIX_ADMIN_EMAIL")
+    contrasena_admin = _variable_obligatoria("AUTOFIX_ADMIN_PASSWORD")
+    correo_superadmin = _variable_obligatoria("AUTOFIX_SUPERADMIN_EMAIL")
+    contrasena_superadmin = _variable_obligatoria("AUTOFIX_SUPERADMIN_PASSWORD")
+
+    for nombre, contrasena in (
+        ("AUTOFIX_ADMIN_PASSWORD", contrasena_admin),
+        ("AUTOFIX_SUPERADMIN_PASSWORD", contrasena_superadmin),
+    ):
+        if len(contrasena) < 12:
+            raise RuntimeError(
+                f"La variable {nombre} debe tener al menos 12 caracteres."
+            )
+
+    return (
+        correo_admin,
+        contrasena_admin,
+        correo_superadmin,
+        contrasena_superadmin,
+    )
 
 
 def _asegurar_empresa_defecto(db) -> Empresa:
@@ -66,10 +121,15 @@ def _asegurar_usuario(
     )
     db.add(usuario)
     db.commit()
-    print(f"Usuario creado: {correo} / {contrasena} (rol {rol.value})")
+    print(f"Usuario creado: {correo} (rol {rol.value})")
 
 
 def seed() -> None:
+    _exigir_credenciales_en_produccion()
+    correo_admin, contrasena_admin, correo_superadmin, contrasena_superadmin = (
+        _leer_credenciales()
+    )
+
     Base.metadata.create_all(bind=engine)
     aplicar_migraciones()
     db = SessionLocal()
@@ -77,15 +137,15 @@ def seed() -> None:
         empresa = _asegurar_empresa_defecto(db)
         _asegurar_usuario(
             db,
-            correo=CORREO_ADMIN,
-            contrasena=CONTRASENA_ADMIN,
+            correo=correo_admin,
+            contrasena=contrasena_admin,
             rol=Rol.ADMIN,
             empresa_id=empresa.id,
         )
         _asegurar_usuario(
             db,
-            correo=CORREO_SUPERADMIN,
-            contrasena=CONTRASENA_SUPERADMIN,
+            correo=correo_superadmin,
+            contrasena=contrasena_superadmin,
             rol=Rol.SUPERADMIN,
             empresa_id=None,
         )

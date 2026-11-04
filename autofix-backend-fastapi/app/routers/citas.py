@@ -5,12 +5,13 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, empresa_filtro, get_current_user
+from app.routers.deps import admin, empleado, empresa_filtro
 from app.database import get_db
 from app.models.enums import EstadoCita
 from app.models.usuario import Usuario
 from app.schemas.cita import CitaCreate, CitaEstadoRequest, CitaResponse, CitaUpdate
 from app.services import cita_service
+from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(prefix="/api/citas", tags=["Citas"])
 
@@ -26,7 +27,17 @@ def crear_cita(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> CitaResponse:
-    return cita_service.crear_cita(db, usuario.empresa_id, payload)
+    creada = cita_service.crear_cita(db, usuario.empresa_id, payload)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="CREAR_CITA",
+        entidad="Cita",
+        entidad_id=creada.id,
+        detalle=f"Cita creada para el vehículo {creada.vehiculoId}",
+    )
+    return creada
 
 
 @router.get(
@@ -37,7 +48,7 @@ def crear_cita(
 def listar_citas(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
     estado: EstadoCita | None = Query(None),
     desde: date | None = Query(None),
     hasta: date | None = Query(None),
@@ -73,7 +84,7 @@ def listar_citas(
 def obtener_cita(
     cita_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> CitaResponse:
     return cita_service.obtener_cita(db, empresa_filtro(usuario), cita_id)
 
@@ -103,7 +114,17 @@ def cambiar_estado_cita(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> CitaResponse:
-    return cita_service.cambiar_estado(db, empresa_filtro(usuario), cita_id, payload.estado)
+    cambiada = cita_service.cambiar_estado(db, empresa_filtro(usuario), cita_id, payload.estado)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="CAMBIO_ESTADO_CITA",
+        entidad="Cita",
+        entidad_id=cambiada.id,
+        detalle=f"Estado de la cita cambiada a {cambiada.estado.value}",
+    )
+    return cambiada
 
 
 @router.delete(

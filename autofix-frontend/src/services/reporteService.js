@@ -15,3 +15,18 @@ export const ventasMensuales = async (meses = 12) => {
   const response = await api.get('/api/reportes/ventas-mensuales', { params: { meses } });
   return response.data;
 };
+
+export const productividadResumenPeriodo = async (periodo = 'diario', fecha) => {
+  const response = await api.get('/api/reportes/productividad-periodo', {
+    params: { periodo, fecha: fecha?.toISOString().split('T')[0] },
+  });
+  return response.data;
+};
+
+export const productividadPeriodoPDF = async (periodo = 'diario', fecha) => {
+  const response = await api.get('/api/reportes/productividad-periodo/pdf', {
+    params: { periodo, fecha: fecha?.toISOString().split('T')[0] },
+    responseType: 'blob',
+  });
+  return response.data;
+};

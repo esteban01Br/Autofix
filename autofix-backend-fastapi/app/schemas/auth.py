@@ -2,6 +2,8 @@
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+from app.schemas.common import validar_contrasena
+
 
 class LoginRequest(BaseModel):
     correo: EmailStr = Field(description="Correo electrónico del usuario")
@@ -16,9 +18,14 @@ class RegisterRequest(BaseModel):
     apellido: str = Field(min_length=1, max_length=100, description="Apellido")
     correo: EmailStr = Field(description="Correo electrónico")
     contrasena: str = Field(
-        min_length=8, max_length=128, description="Contraseña (mínimo 8 caracteres)"
+        max_length=128, description="Contraseña (mínimo 10 caracteres, con letra y número)"
     )
     telefono: str | None = Field(default=None, max_length=20)
+    slug: str = Field(
+        min_length=1,
+        max_length=80,
+        description="Slug de la empresa a la que se une el usuario",
+    )
 
     @field_validator("nombre", "apellido")
     @classmethod
@@ -35,9 +42,7 @@ class RegisterRequest(BaseModel):
     @field_validator("contrasena")
     @classmethod
     def contrasena_segura(cls, valor: str) -> str:
-        if valor.islower() and valor.isalpha():
-            raise ValueError("Debe contener al menos una mayúscula o un número")
-        return valor
+        return validar_contrasena(valor)
 
 
 class TokenResponse(BaseModel):

@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, empresa_filtro, get_current_user
+from app.routers.deps import admin, empleado, empresa_filtro
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.repuesto import (
@@ -50,7 +50,7 @@ def crear_repuesto(
 def listar_repuestos(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
     busqueda: str | None = Query(None, description="Filtra por nombre, código o descripción"),
     stock_min: int | None = Query(None, ge=0),
     stock_max: int | None = Query(None, ge=0),
@@ -85,7 +85,7 @@ def listar_repuestos(
 def buscar_por_codigo(
     codigo: str,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> RepuestoResponse:
     return repuesto_service.obtener_por_codigo(db, empresa_filtro(usuario), codigo)
 
@@ -98,7 +98,7 @@ def buscar_por_codigo(
 def obtener_repuesto(
     repuesto_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> RepuestoResponse:
     return repuesto_service.obtener_repuesto(db, empresa_filtro(usuario), repuesto_id)
 
@@ -128,7 +128,17 @@ def ajustar_stock(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> RepuestoResponse:
-    return repuesto_service.ajustar_stock(db, empresa_filtro(usuario), repuesto_id, payload.cantidad)
+    ajustado = repuesto_service.ajustar_stock(db, empresa_filtro(usuario), repuesto_id, payload.cantidad)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="AJUSTE_STOCK",
+        entidad="Repuesto",
+        entidad_id=ajustado.id,
+        detalle=f"Stock ajustado en {payload.cantidad} unidades",
+    )
+    return ajustado
 
 
 @router.delete(

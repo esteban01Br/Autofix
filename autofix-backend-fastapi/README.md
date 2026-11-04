@@ -42,17 +42,19 @@ python -m venv .venv
 .venv\Scripts\activate            # Windows
 pip install -r requirements.txt
 
-# 2) Variables de entorno (opcional, ya hay valores por defecto)
+# 2) Variables de entorno (define las credenciales iniciales en .env)
 copy .env.example .env
 
-# 3) Crear el administrador por defecto
+# 3) Crear el administrador inicial (requiere las variables AUTOFIX_* en .env)
 python -m app.seed
 
 # 4) Ejecutar el servidor (http://localhost:8081)
 python run.py
 ```
 
-Acceso por defecto: `admin@autofix.com` / `Admin123!`.
+El acceso inicial usa las credenciales definidas en tu archivo `.env`
+(`AUTOFIX_ADMIN_EMAIL` / `AUTOFIX_ADMIN_PASSWORD`). No hay credenciales por
+defecto en el código.
 
 Documentación interactiva (Swagger) en `http://localhost:8081/docs`.
 
@@ -77,8 +79,10 @@ Documentación interactiva (Swagger) en `http://localhost:8081/docs`.
 | `DEBUG` | Modo debug | `false` |
 | `DOCS_ENABLED` | Mostrar `/docs` y `/openapi.json` (en producción: ocultos por defecto) | según entorno |
 | `RATE_LIMIT_ENABLED` | Límite de peticiones en login (10/min) y registro (5/min) | `true` |
-| `AUTOFIX_ADMIN_EMAIL` | Correo del administrador inicial (seed) | `admin@autofix.com` |
-| `AUTOFIX_ADMIN_PASSWORD` | Contraseña del administrador inicial (seed) | `Admin123!` |
+| `AUTOFIX_ADMIN_EMAIL` | Correo del administrador inicial (seed). **Obligatoria** | definida en `.env` |
+| `AUTOFIX_ADMIN_PASSWORD` | Contraseña del administrador inicial (seed). **Obligatoria**, mínimo 12 caracteres | definida en `.env` |
+| `AUTOFIX_SUPERADMIN_EMAIL` | Correo del superadministrador inicial (seed). **Obligatoria** | definido en `.env` |
+| `AUTOFIX_SUPERADMIN_PASSWORD` | Contraseña del superadministrador inicial (seed). **Obligatoria**, mínimo 12 caracteres | definida en `.env` |
 
 ## Contrato de la API (resumen)
 

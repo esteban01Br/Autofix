@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import empresa_filtro, gestion, get_current_user
+from app.routers.deps import empleado, empresa_filtro, gestion
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.servicio import ServicioCreate, ServicioResponse, ServicioUpdate
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/api/servicios", tags=["Servicios"])
 )
 def listar_servicios(
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
     solo_activos: bool = Query(False, description="Solo servicios activos"),
 ) -> list[ServicioResponse]:
     return servicio_service.listar_servicios(
@@ -36,7 +36,7 @@ def listar_servicios(
 def obtener_servicio(
     servicio_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> ServicioResponse:
     return servicio_service.obtener_servicio(
         db, empresa_filtro(usuario), servicio_id

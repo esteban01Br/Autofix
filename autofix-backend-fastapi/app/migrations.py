@@ -425,6 +425,22 @@ def _migrar_proveedores(conn, insp) -> None:
         )
 
 
+def _migrar_bloqueo_usuarios(conn, insp) -> None:
+    """Agrega el bloqueo temporal por intentos fallidos (idempotente)."""
+    if "usuarios" not in insp.get_table_names():
+        return
+    cols = _columnas(insp, "usuarios")
+    if "intentos_fallidos" not in cols:
+        conn.execute(
+            text(
+                "ALTER TABLE usuarios ADD COLUMN intentos_fallidos"
+                " INTEGER NOT NULL DEFAULT 0"
+            )
+        )
+    if "bloqueado_hasta" not in cols:
+        conn.execute(text("ALTER TABLE usuarios ADD COLUMN bloqueado_hasta TIMESTAMP"))
+
+
 def _migrar_a_multiempresa(conn, insp) -> None:
     if "empresas" not in insp.get_table_names():
         return  # create_all aún no la crea (no debería pasar).
@@ -476,6 +492,7 @@ def _migrar_a_multiempresa(conn, insp) -> None:
     _migrar_slug_y_suscripciones(conn, insp)
     _migrar_cotizaciones(conn, insp)
     _migrar_proveedores(conn, insp)
+    _migrar_bloqueo_usuarios(conn, insp)
 
 
 # ------------------------------------------------------------------

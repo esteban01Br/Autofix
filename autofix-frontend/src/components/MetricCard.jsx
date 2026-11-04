@@ -65,7 +65,7 @@ export default function MetricCard({
         aria-hidden="true"
         className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full blur-2xl opacity-40 transition-opacity duration-300 group-hover:opacity-80"
         style={{
-          background: acento ? 'rgba(102, 58, 243, 0.3)' : 'rgba(124, 145, 182, 0.14)',
+          background: acento ? 'rgba(255, 136, 51, 0.22)' : 'rgba(124, 145, 182, 0.12)',
         }}
       />
 
@@ -85,7 +85,7 @@ export default function MetricCard({
         <div
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-110 ${
             acento
-              ? 'bg-accent-glow text-[#b9a5ff] shadow-[inset_0_0_0_1px_rgba(102,58,243,0.38)]'
+              ? 'bg-accent-glow text-[var(--color-signal-orange)] shadow-[inset_0_0_0_1px_rgba(255,136,51,0.38)]'
               : 'tile-icono'
           }`}
         >

@@ -3,11 +3,12 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, empresa_filtro, get_current_user
+from app.routers.deps import admin, empleado, empresa_filtro
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.vehiculo import VehiculoCreate, VehiculoResponse, VehiculoUpdate
 from app.services import vehiculo_service
+from app.services.auditoria_service import registrar as auditar
 
 router = APIRouter(prefix="/api/vehiculos", tags=["Vehículos"])
 
@@ -23,7 +24,17 @@ def crear_vehiculo(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> VehiculoResponse:
-    return vehiculo_service.crear_vehiculo(db, usuario.empresa_id, payload)
+    creado = vehiculo_service.crear_vehiculo(db, usuario.empresa_id, payload)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="CREAR_VEHICULO",
+        entidad="Vehiculo",
+        entidad_id=creado.id,
+        detalle=f"Vehículo creado: {creado.placa} - {creado.marca} {creado.modelo}",
+    )
+    return creado
 
 
 @router.get(
@@ -34,7 +45,7 @@ def crear_vehiculo(
 def listar_vehiculos(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
     placa: str | None = Query(None),
     marca: str | None = Query(None),
     cliente_id: int | None = Query(None),
@@ -69,7 +80,7 @@ def listar_vehiculos(
 def obtener_vehiculo(
     vehiculo_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> VehiculoResponse:
     return vehiculo_service.obtener_vehiculo(db, empresa_filtro(usuario), vehiculo_id)
 

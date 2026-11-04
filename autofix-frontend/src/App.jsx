@@ -20,6 +20,7 @@ const MiEmpresa = lazy(() => import('./pages/MiEmpresa'));
 const MisOrdenes = lazy(() => import('./pages/MisOrdenes'));
 const Auditoria = lazy(() => import('./pages/Auditoria'));
 const Productividad = lazy(() => import('./pages/Productividad'));
+const ResumenPeriodo = lazy(() => import('./pages/ResumenPeriodo'));
 const Servicios = lazy(() => import('./pages/Servicios'));
 const Cotizaciones = lazy(() => import('./pages/Cotizaciones'));
 const Proveedores = lazy(() => import('./pages/Proveedores'));
@@ -65,7 +66,10 @@ const titulos = {
   '/mis-ordenes': 'Mis órdenes',
   '/auditoria': 'Auditoría',
   '/productividad': 'Productividad',
+  '/resumen': 'Resumen productividad',
   '/servicios': 'Servicios',
+  '/cotizaciones': 'Cotizaciones',
+  '/proveedores': 'Proveedores',
 };
 
 function ConTitulo() {
@@ -121,6 +125,7 @@ export default function App() {
           <Route path="/mis-ordenes" element={<ProtectedRoute roles={['MECANICO']}><MisOrdenes /></ProtectedRoute>} />
           <Route path="/auditoria" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Auditoria /></ProtectedRoute>} />
           <Route path="/productividad" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Productividad /></ProtectedRoute>} />
+          <Route path="/resumen" element={<ProtectedRoute roles={['ADMIN']}><ResumenPeriodo /></ProtectedRoute>} />
           <Route path="/servicios" element={<ProtectedRoute roles={['ADMIN', 'GERENTE', 'ASESOR']}><Servicios /></ProtectedRoute>} />
         <Route path="/cotizaciones" element={<ProtectedRoute roles={['ADMIN', 'GERENTE']}><Cotizaciones /></ProtectedRoute>} />
         <Route path="/proveedores" element={<ProtectedRoute roles={['ADMIN', 'GERENTE', 'BODEGUERO']}><Proveedores /></ProtectedRoute>} />

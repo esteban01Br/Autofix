@@ -153,7 +153,7 @@ if (Test-Path $portal) {
     Write-Host "  Portal   -> http://localhost:5174   (login + planes)" -ForegroundColor Green
 }
 Write-Host ""
-Write-Host "  Credenciales por defecto: admin@autofix.com / Admin123!" -ForegroundColor DarkGray
+Write-Host "  Credenciales: definidas en backend\.env (AUTOFIX_ADMIN_EMAIL / AUTOFIX_ADMIN_PASSWORD)" -ForegroundColor DarkGray
 Write-Host "  Pulsa Ctrl+C para detener los servicios."                -ForegroundColor DarkGray
 Write-Host ""
 

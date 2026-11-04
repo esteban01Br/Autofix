@@ -3,7 +3,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.routers.deps import get_current_user, gestion, superadmin
+from app.routers.deps import (
+    get_current_user_sin_suscripcion,
+    gestion_sin_suscripcion,
+    superadmin,
+)
 from app.database import get_db
 from app.models.empresa import Empresa
 from app.models.usuario import Usuario
@@ -35,7 +39,7 @@ def listar_planes() -> list[PlanInfo]:
 )
 def suscripcion_actual(
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(get_current_user_sin_suscripcion),
 ) -> SuscripcionResponse | None:
     suscripcion = suscripcion_service.obtener(db, usuario.empresa_id)
     if suscripcion is None:
@@ -50,7 +54,7 @@ def suscripcion_actual(
 )
 def renovar_suscripcion(
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(gestion),
+    usuario: Usuario = Depends(gestion_sin_suscripcion),
 ) -> SuscripcionResponse:
     suscripcion = suscripcion_service.renovar(db, usuario.empresa_id)
     auditar(
@@ -60,7 +64,7 @@ def renovar_suscripcion(
         accion="RENOVAR_SUSCRIPCION",
         entidad="Suscripcion",
         entidad_id=suscripcion.id,
-        detalle=f"Plan {suscripcion.plan.value} hasta {suscripcion.fecha_fin:%Y-%m-%d}",
+        detalle=f"Plan {suscripcion.plan.value} hasta {suscripcion.fechaFin:%Y-%m-%d}",
     )
     return suscripcion
 

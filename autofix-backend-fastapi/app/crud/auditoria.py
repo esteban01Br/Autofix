@@ -1,6 +1,6 @@
 """CRUD de Auditoria."""
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.models.auditoria import Auditoria
 
@@ -49,7 +49,7 @@ def listar(
     stmt = stmt.order_by(Auditoria.fecha.desc()).limit(limit).offset(offset)
     items = list(db.scalars(stmt).all())
 
-    count_stmt = select(Auditoria)
+    count_stmt = select(func.count(Auditoria.id))
     if empresa_id is not None:
         count_stmt = count_stmt.where(Auditoria.empresa_id == empresa_id)
     if accion:

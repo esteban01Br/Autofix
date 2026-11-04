@@ -38,9 +38,9 @@ Optional setup-only mode:
 
 This script will prepare the backend virtual environment, install Python dependencies, create the default `.env`, install frontend dependencies, seed the default admin user, and start both services together.
 
-Default admin credentials:
-- Email: `admin@autofix.com`
-- Password: `Admin123!`
+The initial admin credentials are defined in the backend `.env` file
+(`AUTOFIX_ADMIN_EMAIL` and `AUTOFIX_ADMIN_PASSWORD`); there are no default
+credentials in the code.
 
 ## Backend conventions
 

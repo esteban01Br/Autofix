@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import admin, empresa_filtro, get_current_user, mecanico
+from app.routers.deps import admin, empleado, empresa_filtro, mecanico
 from app.database import get_db
 from app.models.enums import EstadoOrden
 from app.models.usuario import Usuario
@@ -54,7 +54,7 @@ def crear_orden(
 def listar_ordenes(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
     estado: EstadoOrden | None = Query(None),
     vehiculo_id: int | None = Query(None),
     mecanico_id: int | None = Query(None),
@@ -106,7 +106,7 @@ def listar_mias(
 def obtener_orden(
     orden_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> OrdenTrabajoResponse:
     return orden_trabajo_service.obtener_orden(db, empresa_filtro(usuario), orden_id)
 
@@ -137,7 +137,17 @@ def cambiar_estado_orden(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> OrdenTrabajoResponse:
-    return orden_trabajo_service.cambiar_estado(db, empresa_filtro(usuario), orden_id, payload.estado)
+    orden = orden_trabajo_service.cambiar_estado(db, empresa_filtro(usuario), orden_id, payload.estado)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="CAMBIO_ESTADO_ORDEN",
+        entidad="OrdenTrabajo",
+        entidad_id=orden.id,
+        detalle=f"Estado cambiado a {orden.estado.value}",
+    )
+    return orden
 
 
 @router.patch(
@@ -151,7 +161,17 @@ def asignar_mecanico(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(admin),
 ) -> OrdenTrabajoResponse:
-    return orden_trabajo_service.asignar_mecanico(db, empresa_filtro(usuario), orden_id, payload.mecanicoId)
+    orden = orden_trabajo_service.asignar_mecanico(db, empresa_filtro(usuario), orden_id, payload.mecanicoId)
+    auditar(
+        db,
+        empresa_id=usuario.empresa_id,
+        usuario_id=usuario.id,
+        accion="ASIGNAR_MECANICO",
+        entidad="OrdenTrabajo",
+        entidad_id=orden.id,
+        detalle=f"Mecánico {payload.mecanicoId} asignado a la orden",
+    )
+    return orden
 
 
 @router.delete(

@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.routers.deps import empresa_filtro, gestion, get_current_user
+from app.routers.deps import empleado, empresa_filtro, gestion
 from app.database import get_db
 from app.models.usuario import Usuario
 from app.schemas.proveedor import (
@@ -25,7 +25,7 @@ router = APIRouter(prefix="/api/proveedores", tags=["Proveedores"])
 def listar_proveedores(
     db: Session = Depends(get_db),
     resp: Response = Response(),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
     activo: bool | None = Query(None, description="Filtra por activo"),
     busqueda: str | None = Query(
         None, description="Filtra por nombre, contacto, correo o NIT"
@@ -57,7 +57,7 @@ def listar_proveedores(
 def obtener_proveedor(
     proveedor_id: int,
     db: Session = Depends(get_db),
-    usuario: Usuario = Depends(get_current_user),
+    usuario: Usuario = Depends(empleado),
 ) -> ProveedorResponse:
     return proveedor_service.obtener_proveedor(
         db, empresa_filtro(usuario), proveedor_id

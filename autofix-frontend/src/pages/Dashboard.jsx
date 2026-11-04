@@ -2,22 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
-  BarChart3,
-  Building2,
   Calendar,
   Car,
+  ChevronDown,
   ChevronRight,
-  ClipboardList,
-  FileText,
   LayoutDashboard,
   Package,
   Receipt,
-  ShieldCheck,
   Sparkles,
-  Store,
-  Truck,
-  UserCog,
-  Users,
   Wrench,
 } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
@@ -25,6 +17,7 @@ import Badge from '../components/Badge';
 import EmptyState from '../components/EmptyState';
 import Skeleton from '../components/Skeleton';
 import { useAuth } from '../context/AuthContext';
+import { modulosVisibles } from '../lib/modulos';
 import {
   obtenerVehiculos,
   obtenerCitas,
@@ -34,12 +27,12 @@ import {
 } from '../services/dashboardService';
 
 const SEGMENTOS_ESTADO = [
-  { estado: 'RECIBIDO', color: '#a1a1a1' },
-  { estado: 'DIAGNOSTICO', color: '#737373' },
-  { estado: 'EN_REPARACION', color: '#fafafa' },
-  { estado: 'ESPERANDO_REPUESTOS', color: '#ff8833' },
-  { estado: 'LISTO', color: '#e5e5e5' },
-  { estado: 'ENTREGADO', color: '#464646' },
+  { estado: 'RECIBIDO', color: 'var(--grafico-recibido)' },
+  { estado: 'DIAGNOSTICO', color: 'var(--grafico-diagnostico)' },
+  { estado: 'EN_REPARACION', color: 'var(--grafico-reparacion)' },
+  { estado: 'ESPERANDO_REPUESTOS', color: 'var(--grafico-espera)' },
+  { estado: 'LISTO', color: 'var(--grafico-listo)' },
+  { estado: 'ENTREGADO', color: 'var(--grafico-entregado)' },
 ];
 
 const ACCIONES = [
@@ -69,45 +62,16 @@ const ACCIONES = [
   },
 ];
 
-const MODULOS = [
-  {
-    titulo: 'General',
-    items: [
-      { to: '/dashboard', label: 'Panel', icon: LayoutDashboard, roles: ['SUPERADMIN', 'ADMIN', 'GERENTE', 'ASESOR', 'MECANICO', 'BODEGUERO', 'CAJERO', 'CLIENTE'], desc: 'Vista general del taller' },
-      { to: '/empresas', label: 'Empresas', icon: Building2, roles: ['SUPERADMIN'], desc: 'Gestión multi-empresa' },
-      { to: '/mi-empresa', label: 'Mi empresa', icon: Store, roles: ['ADMIN', 'GERENTE'], desc: 'Configuración de taller' },
-    ],
-  },
-  {
-    titulo: 'Operación',
-    items: [
-      { to: '/clientes', label: 'Clientes', icon: UserCog, roles: ['ADMIN', 'GERENTE', 'ASESOR', 'MECANICO'], desc: 'Base de clientes' },
-      { to: '/vehiculos', label: 'Vehículos', icon: Car, roles: ['ADMIN', 'GERENTE', 'ASESOR', 'MECANICO', 'CLIENTE'], desc: 'Registro de vehículos' },
-      { to: '/citas', label: 'Citas', icon: Calendar, roles: ['ADMIN', 'GERENTE', 'ASESOR', 'MECANICO', 'CLIENTE'], desc: 'Agenda del taller' },
-      { to: '/ordenes', label: 'Órdenes', icon: Wrench, roles: ['ADMIN', 'GERENTE', 'ASESOR', 'MECANICO'], desc: 'Órdenes de trabajo' },
-      { to: '/mis-ordenes', label: 'Mis Órdenes', icon: Wrench, roles: ['MECANICO'], desc: 'Órdenes asignadas' },
-      { to: '/repuestos', label: 'Repuestos', icon: Package, roles: ['ADMIN', 'GERENTE', 'BODEGUERO', 'MECANICO'], desc: 'Inventario de repuestos' },
-      { to: '/proveedores', label: 'Proveedores', icon: Truck, roles: ['ADMIN', 'GERENTE', 'BODEGUERO'], desc: 'Proveedores' },
-      { to: '/servicios', label: 'Servicios', icon: ClipboardList, roles: ['ADMIN', 'GERENTE', 'ASESOR'], desc: 'Catálogo de servicios' },
-      { to: '/cotizaciones', label: 'Cotizaciones', icon: FileText, roles: ['ADMIN', 'GERENTE'], desc: 'Presupuestos' },
-    ],
-  },
-  {
-    titulo: 'Equipo',
-    items: [
-      { to: '/usuarios', label: 'Usuarios', icon: Users, roles: ['ADMIN', 'GERENTE'], desc: 'Gestión de usuarios' },
-      { to: '/mecanicos', label: 'Mecánicos', icon: Wrench, roles: ['ADMIN', 'GERENTE'], desc: 'Equipo mecánico' },
-      { to: '/productividad', label: 'Productividad', icon: BarChart3, roles: ['ADMIN', 'GERENTE'], desc: 'Indicadores' },
-    ],
-  },
-  {
-    titulo: 'Administración',
-    items: [
-      { to: '/facturas', label: 'Facturas', icon: Receipt, roles: ['ADMIN', 'GERENTE', 'CAJERO'], desc: 'Facturación y cobros' },
-      { to: '/auditoria', label: 'Auditoría', icon: ShieldCheck, roles: ['ADMIN', 'GERENTE'], desc: 'Trazabilidad' },
-    ],
-  },
-];
+const CLAVE_SECCIONES = 'autofix_modulos_abiertos';
+
+const estadoInicialSecciones = () => {
+  try {
+    const guardado = JSON.parse(window.localStorage.getItem(CLAVE_SECCIONES) || 'null');
+    return guardado && typeof guardado === 'object' ? guardado : {};
+  } catch {
+    return {};
+  }
+};
 
 const moneda = new Intl.NumberFormat('es-CO', {
   style: 'currency',
@@ -221,8 +185,35 @@ export default function Dashboard() {
     facturas: null,
   });
   const [estado, setEstado] = useState({ cargando: true, error: '' });
+  const [seccionesAbiertas, setSeccionesAbiertas] = useState(estadoInicialSecciones);
   const { usuario } = useAuth();
   const navigate = useNavigate();
+
+  const modulosPorRol = useMemo(() => modulosVisibles(usuario?.rol), [usuario?.rol]);
+  const todasAbiertas = modulosPorRol.every(
+    (seccion) => seccionesAbiertas[seccion.titulo] !== false,
+  );
+
+  const guardarSecciones = (mapa) => {
+    setSeccionesAbiertas(mapa);
+    window.localStorage.setItem(CLAVE_SECCIONES, JSON.stringify(mapa));
+  };
+
+  const alternarSeccion = (titulo) => {
+    guardarSecciones({
+      ...seccionesAbiertas,
+      [titulo]: seccionesAbiertas[titulo] === false,
+    });
+  };
+
+  const alternarTodas = () => {
+    const nuevoEstado = !todasAbiertas;
+    const mapa = {};
+    modulosPorRol.forEach((seccion) => {
+      mapa[seccion.titulo] = nuevoEstado;
+    });
+    guardarSecciones(mapa);
+  };
 
   useEffect(() => {
     let activo = true;
@@ -429,7 +420,7 @@ export default function Dashboard() {
             <button
               key={to}
               onClick={() => navigate(to)}
-              className="inline-flex items-center gap-2 rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-4 py-1.5 text-sm font-medium text-[var(--color-cloud-white)] transition-colors hover:border-[var(--color-steel-border)] hover:bg-[#1f1f1f]"
+              className="inline-flex items-center gap-2 rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-4 py-1.5 text-sm font-medium text-[var(--color-cloud-white)] transition-colors hover:border-[var(--color-steel-border)] hover:bg-surface-hover"
             >
               <Icon size={15} className="transition-transform" />
               {label}
@@ -647,7 +638,7 @@ export default function Dashboard() {
                     .map((orden) => (
                       <tr
                         key={orden.id}
-                        className="border-b border-[var(--color-graphite-edge)] last:border-0 hover:bg-[#151515]"
+                        className="border-b border-[var(--color-graphite-edge)] last:border-0 hover:bg-surface-hover"
                       >
                         <td className="py-2.5 font-mono text-[var(--color-fog)]">#{orden.id}</td>
                         <td className="py-2.5">
@@ -715,7 +706,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => navigate('/facturas')}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-4 py-1.5 text-sm font-medium text-[var(--color-cloud-white)] transition-colors hover:border-[var(--color-steel-border)] hover:bg-[#1f1f1f]"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-4 py-1.5 text-sm font-medium text-[var(--color-cloud-white)] transition-colors hover:border-[var(--color-steel-border)] hover:bg-surface-hover"
                 >
                   Ver facturación
                   <ChevronRight size={14} />
@@ -757,43 +748,92 @@ export default function Dashboard() {
 
       {/* Módulos del sistema */}
       <div className="space-y-4">
-        <div>
-          <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--color-signal-orange)]">
-            <LayoutDashboard size={12} /> Módulos del sistema
-          </p>
-          <h2 className="mt-1 font-display text-2xl font-medium tracking-tight text-[var(--color-cloud-white)]">
-            Todos los servicios
-          </h2>
-          <p className="mt-1 text-sm text-[var(--color-fog)]">
-            Acceso rápido a todos los módulos disponibles para tu rol
-          </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--color-signal-orange)]">
+              <LayoutDashboard size={12} /> Módulos del sistema
+            </p>
+            <h2 className="mt-1 font-display text-2xl font-medium tracking-tight text-[var(--color-cloud-white)]">
+              Todos los servicios
+            </h2>
+            <p className="mt-1 text-sm text-[var(--color-fog)]">
+              Acceso rápido a todos los módulos disponibles para tu rol
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={alternarTodas}
+            className="inline-flex shrink-0 items-center gap-2 self-start rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] px-3 py-1.5 text-xs font-medium text-[var(--color-cloud-white)] transition-colors hover:border-[var(--color-steel-border)] hover:bg-surface-hover sm:self-auto"
+          >
+            <ChevronDown
+              size={14}
+              className={`transition-transform duration-200 ${todasAbiertas ? 'rotate-180' : ''}`}
+            />
+            {todasAbiertas ? 'Contraer todo' : 'Expandir todo'}
+          </button>
         </div>
 
-        <div className="space-y-6">
-          {MODULOS.map((seccion) => {
-            const itemsVisibles = seccion.items.filter((item) => item.roles.includes(usuario?.rol));
-            if (itemsVisibles.length === 0) return null;
+        <div className="space-y-3">
+          {modulosPorRol.map((seccion) => {
+            const abierta = seccionesAbiertas[seccion.titulo] !== false;
             return (
-              <div key={seccion.titulo}>
-                <h3 className="mb-3 text-sm font-medium text-[var(--color-fog)]">{seccion.titulo}</h3>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {itemsVisibles.map(({ to, label, icon: Icon, desc }) => (
-                    <button
-                      key={to}
-                      onClick={() => navigate(to)}
-                      className="group flex items-start gap-3 rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] p-4 text-left transition-all hover:border-[var(--color-steel-border)] hover:bg-[#151515]"
-                    >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] text-[var(--color-cloud-white)] transition-colors group-hover:border-[var(--color-steel-border)]">
-                        <Icon size={18} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-[var(--color-cloud-white)]">{label}</p>
-                        {desc && <p className="mt-0.5 text-xs text-[var(--color-fog)]">{desc}</p>}
-                      </div>
-                      <ChevronRight size={16} className="mt-0.5 shrink-0 text-[var(--color-ash)] transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-signal-orange)]" />
-                    </button>
-                  ))}
-                </div>
+              <div
+                key={seccion.titulo}
+                className="overflow-hidden rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] transition-colors hover:border-[var(--color-steel-border)]"
+              >
+                <button
+                  type="button"
+                  onClick={() => alternarSeccion(seccion.titulo)}
+                  aria-expanded={abierta}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-hover"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] text-[var(--color-cloud-white)]">
+                    <ChevronDown
+                      size={15}
+                      className={`transition-transform duration-200 ${abierta ? '' : '-rotate-90'}`}
+                    />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium text-[var(--color-cloud-white)]">
+                      {seccion.titulo}
+                    </span>
+                    <span className="block truncate text-xs text-[var(--color-fog)]">
+                      {seccion.descripcion}
+                    </span>
+                  </span>
+                  <span className="shrink-0 rounded-full border border-[var(--color-graphite-edge)] px-2 py-0.5 font-mono text-[10px] text-[var(--color-fog)]">
+                    {seccion.items.length} {seccion.items.length === 1 ? 'módulo' : 'módulos'}
+                  </span>
+                </button>
+
+                {abierta && (
+                  <div className="grid grid-cols-1 gap-2.5 border-t border-[var(--color-graphite-edge)] p-3 animate-slide-down sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {seccion.items.map(({ to, label, icon: Icon, desc }) => (
+                      <button
+                        key={to}
+                        type="button"
+                        onClick={() => navigate(to)}
+                        className="group relative flex items-start gap-3 overflow-hidden rounded-[10px] border border-[var(--color-graphite-edge)] bg-[var(--color-charcoal-surface)] p-3.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-steel-border)] active:translate-y-0 active:scale-[0.99]"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[var(--color-accent-glow)] via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                        />
+                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-[var(--color-graphite-edge)] bg-[var(--color-obsidian-canvas)] text-[var(--color-cloud-white)] transition-all duration-200 group-hover:scale-105 group-hover:border-[var(--color-steel-border)] group-hover:text-[var(--color-signal-orange)]">
+                          <Icon size={18} />
+                        </div>
+                        <div className="relative min-w-0 flex-1">
+                          <p className="text-sm font-medium text-[var(--color-cloud-white)]">{label}</p>
+                          {desc && <p className="mt-0.5 truncate text-xs text-[var(--color-fog)]">{desc}</p>}
+                        </div>
+                        <ChevronRight
+                          size={16}
+                          className="relative mt-0.5 shrink-0 text-[var(--color-ash)] transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-[var(--color-signal-orange)]"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
