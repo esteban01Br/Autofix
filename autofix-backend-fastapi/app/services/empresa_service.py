@@ -18,7 +18,10 @@ from app.schemas.empresa import (
 )
 from app.security import create_access_token, hash_password
 from app.services import suscripcion_service
-from app.utils import generar_slug
+from app.utils import ahora_utc, generar_slug
+
+# Versión del texto de términos/política aceptado en el registro.
+VERSION_TERMINOS_ACTUAL = "2026-11-05"
 
 
 def to_response(empresa: Empresa, suscripcion=None) -> EmpresaResponse:
@@ -69,6 +72,15 @@ def obtener_publica(db, slug: str) -> EmpresaPublicaResponse:
 def registrar_empresa(db, payload: EmpresaRegistroRequest) -> EmpresaRegistroResponse:
     """Registro público: crea la empresa, su sucursal principal y el dueño
     como usuario ADMIN. Devuelve el token ya autenticado."""
+    if not payload.acepto_terminos:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Debes aceptar los términos y la política de tratamiento de "
+                "datos personales para registrar la empresa."
+            ),
+        )
+
     correo = payload.correo.strip().lower()
     if crud_usuario.exists_correo(db, correo):
         raise HTTPException(status_code=409, detail="Ya existe un usuario con ese correo.")
@@ -90,6 +102,9 @@ def registrar_empresa(db, payload: EmpresaRegistroRequest) -> EmpresaRegistroRes
         direccion=payload.direccion,
         telefono=payload.telefono_empresa,
         slug=_slug_unico(db, payload.nombre_empresa),
+        acepto_terminos=True,
+        fecha_aceptacion_terminos=ahora_utc(),
+        version_terminos=VERSION_TERMINOS_ACTUAL,
     )
     db.add(empresa)
     db.flush()  # Obtiene empresa.id antes del commit

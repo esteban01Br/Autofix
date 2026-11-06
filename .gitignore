@@ -23,5 +23,12 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Local Cloudflare Pages folder
+# Carpetas generadas por herramientas de despliegue
 .agents/
+.netlify/
+.wrangler/
+
+# Copias de seguridad de la base de datos (contienen datos de clientes)
+respaldos/
+*.dump
+.neon

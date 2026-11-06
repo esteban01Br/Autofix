@@ -5,6 +5,7 @@ import { listarClientes } from '../services/clienteService';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
+import BotonExportar from '../components/BotonExportar';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import EmptyState from '../components/EmptyState';
@@ -123,6 +124,7 @@ export default function Vehiculos() {
   return (
     <div className="space-y-6">
       <PageHeader titulo="Vehículos" subtitulo={`${vehiculos.length} vehículos registrados`}>
+        <BotonExportar entidad="vehiculos" />
         <button onClick={abrirCrear} className="btn btn-primary">
           <Plus size={16} /> Nuevo vehículo
         </button>

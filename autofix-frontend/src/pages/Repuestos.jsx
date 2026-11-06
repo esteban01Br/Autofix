@@ -5,6 +5,7 @@ import { listarProveedores } from '../services/proveedorService';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError, formatearMoneda } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
+import BotonExportar from '../components/BotonExportar';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import EmptyState from '../components/EmptyState';
@@ -197,6 +198,7 @@ export default function Repuestos() {
   return (
     <div className="space-y-6">
       <PageHeader titulo="Inventario de repuestos" subtitulo={`${repuestos.length} repuestos`}>
+        <BotonExportar entidad="repuestos" />
         <button onClick={() => abrirEscaner('buscar')} className="btn btn-ghost">
           <ScanBarcode size={16} /> Escanear
         </button>

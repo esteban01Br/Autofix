@@ -27,6 +27,12 @@ class EmpresaRegistroRequest(BaseModel):
     correo: EmailStr
     contrasena: str = Field(min_length=8, max_length=128)
 
+    # Debe marcarse al registrar la empresa (términos + datos personales).
+    acepto_terminos: bool = Field(
+        default=False,
+        description="El usuario acepta los términos y la política de datos.",
+    )
+
     @field_validator("correo")
     @classmethod
     def normalizar_correo(cls, valor: str) -> str:

@@ -23,7 +23,7 @@ export default function FormLogin({ slug }) {
     setCargando(true);
     try {
       const datos = await login(correo.trim(), contrasena, slug);
-      // La app recibe la sesión vía /?token= y aterriza en su panel.
+      // La app recibe la sesión vía /#token=… y aterriza en su panel.
       entrarALaApp(datos.token, datos.debeCambiarContrasena ? '/cambiar-contrasena' : '/dashboard');
     } catch (err) {
       setError(mensajeError(err, 'No se pudo iniciar sesión. Verifica tus datos.'));

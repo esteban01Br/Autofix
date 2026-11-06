@@ -53,10 +53,25 @@ class Settings:
         os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440")
     )
 
-    # Base de datos (SQLite en local, PostgreSQL en producción)
+    # Base de datos (SQLite en local, PostgreSQL en producción).
+    # En Neon: DATABASE_URL usa la cadena del POOLER; DATABASE_URL_DIRECTA
+    # (opcional) usa la cadena directa y la prefieren Alembic, pg_dump y
+    # pg_restore. Ninguna de las dos se escribe en el repositorio.
     DATABASE_URL: str = _normalizar_database_url(
         os.getenv("DATABASE_URL", "sqlite:///./autofix.db")
     )
+    _url_directa = (
+        os.getenv("DATABASE_URL_DIRECTA", "").strip()
+        or os.getenv("DATABASE_URL_UNPOOLED", "").strip()
+    )
+    DATABASE_URL_DIRECTA: str | None = (
+        _normalizar_database_url(_url_directa) if _url_directa else None
+    )
+
+    # Pool de SQLAlchemy (solo PostgreSQL; SQLite usa su configuración propia).
+    DB_POOL_SIZE: int = int(os.getenv("DB_POOL_SIZE", "5"))
+    DB_MAX_OVERFLOW: int = int(os.getenv("DB_MAX_OVERFLOW", "5"))
+    DB_CONNECT_TIMEOUT: int = int(os.getenv("DB_CONNECT_TIMEOUT", "15"))
 
     # CORS
     CORS_ORIGINS: list[str] = [

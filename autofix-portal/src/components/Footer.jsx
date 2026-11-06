@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Wrench } from 'lucide-react';
+import { Wrench, Mail, MapPin } from 'lucide-react';
+import { NEGOCIO } from '../config/negocio';
+
+const pendiente = '[PENDIENTE: completar en src/config/negocio.js]';
 
 export default function Footer() {
   return (
@@ -19,6 +22,32 @@ export default function Footer() {
               Gestión para talleres mecánicos. Cada empresa con su página de acceso privada,
               sus roles y sus datos aislados.
             </p>
+
+            <div className="mt-4 space-y-1.5 text-xs text-text-secondary">
+              <p className="flex items-start gap-1.5">
+                <span className="text-muted">Responsable:</span>{' '}
+                <span>{NEGOCIO.nombre || pendiente}</span>
+              </p>
+              <p className="flex items-start gap-1.5">
+                <Mail size={12} className="mt-0.5 shrink-0 text-muted" />
+                <span>
+                  {NEGOCIO.correoContacto ? (
+                    <a
+                      href={`mailto:${NEGOCIO.correoContacto}`}
+                      className="hover:text-text-primary"
+                    >
+                      {NEGOCIO.correoContacto}
+                    </a>
+                  ) : (
+                    pendiente
+                  )}
+                </span>
+              </p>
+              <p className="flex items-start gap-1.5">
+                <MapPin size={12} className="mt-0.5 shrink-0 text-muted" />
+                <span>{NEGOCIO.ciudad || pendiente}</span>
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-x-10 gap-y-4 text-xs">
@@ -39,6 +68,9 @@ export default function Footer() {
               <ul className="space-y-1.5 text-text-secondary">
                 <li><Link to="/login" className="transition-colors hover:text-text-primary">Iniciar sesión</Link></li>
                 <li><Link to="/comprar/basico" className="transition-colors hover:text-text-primary">Crear cuenta</Link></li>
+                <li><Link to="/terminos" className="transition-colors hover:text-text-primary">Términos y condiciones</Link></li>
+                <li><Link to="/privacidad" className="transition-colors hover:text-text-primary">Política de datos</Link></li>
+                <li><Link to="/contacto" className="transition-colors hover:text-text-primary">Contacto</Link></li>
               </ul>
             </div>
           </div>

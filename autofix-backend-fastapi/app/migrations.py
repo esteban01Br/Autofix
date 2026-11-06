@@ -441,6 +441,36 @@ def _migrar_bloqueo_usuarios(conn, insp) -> None:
         conn.execute(text("ALTER TABLE usuarios ADD COLUMN bloqueado_hasta TIMESTAMP"))
 
 
+def _migrar_aceptacion_terminos(conn, insp) -> None:
+    """Agrega la aceptación de términos/política de datos a empresas."""
+    if "empresas" not in insp.get_table_names():
+        return
+    cols = _columnas(insp, "empresas")
+    if "acepto_terminos" not in cols:
+        if _es_sqlite():
+            conn.execute(
+                text(
+                    "ALTER TABLE empresas ADD COLUMN acepto_terminos"
+                    " INTEGER NOT NULL DEFAULT 0"
+                )
+            )
+        else:
+            conn.execute(
+                text(
+                    "ALTER TABLE empresas ADD COLUMN acepto_terminos"
+                    " BOOLEAN NOT NULL DEFAULT FALSE"
+                )
+            )
+    if "fecha_aceptacion_terminos" not in cols:
+        conn.execute(
+            text("ALTER TABLE empresas ADD COLUMN fecha_aceptacion_terminos TIMESTAMP")
+        )
+    if "version_terminos" not in cols:
+        conn.execute(
+            text("ALTER TABLE empresas ADD COLUMN version_terminos VARCHAR(20)")
+        )
+
+
 def _migrar_a_multiempresa(conn, insp) -> None:
     if "empresas" not in insp.get_table_names():
         return  # create_all aún no la crea (no debería pasar).
@@ -493,6 +523,7 @@ def _migrar_a_multiempresa(conn, insp) -> None:
     _migrar_cotizaciones(conn, insp)
     _migrar_proveedores(conn, insp)
     _migrar_bloqueo_usuarios(conn, insp)
+    _migrar_aceptacion_terminos(conn, insp)
 
 
 # ------------------------------------------------------------------

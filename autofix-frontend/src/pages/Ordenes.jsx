@@ -8,6 +8,7 @@ import { listarRepuestos } from '../services/repuestoService';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError, formatearFechaHora, formatearMoneda } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
+import BotonExportar from '../components/BotonExportar';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import EmptyState from '../components/EmptyState';
@@ -214,6 +215,7 @@ export default function Ordenes() {
   return (
     <div className="space-y-6">
       <PageHeader titulo="Órdenes de trabajo" subtitulo={`${ordenes.length} órdenes`}>
+        <BotonExportar entidad="ordenes" />
         <button onClick={abrirCrear} className="btn btn-primary">
           <Plus size={16} /> Nueva orden
         </button>

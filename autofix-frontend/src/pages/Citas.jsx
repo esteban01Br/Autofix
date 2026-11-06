@@ -6,6 +6,7 @@ import Badge from '../components/Badge';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
+import BotonExportar from '../components/BotonExportar';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import EmptyState from '../components/EmptyState';
@@ -136,6 +137,7 @@ export default function Citas() {
   return (
     <div className="space-y-6">
       <PageHeader titulo="Citas" subtitulo={`${citas.length} citas`}>
+        <BotonExportar entidad="citas" />
         <button onClick={abrirCrear} className="btn btn-primary">
           <Plus size={16} /> Nueva cita
         </button>

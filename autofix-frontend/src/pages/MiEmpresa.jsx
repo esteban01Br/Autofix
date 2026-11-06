@@ -4,6 +4,7 @@ import { obtenerEmpresaActual, actualizarEmpresaActual } from '../services/empre
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
+import BotonExportar from '../components/BotonExportar';
 import Spinner from '../components/Spinner';
 
 const estadoInicial = {
@@ -92,7 +93,9 @@ export default function MiEmpresa() {
       <PageHeader
         titulo="Mi empresa"
         subtitulo={empresa ? `${empresa.nombre} · próxima factura FAC-${String(empresa.consecutivo_factura + 1).padStart(4, '0')}` : ''}
-      />
+      >
+        <BotonExportar todo etiqueta="Descargar todos mis datos" />
+      </PageHeader>
 
       <form onSubmit={guardar} className="space-y-6 max-w-3xl">
         {/* Vista previa de la marca */}

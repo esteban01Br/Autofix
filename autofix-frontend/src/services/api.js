@@ -1,8 +1,10 @@
 import axios from 'axios';
 
 // En desarrollo el proxy de Vite reenvía /api al backend local.
-// En producción usa la URL del backend en Render.
-const API_URL = 'https://autofix-api-tm6d.onrender.com';
+// En producción usa VITE_API_URL (con la URL de Render como respaldo).
+const API_URL = (
+  import.meta.env.VITE_API_URL?.trim() || 'https://autofix-api-tm6d.onrender.com'
+).replace(/\/+$/, '');
 
 const api = axios.create({
   baseURL: import.meta.env.DEV ? '/' : API_URL,

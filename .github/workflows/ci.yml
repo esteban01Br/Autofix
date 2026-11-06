@@ -19,6 +19,14 @@ jobs:
           cache: pip
           cache-dependency-path: autofix-backend-fastapi/requirements.txt
       - run: pip install -r requirements.txt
+      - name: Aplicar migraciones de Alembic sobre SQLite
+        env:
+          DATABASE_URL: sqlite:///./ci.db
+        run: alembic upgrade head
+      - name: Verificar que no falten migraciones
+        env:
+          DATABASE_URL: sqlite:///./ci.db
+        run: alembic check
       - run: python -m pytest -q
       - name: Auditar dependencias (informativo)
         continue-on-error: true

@@ -13,6 +13,7 @@ const estadoInicial = {
   apellido: '',
   correo: '',
   contrasena: '',
+  acepto_terminos: false,
 };
 
 const formatearCOP = (valor) =>
@@ -42,8 +43,10 @@ export default function Comprar() {
       .finally(() => setCargandoPlanes(false));
   }, []);
 
-  const cambiar = (e) =>
-    setFormulario((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const cambiar = (e) => {
+    const { name, type, checked, value } = e.target;
+    setFormulario((f) => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
+  };
 
   const enviar = async (e) => {
     e.preventDefault();
@@ -64,6 +67,10 @@ export default function Comprar() {
       setError('La contraseña debe contener al menos una mayúscula o un número.');
       return;
     }
+    if (!formulario.acepto_terminos) {
+      setError('Debes aceptar los términos y la política de tratamiento de datos.');
+      return;
+    }
 
     setEnviando(true);
     try {
@@ -75,6 +82,7 @@ export default function Comprar() {
         correo: formulario.correo.trim(),
         contrasena: formulario.contrasena,
         plan: plan.id, // BASICO | PRO | PREMIUM
+        acepto_terminos: formulario.acepto_terminos,
       });
       // La pantalla de éxito muestra su URL de acceso y lo deja entrar.
       navegar('/exito', { state: { ...datos, planNombre: plan.nombre } });
@@ -195,7 +203,12 @@ export default function Comprar() {
                 </h1>
                 <p className="text-sm text-text-secondary mt-1">
                   Estos datos crean tu empresa, tu página de acceso privada y tu
-                  usuario administrador.
+                  usuario administrador. AutoFix los usa únicamente para crear y
+                  administrar la cuenta de tu taller; consulta la{' '}
+                  <Link to="/privacidad" className="text-accent hover:underline">
+                    política de privacidad
+                  </Link>
+                  .
                 </p>
 
                 <form onSubmit={enviar} className="mt-6 space-y-4">
@@ -301,6 +314,32 @@ export default function Comprar() {
                       Debe incluir al menos una mayúscula o un número.
                     </p>
                   </div>
+
+                  <label className="flex items-start gap-2.5 text-xs text-text-secondary">
+                    <input
+                      type="checkbox"
+                      name="acepto_terminos"
+                      checked={formulario.acepto_terminos}
+                      onChange={cambiar}
+                      className="mt-0.5 h-4 w-4 accent-[var(--accent)]"
+                      required
+                    />
+                    <span>
+                      Acepto los{' '}
+                      <Link to="/terminos" target="_blank" className="text-accent hover:underline">
+                        términos y condiciones
+                      </Link>{' '}
+                      y la{' '}
+                      <Link to="/privacidad" target="_blank" className="text-accent hover:underline">
+                        política de tratamiento de datos personales
+                      </Link>
+                      {' · '}
+                      <Link to="/contacto" target="_blank" className="text-accent hover:underline">
+                        contacto
+                      </Link>
+                      .
+                    </span>
+                  </label>
 
                   {error && (
                     <div

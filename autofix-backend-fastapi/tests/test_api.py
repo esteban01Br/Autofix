@@ -834,6 +834,7 @@ def _registrar_empresa(client, nombre, correo_admin):
             "apellido": nombre,
             "correo": correo_admin,
             "contrasena": "Clave12345!",
+            "acepto_terminos": True,
         },
     )
     assert resp.status_code == 201, resp.text
@@ -942,6 +943,7 @@ def test_registro_con_plan_crea_slug_y_suscripcion(client):
             "apellido": "Prueba",
             "correo": correo,
             "contrasena": "Clave12345!",
+            "acepto_terminos": True,
         },
     )
     assert resp.status_code == 201, resp.text
@@ -998,6 +1000,7 @@ def test_suscripcion_vencida_bloquea_login_y_superadmin_la_gestiona(
             "apellido": "Prueba",
             "correo": correo,
             "contrasena": "Clave12345!",
+            "acepto_terminos": True,
         },
     )
     assert resp.status_code == 201, resp.text
@@ -1136,6 +1139,7 @@ def test_panel_superadmin_muestra_suscripcion(client, superadmin_token):
             "apellido": "Panel",
             "correo": correo,
             "contrasena": "Clave12345!",
+            "acepto_terminos": True,
         },
     )
     assert resp.status_code == 201, resp.text

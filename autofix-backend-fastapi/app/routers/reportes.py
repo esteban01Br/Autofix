@@ -1,5 +1,7 @@
 """Rutas de Reportes (productividad y resumen)."""
 
+from datetime import date, datetime, time
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 

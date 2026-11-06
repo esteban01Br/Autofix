@@ -51,6 +51,16 @@ class Empresa(Base):
     )
 
     activa: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+    # Aceptación de términos y política de tratamiento de datos (Ley 1581).
+    acepto_terminos: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
+    fecha_aceptacion_terminos: Mapped[datetime | None] = mapped_column(
+        DateTime, nullable=True
+    )
+    version_terminos: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
     fecha_creacion: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=ahora_utc
     )

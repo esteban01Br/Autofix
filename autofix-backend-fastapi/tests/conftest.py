@@ -3,6 +3,17 @@
 import os
 from pathlib import Path
 
+# Guarda de seguridad: la suite SIEMPRE debe correr sobre SQLite temporal.
+# Si alguien exportó DATABASE_URL apuntando a PostgreSQL (por ejemplo Neon o
+# Render), se aborta en vez de arriesgarse a tocar datos reales.
+_url_entorno = os.getenv("DATABASE_URL", "").strip()
+if _url_entorno and not _url_entorno.startswith("sqlite"):
+    raise RuntimeError(
+        "SEGURIDAD: DATABASE_URL apunta a una base que no es SQLite "
+        f"({_url_entorno.split('://', 1)[0]}://...). Los tests deben usar "
+        "SQLite temporal. Quita esa variable antes de correr pytest."
+    )
+
 # IMPORTANTE: se configura el entorno ANTES de importar la aplicación.
 TEST_DB = Path(__file__).parent / "test_autofix.db"
 if TEST_DB.exists():

@@ -1,0 +1,11 @@
+# AutoFix: portal público de ventas
+# Se permite indexar la landing y las páginas legales; las pantallas de
+# cuenta y el acceso privado de cada taller no aportan valor en buscadores.
+
+User-agent: *
+Allow: /
+
+Disallow: /login
+Disallow: /acceso/
+Disallow: /comprar/
+Disallow: /exito

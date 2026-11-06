@@ -6,6 +6,8 @@ const Login = lazy(() => import('./pages/Login'));
 const Acceso = lazy(() => import('./pages/Acceso'));
 const Comprar = lazy(() => import('./pages/Comprar'));
 const Exito = lazy(() => import('./pages/Exito'));
+const Legal = lazy(() => import('./pages/Legal'));
+const Contacto = lazy(() => import('./pages/Contacto'));
 
 export default function App() {
   return (
@@ -22,6 +24,9 @@ export default function App() {
         <Route path="/acceso/:slug" element={<Acceso />} />
         <Route path="/comprar/:planId" element={<Comprar />} />
         <Route path="/exito" element={<Exito />} />
+        <Route path="/terminos" element={<Legal />} />
+        <Route path="/privacidad" element={<Legal />} />
+        <Route path="/contacto" element={<Contacto />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

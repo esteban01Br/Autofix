@@ -6,6 +6,13 @@ import { useAuth } from '../context/AuthContext';
 import { extraerMensajeError } from '../lib/utils';
 import Spinner from '../components/Spinner';
 
+// El portal concentra las páginas legales públicas.
+// Configúralo con VITE_PORTAL_URL; los valores actuales quedan como respaldo.
+const PORTAL_URL = (
+  import.meta.env.VITE_PORTAL_URL?.trim() ||
+  (import.meta.env.DEV ? 'http://localhost:5174' : 'https://TU-PORTAL.netlify.app')
+).replace(/\/+$/, '');
+
 const estadoInicial = {
   nombre_empresa: '',
   nit: '',
@@ -15,6 +22,7 @@ const estadoInicial = {
   apellido: '',
   correo: '',
   contrasena: '',
+  acepto_terminos: false,
 };
 
 export default function RegistroEmpresa() {
@@ -28,8 +36,8 @@ export default function RegistroEmpresa() {
   }
 
   const manejarCambio = (e) => {
-    const { name, value } = e.target;
-    setFormulario((f) => ({ ...f, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormulario((f) => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleSubmit = async (e) => {
@@ -44,6 +52,10 @@ export default function RegistroEmpresa() {
       setError('La contraseña debe tener al menos 8 caracteres.');
       return;
     }
+    if (!formulario.acepto_terminos) {
+      setError('Debes aceptar los términos y la política de tratamiento de datos.');
+      return;
+    }
 
     setCargando(true);
     try {
@@ -56,6 +68,7 @@ export default function RegistroEmpresa() {
         apellido: formulario.apellido.trim(),
         correo: formulario.correo.trim(),
         contrasena: formulario.contrasena,
+        acepto_terminos: formulario.acepto_terminos,
       });
       // Entra directo: el registro devuelve el token del dueño (ADMIN).
       localStorage.setItem('autofix_token', datos.token);
@@ -146,6 +159,28 @@ export default function RegistroEmpresa() {
               </div>
             </div>
           </div>
+
+          <label className="flex items-start gap-2.5 text-xs text-text-secondary">
+            <input
+              type="checkbox"
+              name="acepto_terminos"
+              checked={formulario.acepto_terminos}
+              onChange={manejarCambio}
+              className="mt-0.5 h-4 w-4 accent-[var(--accent)]"
+              required
+            />
+            <span>
+              Acepto los{' '}
+              <a href={`${PORTAL_URL}/terminos`} target="_blank" rel="noreferrer" className="text-accent hover:underline">
+                términos y condiciones
+              </a>{' '}
+              y la{' '}
+              <a href={`${PORTAL_URL}/privacidad`} target="_blank" rel="noreferrer" className="text-accent hover:underline">
+                política de tratamiento de datos personales
+              </a>
+              .
+            </span>
+          </label>
 
           {error && (
             <div role="alert" className="flex items-start gap-2.5 p-3 rounded-lg bg-danger/10 border border-danger/30 text-sm text-danger animate-fade-in">

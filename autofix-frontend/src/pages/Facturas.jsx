@@ -5,6 +5,7 @@ import { listarOrdenes } from '../services/ordenService';
 import { useToast } from '../context/ToastContext';
 import { extraerMensajeError, formatearFechaHora, formatearMoneda } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
+import BotonExportar from '../components/BotonExportar';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
 import EmptyState from '../components/EmptyState';
@@ -165,6 +166,7 @@ export default function Facturas() {
         titulo="Facturas"
         subtitulo={`${facturas.length} facturas · ${formatearMoneda(totalCobrado)} cobrados de ${formatearMoneda(totalIngresos)}`}
       >
+        <BotonExportar entidad="facturas" />
         <button onClick={abrirModal} className="btn btn-primary">
           <Plus size={16} /> Generar factura
         </button>

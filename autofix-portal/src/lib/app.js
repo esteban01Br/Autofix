@@ -1,12 +1,14 @@
-/** URL de la app operativa (donde vive el panel del taller). */
-export const APP_URL = 'https://autofix-app.pages.dev';
+/** URL de la app operativa, obtenida de VITE_APP_URL. */
+const APP_URL = import.meta.env.VITE_APP_URL?.trim() || 'https://TU-PANEL.netlify.app';
 
 /**
  * Entrega la sesión a la app: la redirige con /#token=… y la app
  * guarda el token en su propio almacenamiento (handoff entre orígenes).
  *
  * El token viaja en el fragmento (#), que el navegador no envía al
- * servidor: no queda en los logs de Cloudflare Pages ni en el Referer.
+ * servidor: no queda en los logs y no se incluye en el Referer.
+ * Solo se llama después de una acción del usuario (login o botón de
+ * "Entrar a mi panel"), nunca al cargar una página.
  */
 export const entrarALaApp = (token, ruta) => {
   const destino = ruta || '/dashboard';

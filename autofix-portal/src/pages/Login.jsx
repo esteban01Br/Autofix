@@ -24,6 +24,14 @@ export default function Login() {
             <p className="mt-2 text-sm text-text-secondary">
               Ingresa con tu correo y contraseña para entrar a AutoFix.
             </p>
+            <p className="mt-1 text-xs text-muted">
+              Usamos estos datos solo para autenticarte y darte acceso a la cuenta de tu
+              taller. Consulta nuestra{' '}
+              <Link to="/privacidad" className="text-accent hover:underline">
+                política de privacidad
+              </Link>
+              .
+            </p>
           </div>
 
           <div className="bg-carbony-black p-6 sm:p-8" style={{ borderRadius: 0 }}>
@@ -54,6 +62,14 @@ export default function Login() {
             <Link to="/acceso" className="text-blueprint font-medium hover:text-frost">
               Acceso privado
             </Link>
+          </p>
+
+          <p className="mt-3 text-center text-xs text-muted">
+            <Link to="/terminos" className="hover:text-text-secondary">Términos</Link>
+            {' · '}
+            <Link to="/privacidad" className="hover:text-text-secondary">Privacidad</Link>
+            {' · '}
+            <Link to="/contacto" className="hover:text-text-secondary">Contacto</Link>
           </p>
         </div>
       </main>

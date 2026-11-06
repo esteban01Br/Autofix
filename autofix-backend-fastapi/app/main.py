@@ -16,6 +16,7 @@ from app.routers import (
     cotizaciones,
     detalles,
     empresas,
+    exportar,
     facturas,
     mecanicos,
     ordenes,
@@ -52,6 +53,7 @@ OPENAPI_TAGS = [
     {"name": "Facturas", "description": "Facturación automática por orden de trabajo."},
     {"name": "Cotizaciones", "description": "Cotizaciones y propuestas de precio."},
     {"name": "Proveedores", "description": "Catálogo de proveedores de repuestos."},
+    {"name": "Exportación", "description": "Descarga de los datos de la empresa en CSV."},
 ]
 
 
@@ -114,6 +116,7 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 # Rutas
 app.include_router(auth.router)
 app.include_router(empresas.router)
+app.include_router(exportar.router)
 app.include_router(auditoria.router)
 app.include_router(reportes.router)
 app.include_router(usuarios.router)

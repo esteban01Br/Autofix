@@ -18,10 +18,10 @@ Portal público del SaaS AutoFix: landing, planes, compra de suscripciones
 
 ## Variables de entorno
 
-| Variable        | Descripción                                   | Ejemplo                                    |
-| --------------- | --------------------------------------------- | ------------------------------------------ |
-| `VITE_API_URL`  | URL de la API (opcional en dev: usa proxy)    | `https://autofix-api-tm6d.onrender.com`    |
-| `VITE_APP_URL`  | URL de la app operativa (para entrar al panel) | `https://subtle-figolla-fb4cd0.cloudflare.app` |
+| Variable | Descripción | Ejemplo |
+| --- | --- | --- |
+| `VITE_API_URL` | URL de la API (opcional en dev: usa proxy) | `https://autofix-api-tm6d.onrender.com` |
+| `VITE_APP_URL` | URL de la app operativa (para entrar al panel) | `https://TU-PANEL.netlify.app` |
 
 En desarrollo no hace falta ninguna: el proxy de Vite reenvía `/api` al
 backend local (puertos 8081/8000) y la app se asume en `localhost:5173`.
@@ -35,15 +35,32 @@ npm run dev    # http://localhost:5174
 
 (El launcher `.\start-dev.ps1` de la raíz ya arranca backend, app y portal.)
 
-## Despliegue en Cloudflare Pages
+## Despliegue en Netlify
 
-1. Crear un **sitio nuevo** en Cloudflare conectado al mismo repositorio.
+1. Crear un **sitio nuevo** en Netlify conectado al mismo repositorio.
 2. Base directory: `autofix-portal`
 3. Build command: `npm run build`
 4. Publish directory: `dist`
 
 En **Site settings → Environment variables**:
 - `VITE_API_URL` = URL de la API en Render
-- `VITE_APP_URL` = URL del sitio Cloudflare Pages
+- `VITE_APP_URL` = URL del sitio Netlify
 
-La cámara requiere HTTPS (Cloudflare) o `localhost`; el navegador pedirá permiso la primera vez.
+La cámara requiere HTTPS (Netlify) o `localhost`; el navegador pedirá permiso la primera vez.
+
+## Módulos
+
+- **Landing** (con características y planes)
+- **Compra** (registro de empresa y plan elegido)
+- **Éxito** (URL privada de acceso)
+- **Acceso por empresa** (login vinculado al `slug` de la empresa)
+
+## Escáner de códigos de barras
+
+En el módulo de repuestos, el botón **Escanear** abre la cámara:
+
+- Código **nuevo** → abre el formulario de registro con el código ya diligenciado.
+- Código **existente** → abre el ajuste de stock de ese repuesto.
+
+La cámara requiere HTTPS (Netlify) o `localhost`; el navegador pedirá
+permiso la primera vez.

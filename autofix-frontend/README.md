@@ -43,7 +43,7 @@ npm run dev     # http://localhost:5173
 
 | Variable | Descripción | Ejemplo |
 | --- | --- | --- |
-| `VITE_API_URL` | URL del backend en producción (ej. `https://autofix-api.onrender.com`). En desarrollo no hace falta (usa el proxy). Se define en Cloudflare Pages y se incrusta al compilar. |
+| `VITE_API_URL` | URL del backend en producción (ej. `https://autofix-api-tm6d.onrender.com`). En desarrollo no hace falta (usa el proxy). Se define en Netlify y se incrusta al compilar. |
 
 ## Compilar para producción
 
@@ -52,7 +52,7 @@ npm run build   # genera dist/
 ```
 
 El archivo `public/_headers` y `public/_redirects` se copian a `dist/` y le
-indican a Cloudflare Pages que todas las rutas las maneja React Router (SPA).
+indican a Netlify que todas las rutas las maneja React Router (SPA).
 
 ## Módulos
 
@@ -73,5 +73,5 @@ En el módulo **Repuestos**, el botón **Escanear** abre la cámara:
 - Código **nuevo** → abre el formulario de registro con el código ya diligenciado.
 - Código **existente** → abre el ajuste de stock de ese repuesto.
 
-La cámara requiere HTTPS (Cloudflare) o `localhost`; el navegador pedirá
+La cámara requiere HTTPS (Netlify) o `localhost`; el navegador pedirá
 permiso la primera vez. Soporta EAN-13, EAN-8, CODE-128, CODE-39 y QR.
